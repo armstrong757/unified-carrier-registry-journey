@@ -92,7 +92,7 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
         {/* Order Details Column */}
         <Card>
           <CardContent className="pt-6">
-            <h3 className="text-lg font-semibold text-primary mb-4">Order Details</h3>
+            <h3 className="text-sm font-semibold text-primary mb-4">Order Details</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 text-sm">Registration Fee:</span>
