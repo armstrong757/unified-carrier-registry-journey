@@ -3,6 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface StepOneProps {
   formData: any;
@@ -19,13 +26,20 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           <Label htmlFor="registrationYear">
             Registration Year <span className="text-red-500">*</span>
           </Label>
-          <Input
-            id="registrationYear"
+          <Select
             value={formData.registrationYear}
-            onChange={(e) =>
-              setFormData({ ...formData, registrationYear: e.target.value })
+            onValueChange={(value) =>
+              setFormData({ ...formData, registrationYear: value })
             }
-          />
+          >
+            <SelectTrigger id="registrationYear">
+              <SelectValue placeholder="Select year" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="2024">2024</SelectItem>
+              <SelectItem value="2025">2025</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
