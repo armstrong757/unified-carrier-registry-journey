@@ -44,7 +44,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="representative">
-            Representative <span className="text-red-500">*</span>
+            Full Name <span className="text-red-500">*</span>
           </Label>
           <Input
             id="representative"
