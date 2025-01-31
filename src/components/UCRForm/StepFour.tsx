@@ -2,6 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 interface StepFourProps {
   formData: any;
@@ -13,78 +14,99 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
     <div className="space-y-6 animate-fadeIn">
       <h2 className="text-2xl font-bold text-primary">Billing Information</h2>
 
-      <Card>
-        <CardContent className="space-y-4 pt-6">
-          <div className="space-y-2">
-            <Label htmlFor="cardNumber">
-              Card Number <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="cardNumber"
-              placeholder="1234 5678 9012 3456"
-              value={formData.cardNumber}
-              onChange={(e) =>
-                setFormData({ ...formData, cardNumber: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Billing Information Column */}
+        <Card>
+          <CardContent className="space-y-4 pt-6">
             <div className="space-y-2">
-              <Label htmlFor="expiryDate">
-                Expiry Date <span className="text-red-500">*</span>
+              <Label htmlFor="cardNumber">
+                Card Number <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="expiryDate"
-                placeholder="MM/YY"
-                value={formData.expiryDate}
+                id="cardNumber"
+                placeholder="1234 5678 9012 3456"
+                value={formData.cardNumber}
                 onChange={(e) =>
-                  setFormData({ ...formData, expiryDate: e.target.value })
+                  setFormData({ ...formData, cardNumber: e.target.value })
                 }
               />
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="expiryDate">
+                  Expiry Date <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="expiryDate"
+                  placeholder="MM/YY"
+                  value={formData.expiryDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, expiryDate: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cvv">
+                  CVV <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="cvv"
+                  placeholder="123"
+                  value={formData.cvv}
+                  onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label htmlFor="cvv">
-                CVV <span className="text-red-500">*</span>
+              <Label htmlFor="cardName">
+                Name on Card <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="cvv"
-                placeholder="123"
-                value={formData.cvv}
-                onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
+                id="cardName"
+                placeholder="John Doe"
+                value={formData.cardName}
+                onChange={(e) =>
+                  setFormData({ ...formData, cardName: e.target.value })
+                }
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="cardName">
-              Name on Card <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="cardName"
-              placeholder="John Doe"
-              value={formData.cardName}
-              onChange={(e) =>
-                setFormData({ ...formData, cardName: e.target.value })
-              }
-            />
-          </div>
+            <div className="flex items-start space-x-2 pt-4">
+              <Checkbox
+                id="terms"
+                checked={formData.termsAccepted}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, termsAccepted: checked })
+                }
+              />
+              <Label htmlFor="terms" className="leading-normal">
+                I agree to the terms, privacy policy, and refund policy{" "}
+                <span className="text-red-500">*</span>
+              </Label>
+            </div>
+          </CardContent>
+        </Card>
 
-          <div className="flex items-start space-x-2 pt-4">
-            <Checkbox
-              id="terms"
-              checked={formData.termsAccepted}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, termsAccepted: checked })
-              }
-            />
-            <Label htmlFor="terms" className="leading-normal">
-              I agree to the terms, privacy policy, and refund policy{" "}
-              <span className="text-red-500">*</span>
-            </Label>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Order Details Column */}
+        <Card>
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-semibold text-primary mb-4">Order Details</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Registration Fee:</span>
+                <span className="font-medium">1 Vehicle</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Total Cost:</span>
+                <span className="font-bold text-lg text-primary">$149</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
