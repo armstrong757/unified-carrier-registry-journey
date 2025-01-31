@@ -16,7 +16,9 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="registrationYear">Registration Year</Label>
+          <Label htmlFor="registrationYear">
+            Registration Year <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="registrationYear"
             value={formData.registrationYear}
@@ -27,7 +29,9 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="representative">Representative</Label>
+          <Label htmlFor="representative">
+            Representative <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="representative"
             value={formData.representative}
@@ -38,7 +42,9 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">
+            Email <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="email"
             type="email"
@@ -50,7 +56,9 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone</Label>
+          <Label htmlFor="phone">
+            Phone <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="phone"
             value={formData.phone}
