@@ -73,15 +73,16 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
               />
             </div>
 
-            <div className="flex items-center space-x-2 pt-4">
+            <div className="flex items-start space-x-2 pt-4">
               <Checkbox
                 id="terms"
                 checked={formData.termsAccepted}
                 onCheckedChange={(checked) =>
                   setFormData({ ...formData, termsAccepted: checked })
                 }
+                className="mt-1"
               />
-              <Label htmlFor="terms" className="text-sm leading-none">
+              <Label htmlFor="terms" className="text-sm leading-normal">
                 I agree to the terms, privacy policy, and refund policy{" "}
                 <span className="text-red-500">*</span>
               </Label>
