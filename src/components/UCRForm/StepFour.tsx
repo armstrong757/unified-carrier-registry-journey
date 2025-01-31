@@ -73,7 +73,7 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
               />
             </div>
 
-            <div className="flex items-start space-x-2 pt-4">
+            <div className="flex items-center space-x-2 pt-4">
               <Checkbox
                 id="terms"
                 checked={formData.termsAccepted}
@@ -81,7 +81,7 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
                   setFormData({ ...formData, termsAccepted: checked })
                 }
               />
-              <Label htmlFor="terms" className="leading-normal">
+              <Label htmlFor="terms" className="text-sm leading-none">
                 I agree to the terms, privacy policy, and refund policy{" "}
                 <span className="text-red-500">*</span>
               </Label>
@@ -101,7 +101,7 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 text-sm">Total Cost:</span>
-                <span className="text-sm text-primary">$149</span>
+                <span className="text-sm">$149</span>
               </div>
             </div>
           </CardContent>

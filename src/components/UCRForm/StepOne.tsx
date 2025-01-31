@@ -89,7 +89,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           />
         </div>
 
-        <div className="flex items-start space-x-2">
+        <div className="flex items-center space-x-2">
           <Checkbox
             id="authorization"
             checked={formData.authorization}
@@ -97,7 +97,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
               setFormData({ ...formData, authorization: checked })
             }
           />
-          <Label htmlFor="authorization" className="leading-normal">
+          <Label htmlFor="authorization" className="text-sm leading-none">
             I certify that I am authorized to submit this registration{" "}
             <span className="text-red-500">*</span>
           </Label>
