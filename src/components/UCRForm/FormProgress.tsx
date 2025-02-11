@@ -1,4 +1,5 @@
-import { cn } from "@/lib/utils";
+
+import { Progress } from "@/components/ui/progress";
 
 interface FormProgressProps {
   currentStep: number;
@@ -6,30 +7,13 @@ interface FormProgressProps {
 }
 
 const FormProgress = ({ currentStep, totalSteps }: FormProgressProps) => {
+  const progressPercentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
+
   return (
-    <div className="w-full mb-8">
-      <div className="flex justify-between mb-2">
-        {Array.from({ length: totalSteps }, (_, i) => (
-          <div
-            key={i}
-            className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
-              i + 1 <= currentStep
-                ? "bg-primary text-white"
-                : "bg-gray-200 text-gray-500"
-            )}
-          >
-            {i + 1}
-          </div>
-        ))}
-      </div>
-      <div className="w-full bg-gray-200 h-2 rounded-full">
-        <div
-          className="bg-primary h-2 rounded-full transition-all duration-300"
-          style={{
-            width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%`,
-          }}
-        />
+    <div className="w-full mb-8 space-y-2">
+      <Progress value={progressPercentage} className="h-2" />
+      <div className="text-sm text-center text-muted-foreground">
+        Step {currentStep} of {totalSteps}
       </div>
     </div>
   );
