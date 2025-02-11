@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -83,7 +84,33 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
                 className="mt-1"
               />
               <Label htmlFor="terms" className="text-sm leading-normal">
-                I agree to the terms, privacy policy, and refund policy{" "}
+                I agree to the{" "}
+                <a 
+                  href="/terms" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  terms
+                </a>
+                ,{" "}
+                <a 
+                  href="/privacy" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  privacy policy
+                </a>
+                , and{" "}
+                <a 
+                  href="/refund" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  refund policy
+                </a>{" "}
                 <span className="text-red-500">*</span>
               </Label>
             </div>
