@@ -135,7 +135,7 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
                 <span className="text-gray-600 text-sm">Total Cost:*</span>
                 <span className="text-sm">$15</span>
               </div>
-              <p className="text-gray-500 text-[13px] italic">
+              <p className="text-gray-500 text-[12px] italic">
                 *Includes any required government fees and our charge for providing this service.
               </p>
             </div>
