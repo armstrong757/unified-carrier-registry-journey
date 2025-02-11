@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -125,13 +126,36 @@ const MCS150 = () => {
     },
   });
 
+  const shouldSkipStep3 = () => {
+    return (
+      formData.hasChanges !== "yes" || !formData.changesToMake.companyInfo
+    );
+  };
+
+  const shouldSkipStep4 = () => {
+    return (
+      formData.hasChanges !== "yes" || !formData.changesToMake.operatingInfo
+    );
+  };
+
+  const getNextStep = (currentStep: number) => {
+    if (currentStep === 1 && formData.reasonForFiling.outOfBusiness) {
+      return 5;
+    }
+    if (currentStep === 2) {
+      if (shouldSkipStep3() && shouldSkipStep4()) return 5;
+      if (shouldSkipStep3()) return 4;
+      return 3;
+    }
+    if (currentStep === 3 && shouldSkipStep4()) {
+      return 5;
+    }
+    return currentStep + 1;
+  };
+
   const handleNext = () => {
     if (currentStep < totalSteps) {
-      if (currentStep === 1 && formData.reasonForFiling.outOfBusiness) {
-        setCurrentStep(5);
-      } else {
-        setCurrentStep(currentStep + 1);
-      }
+      setCurrentStep(getNextStep(currentStep));
     } else {
       toast({
         title: "Form Submitted",
@@ -145,6 +169,12 @@ const MCS150 = () => {
     if (currentStep > 1) {
       if (formData.reasonForFiling.outOfBusiness && currentStep === 5) {
         setCurrentStep(1);
+      } else if (currentStep === 5) {
+        if (!shouldSkipStep4()) setCurrentStep(4);
+        else if (!shouldSkipStep3()) setCurrentStep(3);
+        else setCurrentStep(2);
+      } else if (currentStep === 4 && shouldSkipStep3()) {
+        setCurrentStep(2);
       } else {
         setCurrentStep(currentStep - 1);
       }
