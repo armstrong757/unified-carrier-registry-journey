@@ -125,15 +125,9 @@ const MCS150 = () => {
     },
   });
 
-  useEffect(() => {
-    if (formData.reasonForFiling.outOfBusiness) {
-      setCurrentStep(5);
-    }
-  }, [formData.reasonForFiling.outOfBusiness]);
-
   const handleNext = () => {
     if (currentStep < totalSteps) {
-      if (formData.reasonForFiling.outOfBusiness && currentStep === 1) {
+      if (currentStep === 1 && formData.reasonForFiling.outOfBusiness) {
         setCurrentStep(5);
       } else {
         setCurrentStep(currentStep + 1);
