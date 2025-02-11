@@ -132,7 +132,7 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
                 <span className="text-sm">$149</span>
               </div>
               <p className="text-gray-500 text-[12px] italic">
-                *Includes any required government fees and our charge for providing you this service.
+                *Includes any required government fees and our charge for providing this service.
               </p>
             </div>
           </CardContent>
