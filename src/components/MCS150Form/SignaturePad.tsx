@@ -21,8 +21,14 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
       backgroundColor: 'white',
     });
 
-    canvas.freeDrawingBrush.width = 2;
-    canvas.freeDrawingBrush.color = "#000000";
+    // Initialize canvas first
+    canvas.renderAll();
+
+    // Then set the brush properties
+    if (canvas.freeDrawingBrush) {
+      canvas.freeDrawingBrush.width = 2;
+      canvas.freeDrawingBrush.color = "#000000";
+    }
 
     fabricRef.current = canvas;
 
