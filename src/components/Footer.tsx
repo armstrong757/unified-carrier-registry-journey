@@ -25,7 +25,7 @@ const Footer = () => {
           </nav>
         </div>
       </div>
-      <div className="bg-gray-50 py-8">
+      <div className="bg-gray-50 py-4">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <p className="text-[#8E9196] text-xs">
             The information and images on this website are the property of DOT Hub LLC and may not be reproduced, reused, or appropriated without the express written consent of the owner. DOT Hub, operated by DOT Hub LLC, is a private third-party provider offering services for a fee. This website serves as a commercial solicitation and advertisement. We are not affiliated with any government authority such as USDOT or FMCSA.
