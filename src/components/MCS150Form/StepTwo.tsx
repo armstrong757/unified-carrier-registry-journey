@@ -56,7 +56,7 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
             onValueChange={(value) =>
               setFormData({ ...formData, hasChanges: value })
             }
-            className="space-y-4"
+            className="space-y-2"
           >
             <div className="flex items-start space-x-2">
               <RadioGroupItem value="no" id="no-changes" className="mt-1" />
@@ -89,7 +89,7 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
               </div>
 
               {formData.changesToMake.companyInfo && (
-                <div className="space-y-4 pl-6">
+                <div className="space-y-2 pl-6">
                   <Label>
                     Select all information you wish to change or update{" "}
                     <span className="text-red-500">*</span>
@@ -132,7 +132,7 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
               </div>
 
               {formData.changesToMake.operatingInfo && (
-                <div className="space-y-4 pl-6">
+                <div className="space-y-2 pl-6">
                   <Label>
                     Select all information you wish to change or update{" "}
                     <span className="text-red-500">*</span>

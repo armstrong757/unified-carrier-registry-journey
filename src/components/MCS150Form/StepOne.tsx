@@ -33,7 +33,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
         <RadioGroup
           value={Object.entries(formData.reasonForFiling).find(([_, value]) => value)?.[0] || ""}
           onValueChange={updateReasonForFiling}
-          className="space-y-4"
+          className="space-y-2"
         >
           <div className="flex items-start space-x-2">
             <RadioGroupItem value="biennialUpdate" id="biennialUpdate" className="mt-1" />
