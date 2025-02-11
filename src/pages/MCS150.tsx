@@ -156,6 +156,7 @@ const MCS150 = () => {
   const handleNext = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(getNextStep(currentStep));
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       toast({
         title: "Form Submitted",
@@ -178,6 +179,7 @@ const MCS150 = () => {
       } else {
         setCurrentStep(currentStep - 1);
       }
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 

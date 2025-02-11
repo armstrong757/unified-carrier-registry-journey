@@ -42,6 +42,7 @@ const UCR = () => {
   const handleNext = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       // Handle form submission
       toast({
@@ -55,6 +56,7 @@ const UCR = () => {
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
