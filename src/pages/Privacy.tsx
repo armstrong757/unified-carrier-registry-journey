@@ -1,4 +1,3 @@
-
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -335,3 +334,19 @@ const Privacy = () => {
             <h3 className="text-md font-semibold mt-4 mb-2">a. Request for Information or Deletion</h3>
             <p className="mb-4">
               California consumers have the right to
+            </p>
+
+            <h2 className="text-lg font-semibold mt-6 mb-3">14. Contact Us</h2>
+            <p className="mb-4">
+              If you have any questions about this Privacy Policy, please contact us as follows:
+              <br />
+              Email Address: hello@DOTHUB.com
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Privacy;
