@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import FormProgress from "@/components/UCRForm/FormProgress";
 import StepOne from "@/components/MCS150Form/StepOne";
 import StepTwo from "@/components/MCS150Form/StepTwo";
+import StepThree from "@/components/MCS150Form/StepThree";
 
 const MCS150 = () => {
   const { toast } = useToast();
@@ -145,7 +147,8 @@ const MCS150 = () => {
         return <StepOne formData={formData} setFormData={setFormData} />;
       case 2:
         return <StepTwo formData={formData} setFormData={setFormData} />;
-      // We'll implement the other steps next
+      case 3:
+        return <StepThree formData={formData} setFormData={setFormData} />;
       default:
         return null;
     }
