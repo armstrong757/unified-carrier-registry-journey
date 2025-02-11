@@ -8,6 +8,18 @@ interface StepThreeProps {
 }
 
 const StepThree = ({ formData, setFormData }: StepThreeProps) => {
+  // If user selected "No changes" or didn't select company info changes, skip this step
+  if (formData.hasChanges !== "yes" || !formData.changesToMake.companyInfo) {
+    return (
+      <div className="space-y-6 animate-fadeIn">
+        <h2 className="text-2xl font-bold text-primary">Company Information</h2>
+        <p className="text-gray-600">
+          No company information changes were selected. Click Next to continue.
+        </p>
+      </div>
+    );
+  }
+
   const updatePrincipalAddress = (field: string, value: string) => {
     setFormData({
       ...formData,
@@ -33,87 +45,97 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
       <h2 className="text-2xl font-bold text-primary">Company Information</h2>
 
       <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="ownerName">
-            Owner's Name <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id="ownerName"
-            value={formData.ownerName}
-            onChange={(e) =>
-              setFormData({ ...formData, ownerName: e.target.value })
-            }
-            placeholder="Full Name"
-          />
-        </div>
-
-        <div className="space-y-4">
-          <Label>
-            Principal Place of Business <span className="text-red-500">*</span>
-          </Label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {formData.companyInfoChanges.ownerName && (
+          <div className="space-y-2">
+            <Label htmlFor="ownerName">
+              Owner's Name <span className="text-red-500">*</span>
+            </Label>
             <Input
-              placeholder="Address"
-              value={formData.principalAddress.address}
-              onChange={(e) => updatePrincipalAddress("address", e.target.value)}
-            />
-            <Input
-              placeholder="City"
-              value={formData.principalAddress.city}
-              onChange={(e) => updatePrincipalAddress("city", e.target.value)}
-            />
-            <Input
-              placeholder="State"
-              value={formData.principalAddress.state}
-              onChange={(e) => updatePrincipalAddress("state", e.target.value)}
-            />
-            <Input
-              placeholder="ZIP Code"
-              value={formData.principalAddress.zip}
-              onChange={(e) => updatePrincipalAddress("zip", e.target.value)}
-            />
-            <Input
-              placeholder="Country"
-              value={formData.principalAddress.country}
-              onChange={(e) => updatePrincipalAddress("country", e.target.value)}
+              id="ownerName"
+              value={formData.ownerName}
+              onChange={(e) =>
+                setFormData({ ...formData, ownerName: e.target.value })
+              }
+              placeholder="Full Name"
             />
           </div>
-        </div>
+        )}
 
-        <div className="space-y-4">
-          <Label>
-            Company Mailing Address <span className="text-red-500">*</span>
-          </Label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              placeholder="Address"
-              value={formData.mailingAddress.address}
-              onChange={(e) => updateMailingAddress("address", e.target.value)}
-            />
-            <Input
-              placeholder="City"
-              value={formData.mailingAddress.city}
-              onChange={(e) => updateMailingAddress("city", e.target.value)}
-            />
-            <Input
-              placeholder="State"
-              value={formData.mailingAddress.state}
-              onChange={(e) => updateMailingAddress("state", e.target.value)}
-            />
-            <Input
-              placeholder="ZIP Code"
-              value={formData.mailingAddress.zip}
-              onChange={(e) => updateMailingAddress("zip", e.target.value)}
-            />
-            <Input
-              placeholder="Country"
-              value={formData.mailingAddress.country}
-              onChange={(e) => updateMailingAddress("country", e.target.value)}
-            />
-          </div>
-        </div>
+        {formData.companyInfoChanges.address && (
+          <>
+            <div className="space-y-4">
+              <Label>
+                Principal Place of Business <span className="text-red-500">*</span>
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  placeholder="Address"
+                  value={formData.principalAddress.address}
+                  onChange={(e) =>
+                    updatePrincipalAddress("address", e.target.value)
+                  }
+                />
+                <Input
+                  placeholder="City"
+                  value={formData.principalAddress.city}
+                  onChange={(e) => updatePrincipalAddress("city", e.target.value)}
+                />
+                <Input
+                  placeholder="State"
+                  value={formData.principalAddress.state}
+                  onChange={(e) => updatePrincipalAddress("state", e.target.value)}
+                />
+                <Input
+                  placeholder="ZIP Code"
+                  value={formData.principalAddress.zip}
+                  onChange={(e) => updatePrincipalAddress("zip", e.target.value)}
+                />
+                <Input
+                  placeholder="Country"
+                  value={formData.principalAddress.country}
+                  onChange={(e) =>
+                    updatePrincipalAddress("country", e.target.value)
+                  }
+                />
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <Label>
+                Company Mailing Address <span className="text-red-500">*</span>
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  placeholder="Address"
+                  value={formData.mailingAddress.address}
+                  onChange={(e) => updateMailingAddress("address", e.target.value)}
+                />
+                <Input
+                  placeholder="City"
+                  value={formData.mailingAddress.city}
+                  onChange={(e) => updateMailingAddress("city", e.target.value)}
+                />
+                <Input
+                  placeholder="State"
+                  value={formData.mailingAddress.state}
+                  onChange={(e) => updateMailingAddress("state", e.target.value)}
+                />
+                <Input
+                  placeholder="ZIP Code"
+                  value={formData.mailingAddress.zip}
+                  onChange={(e) => updateMailingAddress("zip", e.target.value)}
+                />
+                <Input
+                  placeholder="Country"
+                  value={formData.mailingAddress.country}
+                  onChange={(e) => updateMailingAddress("country", e.target.value)}
+                />
+              </div>
+            </div>
+          </>
+        )}
+
+        {formData.companyInfoChanges.phone && (
           <div className="space-y-2">
             <Label htmlFor="businessPhone">
               Business Phone Number <span className="text-red-500">*</span>
@@ -127,7 +149,9 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               placeholder="Phone Number"
             />
           </div>
+        )}
 
+        {formData.companyInfoChanges.email && (
           <div className="space-y-2">
             <Label htmlFor="businessEmail">
               Business Email Address <span className="text-red-500">*</span>
@@ -142,9 +166,9 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               placeholder="Email Address"
             />
           </div>
-        </div>
+        )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {formData.companyInfoChanges.companyName && (
           <div className="space-y-2">
             <Label htmlFor="companyName">
               Company Name <span className="text-red-500">*</span>
@@ -158,7 +182,9 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               placeholder="Company Name"
             />
           </div>
+        )}
 
+        {formData.companyInfoChanges.einSsn && (
           <div className="space-y-2">
             <Label htmlFor="einSsn">
               EIN or SSN Number <span className="text-red-500">*</span>
@@ -172,7 +198,7 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               placeholder="EIN/SSN"
             />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
