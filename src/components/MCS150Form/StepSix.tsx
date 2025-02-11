@@ -132,9 +132,12 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
               </div>
               <Separator />
               <div className="flex justify-between items-center font-medium">
-                <span className="text-gray-600 text-sm">Total Cost:</span>
+                <span className="text-gray-600 text-sm">Total Cost:*</span>
                 <span className="text-sm">$15</span>
               </div>
+              <p className="text-gray-500 text-[13px] italic">
+                *Total cost includes any required government fees, as well as our charge for providing you this service.
+              </p>
             </div>
           </CardContent>
         </Card>
