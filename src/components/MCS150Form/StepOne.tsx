@@ -35,27 +35,27 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           onValueChange={updateReasonForFiling}
           className="space-y-1.5"
         >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="biennialUpdate" id="biennialUpdate" />
-            <Label htmlFor="biennialUpdate">
+          <div className="flex items-start space-x-2">
+            <RadioGroupItem value="biennialUpdate" id="biennialUpdate" className="mt-0.5" />
+            <Label htmlFor="biennialUpdate" className="text-sm">
               Biennial Update or Changes
             </Label>
           </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="reactivate" id="reactivate" />
-            <Label htmlFor="reactivate">
+          <div className="flex items-start space-x-2">
+            <RadioGroupItem value="reactivate" id="reactivate" className="mt-0.5" />
+            <Label htmlFor="reactivate" className="text-sm">
               Reactivate
             </Label>
           </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="reapplication" id="reapplication" />
-            <Label htmlFor="reapplication">
+          <div className="flex items-start space-x-2">
+            <RadioGroupItem value="reapplication" id="reapplication" className="mt-0.5" />
+            <Label htmlFor="reapplication" className="text-sm">
               Reapplication (after revocation of new entrant)
             </Label>
           </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="outOfBusiness" id="outOfBusiness" />
-            <Label htmlFor="outOfBusiness">
+          <div className="flex items-start space-x-2">
+            <RadioGroupItem value="outOfBusiness" id="outOfBusiness" className="mt-0.5" />
+            <Label htmlFor="outOfBusiness" className="text-sm">
               Out of Business Notification
             </Label>
           </div>
