@@ -19,9 +19,14 @@ const Footer = () => {
               Refund Policy
             </Link>
             <span className="text-[#C8C8C9] hidden md:inline">·</span>
-            <Link to="/contact" className="text-[#C8C8C9] hover:text-gray-300">
+            <a 
+              href="/contact" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#C8C8C9] hover:text-gray-300"
+            >
               Contact Us
-            </Link>
+            </a>
           </nav>
         </div>
       </div>
