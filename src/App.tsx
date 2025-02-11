@@ -19,7 +19,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/ucr" element={<UCR />} />
-          <Route path="/mcs150" element={<MCS150} />
+          <Route path="/mcs150" element={<MCS150 />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
