@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from "react";
-import { fabric } from "fabric";
+import * as fabric from "fabric"; // Changed import syntax
 import { Button } from "@/components/ui/button";
 
 interface SignaturePadProps {
@@ -14,7 +14,7 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    const canvas = new fabric.Canvas(canvasRef.current, {
+    const canvas = new fabric.fabric.Canvas(canvasRef.current, { // Updated constructor call
       isDrawingMode: true,
       width: 400,
       height: 150,
