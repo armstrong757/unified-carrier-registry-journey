@@ -1,3 +1,4 @@
+
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -333,7 +334,42 @@ const Privacy = () => {
 
             <h3 className="text-md font-semibold mt-4 mb-2">a. Request for Information or Deletion</h3>
             <p className="mb-4">
-              California consumers have the right to
+              California consumers have the right to request, under certain circumstances, that a business that collects personal information about the consumer disclose to the consumer the information listed below for the preceding 12 months:
+            </p>
+            <ul className="list-disc pl-6 mb-4">
+              <li className="mb-2">The categories of personal information collected about you;</li>
+              <li className="mb-2">The categories of sources from which we collected your personal information;</li>
+              <li className="mb-2">The categories of personal information that we have sold or disclosed about you for a business purpose;</li>
+              <li className="mb-2">The categories of third parties to whom your personal information was disclosed for a business purpose;</li>
+              <li className="mb-2">Our business or commercial purpose for collecting or selling your personal information; and</li>
+              <li className="mb-2">The specific pieces of personal information we have collected about you.</li>
+            </ul>
+
+            <p className="mb-4">
+              Please note that if we collected information about you for a single one-time transaction and do not keep that information in the ordinary course of business, that information will not be retained for purposes of a request under this section. In addition, if we have de-identified or anonymized data about you, we are not required to re-identify or otherwise link your identity to that data if it is not otherwise maintained that way in our records.
+            </p>
+
+            <p className="mb-4">
+              You can also request that we delete your personal information. There may be certain exceptions to our obligation to delete your information such as if you have an existing account or transaction with us or if we have a legitimate business reason to keep your information.
+            </p>
+
+            <h3 className="text-md font-semibold mt-4 mb-2">b. How to Submit a Request</h3>
+            <p className="mb-4">
+              To submit a request for access to or deletion of your personal information, please contact us at hello@DOTHUB.com. We will respond to your request within 45 days of receipt and verify your identity before processing your request.
+            </p>
+
+            <h3 className="text-md font-semibold mt-4 mb-2">c. Verification Process</h3>
+            <p className="mb-4">
+              To protect your privacy, we will take steps to verify your identity before fulfilling your request. These steps may include asking you to provide sufficient information that allows us to reasonably verify you are the person about whom we collected personal information or an authorized representative.
+            </p>
+
+            <h2 className="text-lg font-semibold mt-6 mb-3">13. Changes to This Privacy Policy</h2>
+            <p className="mb-4">
+              We may update this Privacy Policy from time to time. When we do, we will revise the "Updated" date at the top of this Privacy Policy. For material changes to this Privacy Policy, we will notify you either by placing a prominent notice on our website or by sending you a notification directly. We encourage you to review this Privacy Policy periodically to stay informed about our information practices and your privacy rights and choices.
+            </p>
+
+            <p className="mb-4">
+              Your continued use of our Services after we make changes to this Privacy Policy means you accept those changes. If you do not agree to any changes made to this Privacy Policy, you must stop using the Services.
             </p>
 
             <h2 className="text-lg font-semibold mt-6 mb-3">14. Contact Us</h2>
