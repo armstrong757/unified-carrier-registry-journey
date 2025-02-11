@@ -9,23 +9,23 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center px-4 py-12 sm:py-16">
       <div className="w-full max-w-7xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-bold text-center text-[#1EAEDB] mb-16">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center text-[#1A1F2C] mb-16">
           We Keep Your Business On The Road
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[720px] mx-auto">
           {/* UCR Card */}
           <div className="bg-white rounded-lg shadow-md p-6 border border-gray-100 flex flex-col items-center text-center w-full md:max-w-[350px]">
-            <div className="w-16 h-16 bg-[#33C3F0] rounded-lg flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-[#1A1F2C] rounded-lg flex items-center justify-center mb-4">
               <Globe className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-xl font-semibold text-[#1EAEDB] mb-2">UCR</h2>
+            <h2 className="text-xl font-semibold text-[#1A1F2C] mb-2">UCR</h2>
             <p className="text-gray-600 mb-6">
               Verify your current status with Unified Carrier Registration.
             </p>
             <Button 
               onClick={() => navigate("/ucr")}
-              className="bg-[#0FA0CE] hover:bg-[#1EAEDB] text-white"
+              className="bg-white border-2 border-[#1A1F2C] text-[#1A1F2C] hover:bg-[#1A1F2C] hover:text-white transition-colors"
             >
               View Details
             </Button>
@@ -33,10 +33,10 @@ const Index = () => {
 
           {/* MCS-150 Card */}
           <div className="bg-white rounded-lg shadow-md p-6 border border-gray-100 flex flex-col items-center text-center w-full md:max-w-[350px]">
-            <div className="w-16 h-16 bg-[#33C3F0] rounded-lg flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-[#1A1F2C] rounded-lg flex items-center justify-center mb-4">
               <FileText className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-xl font-semibold text-[#1EAEDB] mb-2">
+            <h2 className="text-xl font-semibold text-[#1A1F2C] mb-2">
               MCS-150 BIENNIAL UPDATE
             </h2>
             <p className="text-gray-600 mb-6">
@@ -44,7 +44,7 @@ const Index = () => {
             </p>
             <Button 
               onClick={() => navigate("/mcs150")}
-              className="bg-[#0FA0CE] hover:bg-[#1EAEDB] text-white"
+              className="bg-white border-2 border-[#1A1F2C] text-[#1A1F2C] hover:bg-[#1A1F2C] hover:text-white transition-colors"
             >
               View Details
             </Button>
