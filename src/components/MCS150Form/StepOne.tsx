@@ -27,39 +27,49 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           Select your reason for filing <span className="text-red-500">*</span>
         </Label>
         <div className="space-y-4">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-start space-x-2">
             <Checkbox
               id="biennialUpdate"
               checked={formData.reasonForFiling.biennialUpdate}
               onCheckedChange={() => updateReasonForFiling("biennialUpdate")}
+              className="mt-1"
             />
-            <Label htmlFor="biennialUpdate">Biennial Update or Changes</Label>
+            <Label htmlFor="biennialUpdate" className="leading-normal">
+              Biennial Update or Changes
+            </Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-start space-x-2">
             <Checkbox
               id="reactivate"
               checked={formData.reasonForFiling.reactivate}
               onCheckedChange={() => updateReasonForFiling("reactivate")}
+              className="mt-1"
             />
-            <Label htmlFor="reactivate">Reactivate</Label>
+            <Label htmlFor="reactivate" className="leading-normal">
+              Reactivate
+            </Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-start space-x-2">
             <Checkbox
               id="reapplication"
               checked={formData.reasonForFiling.reapplication}
               onCheckedChange={() => updateReasonForFiling("reapplication")}
+              className="mt-1"
             />
-            <Label htmlFor="reapplication">
+            <Label htmlFor="reapplication" className="leading-normal">
               Reapplication (after revocation of new entrant)
             </Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-start space-x-2">
             <Checkbox
               id="outOfBusiness"
               checked={formData.reasonForFiling.outOfBusiness}
               onCheckedChange={() => updateReasonForFiling("outOfBusiness")}
+              className="mt-1"
             />
-            <Label htmlFor="outOfBusiness">Out of Business Notification</Label>
+            <Label htmlFor="outOfBusiness" className="leading-normal">
+              Out of Business Notification
+            </Label>
           </div>
         </div>
       </div>

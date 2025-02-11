@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,7 +25,6 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
       <h2 className="text-2xl font-bold text-primary">Billing Information</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Billing Information Column */}
         <Card>
           <CardContent className="space-y-4 pt-6">
             <div className="space-y-2">
@@ -93,7 +91,6 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
           </CardContent>
         </Card>
 
-        {/* Order Details Column */}
         <Card>
           <CardContent className="pt-6">
             <h3 className="text-sm font-semibold text-primary mb-4">Order Details</h3>
