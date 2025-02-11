@@ -23,17 +23,17 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-8 animate-fadeIn">
       <h2 className="text-2xl font-bold text-primary">Reason For Filing</h2>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         <Label>
           Select your reason for filing <span className="text-red-500">*</span>
         </Label>
         <RadioGroup
           value={Object.entries(formData.reasonForFiling).find(([_, value]) => value)?.[0] || ""}
           onValueChange={updateReasonForFiling}
-          className="space-y-2"
+          className="space-y-4"
         >
           <div className="flex items-start space-x-2">
             <RadioGroupItem value="biennialUpdate" id="biennialUpdate" className="mt-1" />

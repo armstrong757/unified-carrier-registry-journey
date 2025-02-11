@@ -40,13 +40,13 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-8 animate-fadeIn">
       <h2 className="text-2xl font-bold text-primary">
         Biennial Update or Changes
       </h2>
 
-      <div className="space-y-6">
-        <div className="space-y-4">
+      <div className="space-y-8">
+        <div className="space-y-6">
           <Label>
             Are there any changes you want to make on MCS-150?{" "}
             <span className="text-red-500">*</span>
@@ -56,6 +56,7 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
             onValueChange={(value) =>
               setFormData({ ...formData, hasChanges: value })
             }
+            className="space-y-4"
           >
             <div className="flex items-start space-x-2">
               <RadioGroupItem value="no" id="no-changes" className="mt-1" />
@@ -73,8 +74,8 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
         </div>
 
         {formData.hasChanges === "yes" && (
-          <div className="space-y-6 pl-4 border-l-2 border-gray-200">
-            <div className="space-y-4">
+          <div className="space-y-8 pl-4 border-l-2 border-gray-200">
+            <div className="space-y-6">
               <div className="flex items-start space-x-2">
                 <Checkbox
                   id="companyInfo"
@@ -88,7 +89,7 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
               </div>
 
               {formData.changesToMake.companyInfo && (
-                <div className="space-y-3 pl-6">
+                <div className="space-y-4 pl-6">
                   <Label>
                     Select all information you wish to change or update{" "}
                     <span className="text-red-500">*</span>
@@ -117,7 +118,7 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
               )}
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="flex items-start space-x-2">
                 <Checkbox
                   id="operatingInfo"
@@ -131,7 +132,7 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
               </div>
 
               {formData.changesToMake.operatingInfo && (
-                <div className="space-y-3 pl-6">
+                <div className="space-y-4 pl-6">
                   <Label>
                     Select all information you wish to change or update{" "}
                     <span className="text-red-500">*</span>
