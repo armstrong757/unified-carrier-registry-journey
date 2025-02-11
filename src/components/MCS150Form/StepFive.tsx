@@ -1,8 +1,8 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import SignaturePad from "./SignaturePad";
 
 interface StepFiveProps {
   formData: any;
@@ -25,7 +25,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "File too large",
           description: "Please upload a file smaller than 5MB",
@@ -46,9 +46,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
   return (
     <div className="space-y-6 animate-fadeIn">
       <h2 className="text-2xl font-bold text-primary">Operator Information</h2>
-      <p className="text-gray-600">
-        Please provide information about the person operating this vehicle.
-      </p>
+      <p className="text-gray-600">Who is creating this update?</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
@@ -89,7 +87,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="email">
-            Email <span className="text-red-500">*</span>
+            Email (to contact you) <span className="text-red-500">*</span>
           </Label>
           <Input
             id="email"
@@ -102,7 +100,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="phone">
-            Phone <span className="text-red-500">*</span>
+            Phone (to contact you) <span className="text-red-500">*</span>
           </Label>
           <Input
             id="phone"
@@ -127,7 +125,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="milesDriven">
-            Annual Miles Driven <span className="text-red-500">*</span>
+            Miles driven in the last 12 months <span className="text-red-500">*</span>
           </Label>
           <Input
             id="milesDriven"
@@ -135,37 +133,31 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             min="0"
             value={formData.operator.milesDriven}
             onChange={(e) => updateOperator("milesDriven", e.target.value)}
-            placeholder="Enter annual miles driven"
+            placeholder="Enter miles driven"
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="licenseFile">
-            Driver's License Copy <span className="text-red-500">*</span>
+            Upload Driver License <span className="text-red-500">*</span>
           </Label>
           <Input
             id="licenseFile"
             type="file"
             accept=".pdf,.jpg,.jpeg,.png"
             onChange={handleFileUpload}
-            className="cursor-pointer"
+            className="cursor-pointer file:hidden"
           />
-          <p className="text-sm text-gray-500">Upload a copy of your driver's license (PDF, JPG, PNG)</p>
+          <p className="text-sm text-gray-500">Upload a copy of your license (PDF, JPG, PNG)</p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 col-span-2">
           <Label htmlFor="signature">
-            Digital Signature <span className="text-red-500">*</span>
+            Signature <span className="text-red-500">*</span>
           </Label>
-          <Input
-            id="signature"
-            value={formData.operator.signature}
-            onChange={(e) => updateOperator("signature", e.target.value)}
-            placeholder="Type your full name as signature"
+          <SignaturePad
+            onChange={(signatureData) => updateOperator("signature", signatureData)}
           />
-          <p className="text-sm text-gray-500">
-            By typing your name, you agree that this represents your legal signature
-          </p>
         </div>
       </div>
     </div>
