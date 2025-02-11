@@ -48,7 +48,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
       <h2 className="text-2xl font-bold text-primary">Operator Information</h2>
       <p className="text-gray-600">Who is creating this update?</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-2">
           <Label htmlFor="firstName">
             First Name <span className="text-red-500">*</span>
@@ -58,6 +58,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             value={formData.operator.firstName}
             onChange={(e) => updateOperator("firstName", e.target.value)}
             placeholder="Enter first name"
+            className="w-full"
           />
         </div>
 
@@ -70,6 +71,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             value={formData.operator.lastName}
             onChange={(e) => updateOperator("lastName", e.target.value)}
             placeholder="Enter last name"
+            className="w-full"
           />
         </div>
 
@@ -82,12 +84,13 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             value={formData.operator.title}
             onChange={(e) => updateOperator("title", e.target.value)}
             placeholder="Enter job title"
+            className="w-full"
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="email">
-            Email (to contact you) <span className="text-red-500">*</span>
+            Email <span className="text-red-500">*</span>
           </Label>
           <Input
             id="email"
@@ -95,12 +98,13 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             value={formData.operator.email}
             onChange={(e) => updateOperator("email", e.target.value)}
             placeholder="Enter email address"
+            className="w-full"
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="phone">
-            Phone (to contact you) <span className="text-red-500">*</span>
+            Phone <span className="text-red-500">*</span>
           </Label>
           <Input
             id="phone"
@@ -108,6 +112,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             value={formData.operator.phone}
             onChange={(e) => updateOperator("phone", e.target.value)}
             placeholder="Enter phone number"
+            className="w-full"
           />
         </div>
 
@@ -120,6 +125,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             value={formData.operator.einSsn}
             onChange={(e) => updateOperator("einSsn", e.target.value)}
             placeholder="Enter EIN or SSN"
+            className="w-full"
           />
         </div>
 
@@ -134,6 +140,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             value={formData.operator.milesDriven}
             onChange={(e) => updateOperator("milesDriven", e.target.value)}
             placeholder="Enter miles driven"
+            className="w-full"
           />
         </div>
 
@@ -146,12 +153,12 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             type="file"
             accept=".pdf,.jpg,.jpeg,.png"
             onChange={handleFileUpload}
-            className="cursor-pointer file:hidden"
+            className="cursor-pointer w-full"
           />
           <p className="text-sm text-gray-500">Upload a copy of your license (PDF, JPG, PNG)</p>
         </div>
 
-        <div className="space-y-2 col-span-2">
+        <div className="space-y-2 col-span-1 sm:col-span-2">
           <Label htmlFor="signature">
             Signature <span className="text-red-500">*</span>
           </Label>
