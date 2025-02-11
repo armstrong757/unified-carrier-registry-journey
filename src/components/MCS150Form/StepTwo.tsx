@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -46,7 +45,7 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
       </h2>
 
       <div className="space-y-8">
-        <div className="space-y-6">
+        <div className="space-y-4">
           <Label>
             Are there any changes you want to make on MCS-150?{" "}
             <span className="text-red-500">*</span>
@@ -56,17 +55,17 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
             onValueChange={(value) =>
               setFormData({ ...formData, hasChanges: value })
             }
-            className="space-y-2"
+            className="space-y-1.5"
           >
-            <div className="flex items-start space-x-2">
-              <RadioGroupItem value="no" id="no-changes" className="mt-1" />
-              <Label htmlFor="no-changes" className="leading-normal">
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="no" id="no-changes" />
+              <Label htmlFor="no-changes">
                 No, all the information is the same
               </Label>
             </div>
-            <div className="flex items-start space-x-2">
-              <RadioGroupItem value="yes" id="yes-changes" className="mt-1" />
-              <Label htmlFor="yes-changes" className="leading-normal">
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="yes" id="yes-changes" />
+              <Label htmlFor="yes-changes">
                 Yes, there are changes
               </Label>
             </div>
@@ -75,21 +74,20 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
 
         {formData.hasChanges === "yes" && (
           <div className="space-y-8 pl-4 border-l-2 border-gray-200">
-            <div className="space-y-6">
-              <div className="flex items-start space-x-2">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
                 <Checkbox
                   id="companyInfo"
                   checked={formData.changesToMake.companyInfo}
                   onCheckedChange={() => updateChangesToMake("companyInfo")}
-                  className="mt-1"
                 />
-                <Label htmlFor="companyInfo" className="leading-normal">
+                <Label htmlFor="companyInfo">
                   Company Information (Name, Address, Phone, Email, EIN)
                 </Label>
               </div>
 
               {formData.changesToMake.companyInfo && (
-                <div className="space-y-2 pl-6">
+                <div className="space-y-1.5 pl-6">
                   <Label>
                     Select all information you wish to change or update{" "}
                     <span className="text-red-500">*</span>
@@ -102,37 +100,33 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
                     { id: "companyName", label: "Company Name" },
                     { id: "einSsn", label: "EIN or SSN Number" },
                   ].map(({ id, label }) => (
-                    <div key={id} className="flex items-start space-x-2">
+                    <div key={id} className="flex items-center space-x-2">
                       <Checkbox
                         id={id}
                         checked={formData.companyInfoChanges[id]}
                         onCheckedChange={() => updateCompanyInfoChanges(id)}
-                        className="mt-1"
                       />
-                      <Label htmlFor={id} className="leading-normal">
-                        {label}
-                      </Label>
+                      <Label htmlFor={id}>{label}</Label>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            <div className="space-y-6">
-              <div className="flex items-start space-x-2">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
                 <Checkbox
                   id="operatingInfo"
                   checked={formData.changesToMake.operatingInfo}
                   onCheckedChange={() => updateChangesToMake("operatingInfo")}
-                  className="mt-1"
                 />
-                <Label htmlFor="operatingInfo" className="leading-normal">
+                <Label htmlFor="operatingInfo">
                   Operating Information (Classifications, Vehicles, Drivers)
                 </Label>
               </div>
 
               {formData.changesToMake.operatingInfo && (
-                <div className="space-y-2 pl-6">
+                <div className="space-y-1.5 pl-6">
                   <Label>
                     Select all information you wish to change or update{" "}
                     <span className="text-red-500">*</span>
@@ -145,32 +139,26 @@ const StepTwo = ({ formData, setFormData }: StepTwoProps) => {
                     { id: "cargo", label: "Cargo Classifications" },
                     { id: "hazmat", label: "Hazardous Materials" },
                   ].map(({ id, label }) => (
-                    <div key={id} className="flex items-start space-x-2">
+                    <div key={id} className="flex items-center space-x-2">
                       <Checkbox
                         id={id}
                         checked={formData.operatingInfoChanges[id]}
                         onCheckedChange={() => updateOperatingInfoChanges(id)}
-                        className="mt-1"
                       />
-                      <Label htmlFor={id} className="leading-normal">
-                        {label}
-                      </Label>
+                      <Label htmlFor={id}>{label}</Label>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            <div className="flex items-start space-x-2">
+            <div className="flex items-center space-x-2">
               <Checkbox
                 id="other"
                 checked={formData.changesToMake.other}
                 onCheckedChange={() => updateChangesToMake("other")}
-                className="mt-1"
               />
-              <Label htmlFor="other" className="leading-normal">
-                Other
-              </Label>
+              <Label htmlFor="other">Other</Label>
             </div>
           </div>
         )}
