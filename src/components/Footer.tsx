@@ -16,13 +16,23 @@ const Footer = () => {
               Terms of Use
             </a>
             <span className="text-[#C8C8C9] hidden md:inline">·</span>
-            <Link to="/privacy" className="text-[#C8C8C9] hover:text-gray-300">
+            <a 
+              href="/privacy" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#C8C8C9] hover:text-gray-300"
+            >
               Privacy Policy
-            </Link>
+            </a>
             <span className="text-[#C8C8C9] hidden md:inline">·</span>
-            <Link to="/refund" className="text-[#C8C8C9] hover:text-gray-300">
+            <a 
+              href="/refund" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#C8C8C9] hover:text-gray-300"
+            >
               Refund Policy
-            </Link>
+            </a>
             <span className="text-[#C8C8C9] hidden md:inline">·</span>
             <a 
               href="/contact" 
