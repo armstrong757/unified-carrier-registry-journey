@@ -58,7 +58,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md md:max-w-2xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
           <h1 className="text-2xl font-bold text-center text-gray-900 mb-8">
             Contact Us
@@ -111,13 +111,15 @@ const Contact = () => {
                 )}
               />
 
-              <Button 
-                type="submit" 
-                className="w-full bg-[#FEC6A1] hover:bg-[#E5B291] text-white"
-                disabled={isSubmitting}
-              >
-                Submit
-              </Button>
+              <div className="flex justify-center">
+                <Button 
+                  type="submit" 
+                  className="bg-[#FEC6A1] hover:bg-[#E5B291] text-white px-8"
+                  disabled={isSubmitting}
+                >
+                  Submit
+                </Button>
+              </div>
             </form>
           </Form>
         </div>
