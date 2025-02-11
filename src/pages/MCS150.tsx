@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import FormProgress from "@/components/UCRForm/FormProgress";
@@ -126,9 +125,19 @@ const MCS150 = () => {
     },
   });
 
+  useEffect(() => {
+    if (formData.reasonForFiling.outOfBusiness) {
+      setCurrentStep(5);
+    }
+  }, [formData.reasonForFiling.outOfBusiness]);
+
   const handleNext = () => {
     if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      if (formData.reasonForFiling.outOfBusiness && currentStep === 1) {
+        setCurrentStep(5);
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
     } else {
       toast({
         title: "Form Submitted",
@@ -140,7 +149,11 @@ const MCS150 = () => {
 
   const handleBack = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      if (formData.reasonForFiling.outOfBusiness && currentStep === 5) {
+        setCurrentStep(1);
+      } else {
+        setCurrentStep(currentStep - 1);
+      }
     }
   };
 
