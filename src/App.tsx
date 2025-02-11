@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import UCR from "./pages/UCR";
 import MCS150 from "./pages/MCS150";
 import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
 import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
               <Route path="/ucr" element={<UCR />} />
               <Route path="/mcs150" element={<MCS150 />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<Terms />} />
             </Routes>
           </div>
           <Footer />

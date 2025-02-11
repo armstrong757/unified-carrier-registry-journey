@@ -7,9 +7,14 @@ const Footer = () => {
       <div className="bg-[#1A1F2C] py-6">
         <div className="max-w-7xl mx-auto px-4">
           <nav className="flex flex-col md:flex-row justify-center items-center md:space-x-6 space-y-3 md:space-y-0 text-xs">
-            <Link to="/terms" className="text-[#C8C8C9] hover:text-gray-300">
+            <a 
+              href="/terms" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#C8C8C9] hover:text-gray-300"
+            >
               Terms of Use
-            </Link>
+            </a>
             <span className="text-[#C8C8C9] hidden md:inline">·</span>
             <Link to="/privacy" className="text-[#C8C8C9] hover:text-gray-300">
               Privacy Policy
