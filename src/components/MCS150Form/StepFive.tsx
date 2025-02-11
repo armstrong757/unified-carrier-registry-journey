@@ -162,9 +162,11 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
           <Label htmlFor="signature">
             Signature <span className="text-red-500">*</span>
           </Label>
-          <SignaturePad
-            onChange={(signatureData) => updateOperator("signature", signatureData)}
-          />
+          <div className="w-full sm:w-1/2"> {/* Added container with responsive width */}
+            <SignaturePad
+              onChange={(signatureData) => updateOperator("signature", signatureData)}
+            />
+          </div>
         </div>
       </div>
     </div>
