@@ -6,6 +6,7 @@ import StepOne from "@/components/MCS150Form/StepOne";
 import StepTwo from "@/components/MCS150Form/StepTwo";
 import StepThree from "@/components/MCS150Form/StepThree";
 import StepFour from "@/components/MCS150Form/StepFour";
+import StepFive from "@/components/MCS150Form/StepFive";
 
 const MCS150 = () => {
   const { toast } = useToast();
@@ -151,6 +152,8 @@ const MCS150 = () => {
         return <StepThree formData={formData} setFormData={setFormData} />;
       case 4:
         return <StepFour formData={formData} setFormData={setFormData} />;
+      case 5:
+        return <StepFive formData={formData} setFormData={setFormData} />;
       default:
         return null;
     }
