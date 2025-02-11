@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import UCR from "./pages/UCR";
-import NotFound from "./pages/NotFound";
+import MCS150 from "./pages/MCS150";
 
 const queryClient = new QueryClient();
 
@@ -19,8 +19,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/ucr" element={<UCR />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="/mcs150" element={<MCS150} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
