@@ -148,7 +148,7 @@ const UCRFiling = () => {
             Register for the <span className="font-medium">Unified Carrier Registration Plan</span> based on your fleet size to contribute to funding highway safety initiatives. Annual fees, due by December 31st, support state enforcement, road maintenance, and driving safety. New drivers or companies must pay before their first interstate trip to avoid fines and impoundment. Secure your <span className="italic font-semibold">UCR Registration</span> to travel freely across the United States and beyond!
           </p>
           
-          <div className="mt-8 border rounded-lg overflow-hidden max-w-2xl">
+          <div className="mt-8 border rounded-lg overflow-hidden w-full sm:w-[50%] mx-auto sm:mx-8">
             <Table>
               <TableHeader>
                 <TableRow>
