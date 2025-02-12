@@ -1,8 +1,10 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableHeader,
@@ -30,7 +32,6 @@ const UCRFiling = () => {
   return (
     <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-16">
-        {/* Header Section */}
         <div className="text-center space-y-8">
           <h1 className="text-4xl font-bold text-[#1A1F2C] mb-8">UCR Registration</h1>
           
@@ -53,7 +54,6 @@ const UCRFiling = () => {
           </Card>
         </div>
 
-        {/* Content Sections */}
         <section className="space-y-12 bg-[#edf7ff]/50 p-4 sm:p-8 rounded-xl shadow-sm">
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">What is UCR?</h2>
@@ -61,6 +61,8 @@ const UCRFiling = () => {
               The Unified Carrier Registration (UCR) is a federally mandated program established in 2005 that requires motor carriers and businesses engaged in interstate commerce to register and pay annual fees. This program applies to all companies with an active USDOT number that transport goods across state lines.
             </p>
           </div>
+
+          <Separator className="my-8" />
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Who Needs to Register?</h2>
@@ -73,6 +75,8 @@ const UCRFiling = () => {
             </ul>
           </div>
 
+          <Separator className="my-8" />
+
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Penalties for Non-Compliance:</h2>
             <ul className="list-disc pl-5 text-gray-600 space-y-3">
@@ -82,6 +86,8 @@ const UCRFiling = () => {
               <li>Removal from road operations</li>
             </ul>
           </div>
+
+          <Separator className="my-8" />
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Fee Structure:</h2>
@@ -98,6 +104,8 @@ const UCRFiling = () => {
             </ul>
           </div>
 
+          <Separator className="my-8" />
+
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Legal Framework</h2>
             <p className="text-gray-600 mb-4">The UCR program operates under:</p>
@@ -107,6 +115,8 @@ const UCRFiling = () => {
               <li>Federal Motor Carrier Safety Administration (FMCSA) oversight</li>
             </ul>
           </div>
+
+          <Separator className="my-8" />
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Participating States</h2>
@@ -133,16 +143,6 @@ const UCRFiling = () => {
             <p className="text-gray-600 italic bg-white p-4 rounded-lg">
               Note: Even if based in a non-participating state, registration is required if operating in participating states.
             </p>
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Base State Selection:</h2>
-            <ul className="list-disc pl-5 text-gray-600 space-y-3">
-              <li>Register in your home state if it participates in UCR</li>
-              <li>If your state doesn't participate, select the nearest participating state</li>
-              <li>Canadian-based businesses must also comply when operating in participating states</li>
-              <li>Must be completed before any interstate operations</li>
-            </ul>
           </div>
         </section>
 
