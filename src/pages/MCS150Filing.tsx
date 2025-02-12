@@ -1,18 +1,46 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const MCS150Filing = () => {
   const [dotNumber, setDotNumber] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (dotNumber.trim()) {
+    if (!dotNumber.trim()) return;
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
+        body: { dotNumber: dotNumber.trim() }
+      });
+
+      if (error) throw error;
+      if (!data) throw new Error('No data returned from USDOT lookup');
+
+      // Store the USDOT data in sessionStorage
+      sessionStorage.setItem('usdotData', JSON.stringify(data));
+      
+      // Navigate to the MCS-150 form
       navigate("/mcs150");
+    } catch (error) {
+      console.error('Error fetching USDOT info:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch DOT information. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -35,10 +63,15 @@ const MCS150Filing = () => {
                 value={dotNumber}
                 onChange={(e) => setDotNumber(e.target.value)}
                 className="w-full text-lg py-6"
+                disabled={isLoading}
               />
               <div className="flex justify-center">
-                <Button type="submit" className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8">
-                  GET STARTED
+                <Button 
+                  type="submit" 
+                  className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Loading..." : "GET STARTED"}
                 </Button>
               </div>
             </form>
