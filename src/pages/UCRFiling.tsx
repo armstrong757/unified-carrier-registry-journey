@@ -52,14 +52,14 @@ const UCRFiling = () => {
         <section className="space-y-12 bg-[#edf7ff] p-8 rounded-xl shadow-sm">
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">What is UCR?</h2>
-            <p className="text-gray-600 leading-relaxed pl-1.5 pr-1.5">
+            <p className="text-gray-600 leading-relaxed pl-0.5 pr-0.5">
               The Unified Carrier Registration (UCR) is a federally mandated program established in 2005 that requires motor carriers and businesses engaged in interstate commerce to register and pay annual fees. This program applies to all companies with an active USDOT number that transport goods across state lines.
             </p>
           </div>
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Who Needs to Register?</h2>
-            <ul className="list-disc pl-6 pr-1.5 text-gray-600 space-y-3">
+            <ul className="list-disc pl-6 pr-0.5 text-gray-600 space-y-3">
               <li>Operate commercial motor vehicles in interstate commerce</li>
               <li>Are a motor carrier (private, exempt, or for-hire)</li>
               <li>Work as a broker, freight forwarder, or leasing company</li>
@@ -70,7 +70,7 @@ const UCRFiling = () => {
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Penalties for Non-Compliance:</h2>
-            <ul className="list-disc pl-6 pr-1.5 text-gray-600 space-y-3">
+            <ul className="list-disc pl-6 pr-0.5 text-gray-600 space-y-3">
               <li>Fines ranging from $100 to $5,000</li>
               <li>Vehicle detention or impoundment</li>
               <li>Potential suspension of operating authority</li>
@@ -80,7 +80,7 @@ const UCRFiling = () => {
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Fee Structure:</h2>
-            <ul className="list-disc pl-6 pr-1.5 text-gray-600 space-y-3">
+            <ul className="list-disc pl-6 pr-0.5 text-gray-600 space-y-3">
               <li>Based on fleet size</li>
               <li>Fees support:
                 <ul className="list-disc pl-6 mt-3 space-y-2">
@@ -95,8 +95,8 @@ const UCRFiling = () => {
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Legal Framework</h2>
-            <p className="text-gray-600 mb-4 pl-1.5 pr-1.5">The UCR program operates under:</p>
-            <ul className="list-disc pl-6 pr-1.5 text-gray-600 space-y-3">
+            <p className="text-gray-600 mb-4 pl-0.5 pr-0.5">The UCR program operates under:</p>
+            <ul className="list-disc pl-6 pr-0.5 text-gray-600 space-y-3">
               <li>Unified Carrier Registration Act of 2005</li>
               <li>Code of Federal Regulations Title 49 Section 367</li>
               <li>Federal Motor Carrier Safety Administration (FMCSA) oversight</li>
@@ -105,9 +105,9 @@ const UCRFiling = () => {
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Participating States</h2>
-            <p className="text-gray-600 mb-6 pl-1.5 pr-1.5">Currently, 41 U.S. states participate in the UCR program</p>
-            <p className="font-semibold mb-4 pl-1.5 pr-1.5">Non-participating states:</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6 pl-1.5 pr-1.5">
+            <p className="text-gray-600 mb-6 pl-0.5 pr-0.5">Currently, 41 U.S. states participate in the UCR program</p>
+            <p className="font-semibold mb-4 pl-0.5 pr-0.5">Non-participating states:</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6 pl-0.5 pr-0.5">
               <div className="space-y-2">
                 <p className="text-gray-600">Arizona</p>
                 <p className="text-gray-600">District of Columbia</p>
@@ -125,14 +125,14 @@ const UCRFiling = () => {
                 <p className="text-gray-600">Wyoming</p>
               </div>
             </div>
-            <p className="text-gray-600 italic bg-gray-50 p-4 rounded-lg pl-1.5 pr-1.5">
+            <p className="text-gray-600 italic bg-gray-50 p-4 rounded-lg pl-0.5 pr-0.5">
               Note: Even if based in a non-participating state, registration is required if operating in participating states.
             </p>
           </div>
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Base State Selection:</h2>
-            <ul className="list-disc pl-6 pr-1.5 text-gray-600 space-y-3">
+            <ul className="list-disc pl-6 pr-0.5 text-gray-600 space-y-3">
               <li>Register in your home state if it participates in UCR</li>
               <li>If your state doesn't participate, select the nearest participating state</li>
               <li>Canadian-based businesses must also comply when operating in participating states</li>
