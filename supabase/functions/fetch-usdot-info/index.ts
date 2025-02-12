@@ -32,59 +32,84 @@ interface USDOTData {
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('Fetching carrier data for DOT number:', dotNumber);
   
-  // Remove any 'USDOT' prefix if present
-  dotNumber = dotNumber.replace(/^(USDOT)?/i, '').trim();
+  // Remove any 'USDOT' prefix and all whitespace if present
+  dotNumber = dotNumber.replace(/^(USDOT)?/i, '').replace(/\s+/g, '');
   
   const url = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}?webKey=${apiKey}`;
   console.log('Making request to:', url);
   
-  const response = await fetch(url);
-  console.log('Response status:', response.status);
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('FMCSA API Error:', errorText);
-    throw new Error(`Carrier data fetch failed: ${response.status} - ${errorText}`);
+  try {
+    const response = await fetch(url);
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('FMCSA API Error:', errorText);
+      throw new Error(`FMCSA API Error (${response.status}): ${errorText}`);
+    }
+    
+    const data = await response.json();
+    if (!data) {
+      throw new Error('No data returned from FMCSA API');
+    }
+    
+    console.log('Successfully fetched carrier data:', JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.error('Error in fetchCarrierData:', error);
+    throw error;
   }
-  
-  const data = await response.json();
-  console.log('Successfully fetched carrier data');
-  return data;
 }
 
 async function fetchBasicsData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('Fetching BASIC data for DOT number:', dotNumber);
   
-  // Remove any 'USDOT' prefix if present
-  dotNumber = dotNumber.replace(/^(USDOT)?/i, '').trim();
+  // Remove any 'USDOT' prefix and all whitespace if present
+  dotNumber = dotNumber.replace(/^(USDOT)?/i, '').replace(/\s+/g, '');
   
-  const response = await fetch(
-    `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}/basics?webKey=${apiKey}`
-  );
-  console.log('BASIC data response status:', response.status);
-  
-  if (!response.ok) {
-    if (response.status === 404) {
-      console.log('No BASIC data available for this carrier');
+  try {
+    const response = await fetch(
+      `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}/basics?webKey=${apiKey}`
+    );
+    console.log('BASIC data response status:', response.status);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.log('No BASIC data available for this carrier');
+        return null;
+      }
+      const errorText = await response.text();
+      console.error('BASIC data fetch error:', errorText);
+      throw new Error(`FMCSA BASIC API Error (${response.status}): ${errorText}`);
+    }
+    
+    const data = await response.json();
+    if (!data) {
+      console.log('No BASIC data returned from FMCSA API');
       return null;
     }
-    const errorText = await response.text();
-    console.error('BASIC data fetch error:', errorText);
-    throw new Error(`Basics data fetch failed: ${response.status} - ${errorText}`);
+    
+    console.log('Successfully fetched BASIC data');
+    return data;
+  } catch (error) {
+    console.error('Error in fetchBasicsData:', error);
+    // Don't throw the error for BASIC data, just return null
+    return null;
   }
-  
-  const data = await response.json();
-  console.log('Successfully fetched BASIC data');
-  return data;
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { dotNumber } = await req.json();
+    if (!dotNumber) {
+      throw new Error('DOT number is required');
+    }
+    
     console.log('Received request for DOT number:', dotNumber);
     
     const fmcsaApiKey = Deno.env.get('FMCSA_API_KEY');
@@ -99,11 +124,16 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Check if we already have this DOT number in our database
-    const { data: existingData } = await supabase
+    const { data: existingData, error: fetchError } = await supabase
       .from('usdot_info')
       .select('*')
       .eq('usdot_number', dotNumber)
       .maybeSingle();
+
+    if (fetchError) {
+      console.error('Error fetching from database:', fetchError);
+      throw fetchError;
+    }
 
     if (existingData) {
       console.log('Found existing USDOT info:', dotNumber);
@@ -139,10 +169,7 @@ serve(async (req) => {
     console.log('Fetching new USDOT info from FMCSA API:', dotNumber);
     const [carrierData, basicsData] = await Promise.all([
       fetchCarrierData(dotNumber, fmcsaApiKey),
-      fetchBasicsData(dotNumber, fmcsaApiKey).catch(error => {
-        console.warn('Failed to fetch BASIC data:', error);
-        return null;
-      })
+      fetchBasicsData(dotNumber, fmcsaApiKey)
     ]);
 
     // Transform FMCSA data to our format
