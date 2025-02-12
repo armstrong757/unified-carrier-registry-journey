@@ -42,14 +42,14 @@ const MCS150 = () => {
   const [formData, setFormData] = useState({
     // Step 1 - Reason for Filing
     reasonForFiling: {
-      biennialUpdate: false,
+      biennialUpdate: true, // Default to biennial update since that's the most common
       reactivate: false,
       reapplication: false,
       outOfBusiness: false,
     },
 
     // Step 2 - Changes
-    hasChanges: "",
+    hasChanges: "no", // Default to no changes
     changesToMake: {
       companyInfo: false,
       operatingInfo: false,
@@ -72,30 +72,30 @@ const MCS150 = () => {
       hazmat: false,
     },
 
-    // Step 3 - Company Information
+    // Step 3 - Company Information (Pre-filled from USDOT data)
     ownerName: "",
     principalAddress: {
-      address: "",
-      city: "",
-      state: "",
-      zip: "",
-      country: "",
+      address: mockUSDOTData.physicalAddress.split(',')[0].trim(),
+      city: mockUSDOTData.physicalAddress.split(',')[1]?.trim() || "",
+      state: mockUSDOTData.physicalAddress.split(',')[2]?.trim().split(' ')[0] || "",
+      zip: mockUSDOTData.physicalAddress.split(',')[2]?.trim().split(' ')[1] || "",
+      country: "USA",
     },
     mailingAddress: {
-      address: "",
-      city: "",
-      state: "",
-      zip: "",
-      country: "",
+      address: mockUSDOTData.physicalAddress.split(',')[0].trim(),
+      city: mockUSDOTData.physicalAddress.split(',')[1]?.trim() || "",
+      state: mockUSDOTData.physicalAddress.split(',')[2]?.trim().split(' ')[0] || "",
+      zip: mockUSDOTData.physicalAddress.split(',')[2]?.trim().split(' ')[1] || "",
+      country: "USA",
     },
-    businessPhone: "",
+    businessPhone: mockUSDOTData.telephone,
     businessEmail: "",
-    companyName: "",
+    companyName: mockUSDOTData.legalName,
     einSsn: "",
 
-    // Step 4 - Operations
+    // Step 4 - Operations (Pre-filled from USDOT data)
     companyOperations: {
-      interstateCarrier: false,
+      interstateCarrier: mockUSDOTData.entityType === "CARRIER",
       intrastatehazmatCarrier: false,
       intrastateNonHazmatCarrier: false,
       intrastateHazmatShipper: false,
@@ -109,21 +109,21 @@ const MCS150 = () => {
       trailers: { owned: 0, termLeased: 0, tripLeased: 0 },
       hazmatTrucks: { owned: 0, termLeased: 0, tripLeased: 0 },
       hazmatTrailers: { owned: 0, termLeased: 0, tripLeased: 0 },
-      motorCoach: { owned: 0, termLeased: 0, tripLeased: 0 },
+      motorCoach: { owned: mockUSDOTData.motorcoachCount, termLeased: 0, tripLeased: 0 },
       schoolBusSmall: { owned: 0, termLeased: 0, tripLeased: 0 },
       schoolBusMedium: { owned: 0, termLeased: 0, tripLeased: 0 },
-      schoolBusLarge: { owned: 0, termLeased: 0, tripLeased: 0 },
+      schoolBusLarge: { owned: mockUSDOTData.busCount, termLeased: 0, tripLeased: 0 },
       busLarge: { owned: 0, termLeased: 0, tripLeased: 0 },
-      vanSmall: { owned: 0, termLeased: 0, tripLeased: 0 },
+      vanSmall: { owned: mockUSDOTData.vanCount, termLeased: 0, tripLeased: 0 },
       vanMedium: { owned: 0, termLeased: 0, tripLeased: 0 },
-      limousineSmall: { owned: 0, termLeased: 0, tripLeased: 0 },
+      limousineSmall: { owned: mockUSDOTData.limoCount, termLeased: 0, tripLeased: 0 },
       limousineMedium: { owned: 0, termLeased: 0, tripLeased: 0 },
     },
     drivers: {
-      interstate: "",
-      intrastate: "",
-      total: "",
-      cdl: "",
+      interstate: "0",
+      intrastate: "0",
+      total: mockUSDOTData.powerUnits.toString(),
+      cdl: "0",
     },
     hazmatDetails: {},
 
@@ -133,7 +133,7 @@ const MCS150 = () => {
       lastName: "",
       title: "",
       email: "",
-      phone: "",
+      phone: mockUSDOTData.telephone,
       einSsn: "",
       milesDriven: "",
       licenseFile: null,
