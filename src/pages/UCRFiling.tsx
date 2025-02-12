@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -45,7 +44,7 @@ const UCRFiling = () => {
                 onChange={(e) => setDotNumber(e.target.value)}
                 className="w-full text-lg py-6"
               />
-              <Button type="submit" className="w-full bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg">
+              <Button type="submit" className="w-full bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8">
                 GET STARTED
               </Button>
             </form>
@@ -185,7 +184,7 @@ const UCRFiling = () => {
             </Table>
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-16">
             <Button 
               onClick={scrollToTop}
               className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg"
