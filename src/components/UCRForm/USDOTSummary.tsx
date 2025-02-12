@@ -75,7 +75,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
                 href="/mcs150"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 hover:underline"
+                className="text-accent hover:text-accent/80 hover:underline"
               >
                 Update MCS-150
               </a>
