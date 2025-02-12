@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -49,7 +48,7 @@ const UCRFiling = () => {
         </div>
 
         {/* Content Sections */}
-        <section className="space-y-12 bg-[#edf7ff] p-4 sm:p-8 rounded-xl shadow-sm">
+        <section className="space-y-12 bg-[#edf7ff]/50 p-4 sm:p-8 rounded-xl shadow-sm">
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">What is UCR?</h2>
             <p className="text-gray-600 leading-relaxed">
@@ -125,7 +124,7 @@ const UCRFiling = () => {
                 <p className="text-gray-600">Wyoming</p>
               </div>
             </div>
-            <p className="text-gray-600 italic bg-gray-50 p-4 rounded-lg">
+            <p className="text-gray-600 italic bg-white p-4 rounded-lg">
               Note: Even if based in a non-participating state, registration is required if operating in participating states.
             </p>
           </div>
