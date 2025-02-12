@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import UCR from "./pages/UCR";
 import UCRFiling from "./pages/UCRFiling";
 import MCS150 from "./pages/MCS150";
+import MCS150Filing from "./pages/MCS150Filing";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -29,6 +30,7 @@ const App = () => (
               <Route path="/ucr" element={<UCR />} />
               <Route path="/ucr-filing" element={<UCRFiling />} />
               <Route path="/mcs150" element={<MCS150 />} />
+              <Route path="/mcs-150-filing" element={<MCS150Filing />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
