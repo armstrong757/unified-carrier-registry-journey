@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -43,7 +44,8 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
   
   const validDOTNumber = validateDOTNumber(dotNumber);
   
-  const url = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${validDOTNumber}?webKey=${apiKey}`;
+  // Updated to use the official FMCSA API endpoint
+  const url = `https://api.fmcsa.dot.gov/snapshot/usdot/${validDOTNumber}?webKey=${apiKey}`;
   console.log('DEBUG: Making request to:', url);
   
   try {
@@ -52,7 +54,12 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       throw new Error('Invalid API key format');
     }
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
     console.log('DEBUG: Response status:', response.status);
     
     const responseText = await response.text();
@@ -86,31 +93,31 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     // Log the exact structure we received
     console.log('DEBUG: API Response Structure:', JSON.stringify(data, null, 2));
 
-    // Map the data, with more defensive coding
+    // Map the data based on the official FMCSA API response structure
     const mappedData = {
       usdotNumber: validDOTNumber,
-      operatingStatus: data.carrier?.allowToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
-      entityType: data.carrier?.carrierOperation || 'UNKNOWN',
-      legalName: data.carrier?.legalName || 'NOT PROVIDED',
-      dbaName: data.carrier?.dbaName || '',
+      operatingStatus: data.content?.allowToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
+      entityType: data.content?.carrierOperation || 'UNKNOWN',
+      legalName: data.content?.legalName || 'NOT PROVIDED',
+      dbaName: data.content?.dbaName || '',
       physicalAddress: [
-        data.carrier?.phyStreet,
-        data.carrier?.phyCity,
-        data.carrier?.phyState,
-        data.carrier?.phyZipCode
+        data.content?.phyStreet,
+        data.content?.phyCity,
+        data.content?.phyState,
+        data.content?.phyZipcode
       ].filter(Boolean).join(', ') || 'NOT PROVIDED',
-      telephone: data.carrier?.telephone || 'NOT PROVIDED',
-      powerUnits: parseInt(data.carrier?.totalPowerUnits) || 0,
-      busCount: parseInt(data.carrier?.busTotal) || 0,
-      limoCount: parseInt(data.carrier?.limousineTotal) || 0,
-      minibusCount: parseInt(data.carrier?.minibusTotal) || 0,
-      motorcoachCount: parseInt(data.carrier?.motorcoachTotal) || 0,
-      vanCount: parseInt(data.carrier?.vanTotal) || 0,
-      complaintCount: parseInt(data.carrier?.totalComplaints) || 0,
-      outOfService: data.carrier?.oosStatus === 'Y',
-      outOfServiceDate: data.carrier?.oosDate || null,
-      mcNumber: data.carrier?.mcNumber || '',
-      mcs150LastUpdate: data.carrier?.mcs150FormDate || null,
+      telephone: data.content?.telephone || 'NOT PROVIDED',
+      powerUnits: parseInt(data.content?.totalPowerUnits) || 0,
+      busCount: parseInt(data.content?.totalBuses) || 0,
+      limoCount: parseInt(data.content?.totalLimousines) || 0,
+      minibusCount: parseInt(data.content?.totalMiniBuses) || 0,
+      motorcoachCount: parseInt(data.content?.totalMotorCoaches) || 0,
+      vanCount: parseInt(data.content?.totalVans) || 0,
+      complaintCount: parseInt(data.content?.totalComplaints) || 0,
+      outOfService: data.content?.oosStatus === 'Y',
+      outOfServiceDate: data.content?.oosDate || null,
+      mcNumber: data.content?.mcNumber || '',
+      mcs150LastUpdate: data.content?.mcs150FormDate || null,
       basicsData: {},
     };
 
@@ -126,8 +133,9 @@ async function fetchBasicsData(dotNumber: string, apiKey: string): Promise<any> 
   console.log('Fetching BASIC data for DOT number:', dotNumber);
   
   try {
+    // Updated to use the official FMCSA API endpoint
     const response = await fetch(
-      `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}/basics?webKey=${apiKey}`
+      `https://api.fmcsa.dot.gov/safety/basic/${dotNumber}?webKey=${apiKey}`
     );
     console.log('BASIC data response status:', response.status);
     
