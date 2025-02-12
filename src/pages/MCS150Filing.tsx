@@ -27,16 +27,18 @@ const MCS150Filing = () => {
       if (error) throw error;
       if (!data) throw new Error('No data returned from USDOT lookup');
 
+      console.log('USDOT data received:', data);
+
       // Store the USDOT data in sessionStorage
       sessionStorage.setItem('usdotData', JSON.stringify(data));
       
       // Navigate to the MCS-150 form
-      navigate("/mcs150");
-    } catch (error) {
+      navigate("/mcs150", { state: { usdotData: data } });
+    } catch (error: any) {
       console.error('Error fetching USDOT info:', error);
       toast({
         title: "Error",
-        description: "Failed to fetch DOT information. Please try again.",
+        description: error.message || "Failed to fetch DOT information. Please try again.",
         variant: "destructive",
       });
     } finally {
