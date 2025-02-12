@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -50,9 +49,10 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
   try {
     const response = await fetch(url);
     console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
     
     const responseData = await response.text();
-    console.log('Raw response text:', responseData);
+    console.log('Raw API response:', responseData);
     
     if (responseData.includes("Must provide WebKey")) {
       console.error('Invalid or missing WebKey detected');
@@ -67,6 +67,7 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     let data;
     try {
       data = JSON.parse(responseData);
+      console.log('Parsed API response:', JSON.stringify(data, null, 2));
     } catch (e) {
       console.error('Error parsing JSON:', e);
       throw new Error('Invalid response format from FMCSA API');
@@ -76,8 +77,20 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       throw new Error('No data returned from FMCSA API');
     }
 
-    // Log raw data for debugging
-    console.log('Raw carrier data:', data);
+    // Log each important field from the raw API response
+    console.log('Important fields from API:');
+    console.log('- Legal Name:', data.legalName);
+    console.log('- Operating Status:', data.allowToOperate);
+    console.log('- Entity Type:', data.carrierOperation);
+    console.log('- Address Components:', {
+      street: data.phyStreet,
+      city: data.phyCity,
+      state: data.phyState,
+      zip: data.phyZipCode
+    });
+    console.log('- Phone:', data.telephone);
+    console.log('- Power Units:', data.totalPowerUnits);
+    console.log('- MCS-150 Date:', data.mcs150FormDate);
 
     // Build the physical address string
     const physicalAddress = [
