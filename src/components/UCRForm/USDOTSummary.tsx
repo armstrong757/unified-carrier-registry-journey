@@ -65,12 +65,12 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             <span className="font-medium">EIN: </span>
             {data.ein}
           </div>
-          <div className="mb-2">
+          <div>
             <span className="font-medium">Mileage (Year): </span>
             {data.mileageYear}
           </div>
           {isUCRForm && (
-            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200">
+            <div className="flex items-center gap-2 mt-6 pt-4 border-t border-gray-200">
               <a
                 href="/mcs150"
                 target="_blank"
