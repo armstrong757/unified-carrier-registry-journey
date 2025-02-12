@@ -141,7 +141,7 @@ const UCRFiling = () => {
         </section>
 
         {/* Fee Structure Table Section */}
-        <div className="mt-16 space-y-6 max-w-2xl mx-auto">
+        <div className="space-y-6 max-w-2xl">
           <h2 className="text-2xl font-bold text-[#1A1F2C] mb-4">UCR Filing Fee For 2025</h2>
           <p className="text-gray-600 leading-relaxed">
             Register for the <span className="font-medium">Unified Carrier Registration Plan</span> based on your fleet size to contribute to funding highway safety initiatives. Annual fees, due by December 31st, support state enforcement, road maintenance, and driving safety. New drivers or companies must pay before their first interstate trip to avoid fines and impoundment. Secure your <span className="italic font-semibold">UCR Registration</span> to travel freely across the United States and beyond!
