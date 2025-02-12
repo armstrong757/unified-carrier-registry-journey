@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -29,10 +30,8 @@ interface USDOTData {
 }
 
 function validateDOTNumber(dotNumber: string): string {
-  // Remove any 'USDOT' prefix and all whitespace
   const cleanDOTNumber = dotNumber.replace(/^(USDOT)?/i, '').replace(/\s+/g, '');
   
-  // Check if it's exactly 7 digits
   if (!/^\d{7}$/.test(cleanDOTNumber)) {
     throw new Error('Invalid DOT number format. Must be exactly 7 digits.');
   }
@@ -43,7 +42,6 @@ function validateDOTNumber(dotNumber: string): string {
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('Fetching carrier data for DOT number:', dotNumber);
   
-  // Validate DOT number format
   const validDOTNumber = validateDOTNumber(dotNumber);
   
   const url = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${validDOTNumber}?webKey=${apiKey}`;
@@ -81,28 +79,35 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     // Log raw data for debugging
     console.log('Raw carrier data:', data);
 
-    // Map specific fields from FMCSA response, using raw values when available
+    // Build the physical address string
+    const physicalAddress = [
+      data.phyStreet,
+      data.phyCity,
+      data.phyState,
+      data.phyZipCode
+    ].filter(Boolean).join(', ');
+
+    // Map specific fields from FMCSA response to our format
     const mappedData = {
-      carrierOperation: data.carrierOperation,
-      legalName: data.legalName,
-      dbaName: data.dbaName,
-      allowToOperate: data.allowToOperate,
-      phyStreet: data.phyStreet,
-      phyCity: data.phyCity,
-      phyState: data.phyState,
-      phyZipCode: data.phyZipCode,
-      telephone: data.telephone,
-      totalPowerUnits: data.totalPowerUnits ? parseInt(data.totalPowerUnits) : 0,
-      busVehicle: data.busVehicle ? parseInt(data.busVehicle) : 0,
-      limoVehicle: data.limoVehicle ? parseInt(data.limoVehicle) : 0,
-      miniBusVehicle: data.miniBusVehicle ? parseInt(data.miniBusVehicle) : 0,
-      motorCoachVehicle: data.motorCoachVehicle ? parseInt(data.motorCoachVehicle) : 0,
-      vanVehicle: data.vanVehicle ? parseInt(data.vanVehicle) : 0,
-      complaintCount: data.complaintCount ? parseInt(data.complaintCount) : 0,
-      outOfService: data.outOfService === 'Y',
-      outOfServiceDate: data.outOfServiceDate,
-      mcNumber: data.mcNumber,
-      mcs150FormDate: data.mcs150FormDate,
+      usdotNumber: validDOTNumber,
+      operatingStatus: data.allowToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
+      entityType: data.carrierOperation || 'CARRIER',
+      legalName: data.legalName || '',
+      dbaName: data.dbaName || '',
+      physicalAddress: physicalAddress || '',
+      telephone: data.telephone || '',
+      powerUnits: data.totalPowerUnits ? parseInt(data.totalPowerUnits) : 0,
+      busCount: data.busTotal ? parseInt(data.busTotal) : 0,
+      limoCount: data.limousineTotal ? parseInt(data.limousineTotal) : 0,
+      minibusCount: data.minibusTotal ? parseInt(data.minibusTotal) : 0,
+      motorcoachCount: data.motorcoachTotal ? parseInt(data.motorcoachTotal) : 0,
+      vanCount: data.vanTotal ? parseInt(data.vanTotal) : 0,
+      complaintCount: data.totalComplaints ? parseInt(data.totalComplaints) : 0,
+      outOfService: data.oosStatus === 'Y',
+      outOfServiceDate: data.oosDate || null,
+      mcNumber: data.mcNumber || '',
+      mcs150LastUpdate: data.mcs150FormDate || '',
+      basicsData: {},
     };
 
     console.log('Mapped carrier data:', mappedData);
@@ -115,9 +120,6 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
 
 async function fetchBasicsData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('Fetching BASIC data for DOT number:', dotNumber);
-  
-  // Remove any 'USDOT' prefix and all whitespace if present
-  dotNumber = dotNumber.replace(/^(USDOT)?/i, '').replace(/\s+/g, '');
   
   try {
     const response = await fetch(
@@ -145,7 +147,6 @@ async function fetchBasicsData(dotNumber: string, apiKey: string): Promise<any> 
     return data;
   } catch (error) {
     console.error('Error in fetchBasicsData:', error);
-    // Don't throw the error for BASIC data, just return null
     return null;
   }
 }
@@ -188,28 +189,30 @@ serve(async (req) => {
 
     if (existingData) {
       console.log('Found existing USDOT info:', dotNumber);
+      const transformedData = {
+        usdotNumber: existingData.usdot_number,
+        operatingStatus: existingData.operating_status,
+        entityType: existingData.entity_type,
+        legalName: existingData.legal_name,
+        dbaName: existingData.dba_name,
+        physicalAddress: existingData.physical_address,
+        telephone: existingData.telephone,
+        powerUnits: existingData.power_units,
+        busCount: existingData.bus_count,
+        limoCount: existingData.limo_count,
+        minibusCount: existingData.minibus_count,
+        motorcoachCount: existingData.motorcoach_count,
+        vanCount: existingData.van_count,
+        complaintCount: existingData.complaint_count,
+        outOfService: existingData.out_of_service,
+        outOfServiceDate: existingData.out_of_service_date,
+        mcNumber: existingData.mc_number,
+        mcs150LastUpdate: existingData.mcs150_last_update,
+        basicsData: existingData.basics_data,
+      };
+      
       return new Response(
-        JSON.stringify({
-          usdotNumber: existingData.usdot_number,
-          operatingStatus: existingData.operating_status,
-          entityType: existingData.entity_type,
-          legalName: existingData.legal_name,
-          dbaName: existingData.dba_name,
-          physicalAddress: existingData.physical_address,
-          telephone: existingData.telephone,
-          powerUnits: existingData.power_units,
-          busCount: existingData.bus_count,
-          limoCount: existingData.limo_count,
-          minibusCount: existingData.minibus_count,
-          motorcoachCount: existingData.motorcoach_count,
-          vanCount: existingData.van_count,
-          complaintCount: existingData.complaint_count,
-          outOfService: existingData.out_of_service,
-          outOfServiceDate: existingData.out_of_service_date,
-          mcNumber: existingData.mc_number,
-          mcs150LastUpdate: existingData.mcs150_last_update,
-          basicsData: existingData.basics_data,
-        }),
+        JSON.stringify(transformedData),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
@@ -223,43 +226,11 @@ serve(async (req) => {
       fetchBasicsData(dotNumber, fmcsaApiKey)
     ]);
 
-    // Parse dates properly
-    const outOfServiceDate = carrierData.outOfServiceDate ? new Date(carrierData.outOfServiceDate).toISOString().split('T')[0] : null;
-    const mcs150LastUpdate = carrierData.mcs150FormDate ? new Date(carrierData.mcs150FormDate).toISOString().split('T')[0] : null;
-
-    // Create physical address string using actual values, not defaults
-    const physicalAddress = [
-      carrierData.phyStreet,
-      carrierData.phyCity,
-      carrierData.phyState,
-      carrierData.phyZipCode
-    ].filter(Boolean).join(', ');
-
-    // Transform FMCSA data to our format without adding unnecessary defaults
+    // Create transformed data object
     const transformedData = {
-      usdotNumber: dotNumber,
-      operatingStatus: carrierData.allowToOperate === 'Y' ? 'AUTHORIZED' : 'NOT AUTHORIZED',
-      entityType: carrierData.carrierOperation,
-      legalName: carrierData.legalName,
-      dbaName: carrierData.dbaName,
-      physicalAddress: physicalAddress || null,
-      telephone: carrierData.telephone,
-      powerUnits: carrierData.totalPowerUnits,
-      busCount: carrierData.busVehicle,
-      limoCount: carrierData.limoVehicle,
-      minibusCount: carrierData.miniBusVehicle,
-      motorcoachCount: carrierData.motorCoachVehicle,
-      vanCount: carrierData.vanVehicle,
-      complaintCount: carrierData.complaintCount,
-      outOfService: carrierData.outOfService === 'Y',
-      outOfServiceDate: outOfServiceDate,
-      mcNumber: carrierData.mcNumber,
-      mcs150LastUpdate: mcs150LastUpdate,
+      ...carrierData,
       basicsData: basicsData || {},
     };
-
-    // Log the transformed data before storing
-    console.log('Transformed data:', transformedData);
 
     // Store the data in our database
     const { error: insertError } = await supabase.from('usdot_info').insert({
