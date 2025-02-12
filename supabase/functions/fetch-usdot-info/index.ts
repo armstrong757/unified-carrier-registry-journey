@@ -41,7 +41,7 @@ function validateDOTNumber(dotNumber: string): string {
 
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('DEBUG: Starting carrier data fetch for DOT number:', dotNumber);
-  console.log('DEBUG: Using API key (first 4 chars):', apiKey.substring(0, 4));
+  console.log('DEBUG: Using API key:', apiKey);
   
   const validDOTNumber = validateDOTNumber(dotNumber);
   
@@ -53,7 +53,6 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     const response = await fetch(url);
     console.log('DEBUG: Response received');
     console.log('DEBUG: Response status:', response.status);
-    console.log('DEBUG: Response headers:', Object.fromEntries(response.headers.entries()));
     
     const responseData = await response.text();
     console.log('DEBUG: Raw API response:', responseData);
@@ -88,12 +87,6 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       console.error('DEBUG: No data in API response');
       throw new Error('No data returned from FMCSA API');
     }
-
-    // Detailed logging of all received fields
-    console.log('DEBUG: Raw API fields received:', Object.keys(data));
-    Object.entries(data).forEach(([key, value]) => {
-      console.log(`DEBUG: ${key}:`, value);
-    });
 
     // Build the physical address string
     const physicalAddress = [
