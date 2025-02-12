@@ -32,28 +32,38 @@ const UCR = () => {
   }, [navigate, toast]);
 
   const [formData, setFormData] = useState({
-    // Step 1
-    registrationYear: "",
-    representative: "",
+    // Step 1 - Representative Information (Pre-filled from USDOT data)
+    registrationYear: new Date().getFullYear() + 1, // Default to next year
+    representative: usdotData?.legalName || "",
     email: "",
-    phone: "",
+    phone: usdotData?.telephone || "",
     authorization: false,
 
-    // Step 2
-    classifications: {},
+    // Step 2 - Classifications (Pre-filled based on entity type)
+    classifications: {
+      motorCarrier: usdotData?.entityType === "CARRIER",
+      motorPrivate: false,
+      freightForwarder: false,
+      broker: false,
+      leasingCompany: false,
+    },
 
-    // Step 3
+    // Step 3 - Vehicles (Pre-filled from USDOT data)
     straightTrucks: usdotData?.powerUnits || 0,
-    passengerVehicles: 0,
+    passengerVehicles: (usdotData?.busCount || 0) + 
+                      (usdotData?.limoCount || 0) + 
+                      (usdotData?.minibusCount || 0) + 
+                      (usdotData?.motorcoachCount || 0) + 
+                      (usdotData?.vanCount || 0),
     needsVehicleChanges: "no",
     addVehicles: "",
     excludeVehicles: "",
 
-    // Step 4
+    // Step 4 - Billing
     cardNumber: "",
     expiryDate: "",
     cvv: "",
-    cardName: "",
+    cardName: usdotData?.legalName || "", // Pre-fill with company name
     termsAccepted: false,
   });
 
