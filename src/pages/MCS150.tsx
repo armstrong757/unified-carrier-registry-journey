@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 import FormProgress from "@/components/UCRForm/FormProgress";
 import StepOne from "@/components/MCS150Form/StepOne";
 import StepTwo from "@/components/MCS150Form/StepTwo";
@@ -13,43 +13,36 @@ import USDOTSummary from "@/components/UCRForm/USDOTSummary";
 
 const MCS150 = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 6;
+  const [usdotData, setUsdotData] = useState<any>(null);
 
-  // Updated mock data to include all required properties
-  const mockUSDOTData = {
-    usdotNumber: "1523020",
-    operatingStatus: "NOT AUTHORIZED",
-    entityType: "CARRIER",
-    legalName: "TOWN & COUNTRY EVENT RENTALS INC",
-    dbaName: "", // Added
-    physicalAddress: "7725 AIRPORT BUSINESS PARK WAY VAN NUYS, CA 91406",
-    telephone: "", // Added
-    powerUnits: 110,
-    busCount: 0, // Added
-    limoCount: 0, // Added
-    minibusCount: 0, // Added
-    motorcoachCount: 0, // Added
-    vanCount: 0, // Added
-    complaintCount: 0, // Added
-    outOfService: false, // Added
-    outOfServiceDate: null, // Added
-    mcNumber: "", // Added
-    mcs150LastUpdate: "07/14/2022",
-    basicsData: {}, // Added
-  };
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('usdotData');
+    if (!storedData) {
+      toast({
+        title: "Error",
+        description: "No DOT information found. Please start from the MCS-150 Filing page.",
+        variant: "destructive",
+      });
+      navigate('/mcs-150-filing');
+      return;
+    }
+    setUsdotData(JSON.parse(storedData));
+  }, [navigate, toast]);
 
   const [formData, setFormData] = useState({
     // Step 1 - Reason for Filing
     reasonForFiling: {
-      biennialUpdate: true, // Default to biennial update since that's the most common
+      biennialUpdate: true,
       reactivate: false,
       reapplication: false,
       outOfBusiness: false,
     },
 
     // Step 2 - Changes
-    hasChanges: "no", // Default to no changes
+    hasChanges: "no",
     changesToMake: {
       companyInfo: false,
       operatingInfo: false,
@@ -75,27 +68,27 @@ const MCS150 = () => {
     // Step 3 - Company Information (Pre-filled from USDOT data)
     ownerName: "",
     principalAddress: {
-      address: mockUSDOTData.physicalAddress.split(',')[0].trim(),
-      city: mockUSDOTData.physicalAddress.split(',')[1]?.trim() || "",
-      state: mockUSDOTData.physicalAddress.split(',')[2]?.trim().split(' ')[0] || "",
-      zip: mockUSDOTData.physicalAddress.split(',')[2]?.trim().split(' ')[1] || "",
+      address: usdotData?.physicalAddress?.split(',')[0]?.trim() || "",
+      city: usdotData?.physicalAddress?.split(',')[1]?.trim() || "",
+      state: usdotData?.physicalAddress?.split(',')[2]?.trim()?.split(' ')[0] || "",
+      zip: usdotData?.physicalAddress?.split(',')[2]?.trim()?.split(' ')[1] || "",
       country: "USA",
     },
     mailingAddress: {
-      address: mockUSDOTData.physicalAddress.split(',')[0].trim(),
-      city: mockUSDOTData.physicalAddress.split(',')[1]?.trim() || "",
-      state: mockUSDOTData.physicalAddress.split(',')[2]?.trim().split(' ')[0] || "",
-      zip: mockUSDOTData.physicalAddress.split(',')[2]?.trim().split(' ')[1] || "",
+      address: usdotData?.physicalAddress?.split(',')[0]?.trim() || "",
+      city: usdotData?.physicalAddress?.split(',')[1]?.trim() || "",
+      state: usdotData?.physicalAddress?.split(',')[2]?.trim()?.split(' ')[0] || "",
+      zip: usdotData?.physicalAddress?.split(',')[2]?.trim()?.split(' ')[1] || "",
       country: "USA",
     },
-    businessPhone: mockUSDOTData.telephone,
+    businessPhone: usdotData?.telephone || "",
     businessEmail: "",
-    companyName: mockUSDOTData.legalName,
+    companyName: usdotData?.legalName || "",
     einSsn: "",
 
     // Step 4 - Operations (Pre-filled from USDOT data)
     companyOperations: {
-      interstateCarrier: mockUSDOTData.entityType === "CARRIER",
+      interstateCarrier: usdotData?.entityType === "CARRIER",
       intrastatehazmatCarrier: false,
       intrastateNonHazmatCarrier: false,
       intrastateHazmatShipper: false,
@@ -109,20 +102,20 @@ const MCS150 = () => {
       trailers: { owned: 0, termLeased: 0, tripLeased: 0 },
       hazmatTrucks: { owned: 0, termLeased: 0, tripLeased: 0 },
       hazmatTrailers: { owned: 0, termLeased: 0, tripLeased: 0 },
-      motorCoach: { owned: mockUSDOTData.motorcoachCount, termLeased: 0, tripLeased: 0 },
+      motorCoach: { owned: usdotData?.motorcoachCount || 0, termLeased: 0, tripLeased: 0 },
       schoolBusSmall: { owned: 0, termLeased: 0, tripLeased: 0 },
       schoolBusMedium: { owned: 0, termLeased: 0, tripLeased: 0 },
-      schoolBusLarge: { owned: mockUSDOTData.busCount, termLeased: 0, tripLeased: 0 },
+      schoolBusLarge: { owned: usdotData?.busCount || 0, termLeased: 0, tripLeased: 0 },
       busLarge: { owned: 0, termLeased: 0, tripLeased: 0 },
-      vanSmall: { owned: mockUSDOTData.vanCount, termLeased: 0, tripLeased: 0 },
+      vanSmall: { owned: usdotData?.vanCount || 0, termLeased: 0, tripLeased: 0 },
       vanMedium: { owned: 0, termLeased: 0, tripLeased: 0 },
-      limousineSmall: { owned: mockUSDOTData.limoCount, termLeased: 0, tripLeased: 0 },
+      limousineSmall: { owned: usdotData?.limoCount || 0, termLeased: 0, tripLeased: 0 },
       limousineMedium: { owned: 0, termLeased: 0, tripLeased: 0 },
     },
     drivers: {
       interstate: "0",
       intrastate: "0",
-      total: mockUSDOTData.powerUnits.toString(),
+      total: (usdotData?.powerUnits || 0).toString(),
       cdl: "0",
     },
     hazmatDetails: {},
@@ -133,7 +126,7 @@ const MCS150 = () => {
       lastName: "",
       title: "",
       email: "",
-      phone: mockUSDOTData.telephone,
+      phone: usdotData?.telephone || "",
       einSsn: "",
       milesDriven: "",
       licenseFile: null,
@@ -226,6 +219,10 @@ const MCS150 = () => {
     }
   };
 
+  if (!usdotData) {
+    return null; // Don't render anything while loading
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -257,7 +254,7 @@ const MCS150 = () => {
           
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              <USDOTSummary data={mockUSDOTData} />
+              <USDOTSummary data={usdotData} />
             </div>
           </div>
         </div>
