@@ -70,28 +70,36 @@ serve(async (req) => {
     // If not in database, fetch from FMCSA API
     console.log('Fetching USDOT info from FMCSA API:', dotNumber)
     const fmcsaResponse = await fetch(
-      `https://api.fmcsa.dot.gov/v1/census/${dotNumber}?webKey=${fmcsaApiKey}`
+      `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}?webKey=${fmcsaApiKey}`
     )
 
     if (!fmcsaResponse.ok) {
-      throw new Error(`FMCSA API error: ${fmcsaResponse.statusText}`)
+      const errorText = await fmcsaResponse.text()
+      console.error('FMCSA API error response:', errorText)
+      
+      if (fmcsaResponse.status === 401) {
+        throw new Error('FMCSA API authentication failed. Please check the API key.')
+      } else if (fmcsaResponse.status === 404) {
+        throw new Error('USDOT number not found')
+      } else {
+        throw new Error(`FMCSA API error: ${fmcsaResponse.status} ${fmcsaResponse.statusText}`)
+      }
     }
 
     const fmcsaData = await fmcsaResponse.json()
     
-    // Transform FMCSA data to our format
-    // Note: This is a mock transformation - you'll need to adjust based on actual FMCSA API response format
+    // Transform FMCSA data to our format using the documented field names
     const transformedData: USDOTData = {
       usdotNumber: dotNumber,
-      operatingStatus: fmcsaData.operatingStatus || 'UNKNOWN',
-      entityType: fmcsaData.entityType || 'UNKNOWN',
-      legalName: fmcsaData.legalName || 'UNKNOWN',
-      physicalAddress: fmcsaData.physicalAddress || 'UNKNOWN',
-      powerUnits: parseInt(fmcsaData.powerUnits) || 0,
-      drivers: parseInt(fmcsaData.drivers) || 0,
-      mcs150LastUpdate: fmcsaData.mcs150LastUpdate || 'UNKNOWN',
-      ein: fmcsaData.ein || 'UNKNOWN',
-      mileageYear: `${fmcsaData.mileage || 0} (${fmcsaData.mileageYear || 'UNKNOWN'})`,
+      operatingStatus: fmcsaData.allowToOperate === 'Y' ? 'AUTHORIZED' : 'NOT AUTHORIZED',
+      entityType: 'N/A', // Not provided in basic carrier response
+      legalName: fmcsaData.legalName || '',
+      physicalAddress: `${fmcsaData.phyStreet || ''}, ${fmcsaData.phyCity || ''}, ${fmcsaData.phyState || ''} ${fmcsaData.phyZip || ''}, ${fmcsaData.phyCountry || ''}`.trim(),
+      powerUnits: parseInt(fmcsaData.passengerVehicle) || 0,
+      drivers: 0, // Not provided in basic carrier response
+      mcs150LastUpdate: fmcsaData.snapShotDate || '',
+      ein: '', // Not provided in basic carrier response
+      mileageYear: '', // Not provided in basic carrier response
     }
 
     // Store the data in our database
