@@ -70,7 +70,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             {data.mileageYear}
           </div>
           {isUCRForm && (
-            <div className="flex items-center gap-2 mt-6 pt-4 border-t border-gray-200">
+            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200">
               <a
                 href="/mcs150"
                 target="_blank"
