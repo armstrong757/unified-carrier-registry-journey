@@ -49,16 +49,19 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     }
     
     const data = await response.json();
+    console.log('Raw API response:', JSON.stringify(data));
+
     if (!data) {
       throw new Error('No data returned from FMCSA API');
     }
 
-    // Check if carrier is authorized
-    if (data.allowToOperate !== 'Y') {
-      throw new Error(`This USDOT number (${dotNumber}) is not currently authorized to operate. Please verify the number or contact FMCSA for assistance.`);
+    // Check carrier status more comprehensively
+    if (data.carrierOperation === 'INACTIVE' || data.allowToOperate === 'N') {
+      console.error('Carrier is inactive or not authorized:', JSON.stringify(data));
+      throw new Error(`This carrier (USDOT ${dotNumber}) is not currently authorized to operate. Status: ${data.carrierOperation}, Allowed to Operate: ${data.allowToOperate}`);
     }
     
-    console.log('Successfully fetched carrier data:', JSON.stringify(data));
+    console.log('Successfully parsed carrier data:', JSON.stringify(data));
     return data;
   } catch (error) {
     console.error('Error in fetchCarrierData:', error);
@@ -253,4 +256,3 @@ serve(async (req) => {
     );
   }
 });
-
