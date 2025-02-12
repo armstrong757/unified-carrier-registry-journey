@@ -158,36 +158,44 @@ const MCS150 = () => {
     if (usdotData) {
       console.log('Updating form data with USDOT data:', usdotData);
       
-      const addressParts = usdotData.physicalAddress.split(',').map((part: string) => part.trim());
-      const [street = "", city = "", stateZip = ""] = addressParts;
-      const [state = "", zip = ""] = stateZip.split(' ');
+      let street = '', city = '', state = '', zip = '';
+      if (usdotData.physicalAddress) {
+        const addressParts = usdotData.physicalAddress.split(',').map((part: string) => part.trim());
+        if (addressParts.length >= 3) {
+          street = addressParts[0] || '';
+          city = addressParts[1] || '';
+          const stateZipParts = addressParts[2].split(' ');
+          state = stateZipParts[0] || '';
+          zip = stateZipParts[1] || '';
+        }
+      }
 
       setFormData(prev => ({
         ...prev,
         principalAddress: {
-          address: street,
-          city,
-          state,
-          zip,
+          address: street || '',
+          city: city || '',
+          state: state || '',
+          zip: zip || '',
           country: "USA",
         },
         mailingAddress: {
-          address: street,
-          city,
-          state,
-          zip,
+          address: street || '',
+          city: city || '',
+          state: state || '',
+          zip: zip || '',
           country: "USA",
         },
-        businessPhone: usdotData.telephone || "",
-        companyName: usdotData.legalName || "",
+        businessPhone: usdotData.telephone || '',
+        companyName: usdotData.legalName || '',
         vehicles: {
           ...prev.vehicles,
           motorCoach: { 
             ...prev.vehicles.motorCoach,
             owned: usdotData.motorcoachCount || 0 
           },
-          schoolBusLarge: { 
-            ...prev.vehicles.schoolBusLarge,
+          busLarge: { 
+            ...prev.vehicles.busLarge,
             owned: usdotData.busCount || 0 
           },
           vanSmall: { 
@@ -202,6 +210,9 @@ const MCS150 = () => {
         drivers: {
           ...prev.drivers,
           total: (usdotData.powerUnits || 0).toString(),
+          cdl: (usdotData.powerUnits || 0).toString(), // Default CDL drivers to power units
+          interstate: "0",
+          intrastate: "0",
         },
       }));
     }
