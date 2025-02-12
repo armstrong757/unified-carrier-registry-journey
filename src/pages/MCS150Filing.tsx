@@ -24,8 +24,19 @@ const MCS150Filing = () => {
         body: { dotNumber: dotNumber.trim() }
       });
 
-      if (error) throw error;
-      if (!data) throw new Error('No data returned from USDOT lookup');
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to fetch DOT information');
+      }
+      
+      if (!data) {
+        throw new Error('No data returned from USDOT lookup');
+      }
+
+      // Check if the carrier is authorized
+      if (data.operatingStatus === 'NOT AUTHORIZED') {
+        throw new Error(`USDOT ${dotNumber} is not currently authorized to operate. Please verify the number or contact FMCSA for assistance.`);
+      }
 
       console.log('USDOT data received:', data);
 

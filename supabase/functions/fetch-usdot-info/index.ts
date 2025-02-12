@@ -52,6 +52,11 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     if (!data) {
       throw new Error('No data returned from FMCSA API');
     }
+
+    // Check if carrier is authorized
+    if (data.allowToOperate !== 'Y') {
+      throw new Error(`This USDOT number (${dotNumber}) is not currently authorized to operate. Please verify the number or contact FMCSA for assistance.`);
+    }
     
     console.log('Successfully fetched carrier data:', JSON.stringify(data));
     return data;
