@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -41,20 +42,40 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     const response = await fetch(url);
     console.log('Response status:', response.status);
     
+    const responseData = await response.text();
+    console.log('Raw response text:', responseData);
+    
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('FMCSA API Error:', errorText);
-      throw new Error(`FMCSA API Error (${response.status}): ${errorText}`);
+      console.error('FMCSA API Error:', responseData);
+      throw new Error(`FMCSA API Error (${response.status}): ${responseData}`);
     }
     
-    const data = await response.json();
-    console.log('Raw API response:', JSON.stringify(data));
+    let data;
+    try {
+      data = JSON.parse(responseData);
+    } catch (e) {
+      console.error('Error parsing JSON:', e);
+      throw new Error('Invalid response format from FMCSA API');
+    }
 
     if (!data) {
       throw new Error('No data returned from FMCSA API');
     }
+
+    // Log the specific fields we're interested in
+    console.log('Carrier data fields:', {
+      legalName: data.legalName,
+      dbaName: data.dbaName,
+      carrierOperation: data.carrierOperation,
+      allowToOperate: data.allowToOperate,
+      street: data.phyStreet,
+      city: data.phyCity,
+      state: data.phyState,
+      zip: data.phyZipCode,
+      telephone: data.telephone,
+      totalPowerUnits: data.totalPowerUnits,
+    });
     
-    console.log('Successfully parsed carrier data:', JSON.stringify(data));
     return data;
   } catch (error) {
     console.error('Error in fetchCarrierData:', error);
@@ -177,15 +198,21 @@ serve(async (req) => {
     const outOfServiceDate = carrierData.outOfServiceDate ? new Date(carrierData.outOfServiceDate).toISOString().split('T')[0] : null;
     const mcs150LastUpdate = carrierData.mcs150FormDate ? new Date(carrierData.mcs150FormDate).toISOString().split('T')[0] : null;
 
-    // Transform FMCSA data to our format
+    // Transform FMCSA data to our format, with additional null checks
     const transformedData: USDOTData = {
       usdotNumber: dotNumber,
       operatingStatus: carrierData.allowToOperate === 'Y' ? 'AUTHORIZED' : 'NOT AUTHORIZED',
-      entityType: carrierData.carrierOperation || 'N/A',
-      legalName: carrierData.legalName || '',
+      entityType: carrierData.carrierOperation || 'UNKNOWN',
+      legalName: carrierData.legalName || 'NOT PROVIDED',
       dbaName: carrierData.dbaName || '',
-      physicalAddress: `${carrierData.phyStreet || ''}, ${carrierData.phyCity || ''}, ${carrierData.phyState || ''} ${carrierData.phyZip || ''}, ${carrierData.phyCountry || ''}`.trim(),
-      telephone: carrierData.telephone || '',
+      physicalAddress: [
+        carrierData.phyStreet,
+        carrierData.phyCity,
+        carrierData.phyState,
+        carrierData.phyZipCode,
+        carrierData.phyCountry
+      ].filter(Boolean).join(', ') || 'NOT PROVIDED',
+      telephone: carrierData.telephone || 'NOT PROVIDED',
       powerUnits: parseInt(carrierData.totalPowerUnits) || 0,
       busCount: parseInt(carrierData.busVehicle) || 0,
       limoCount: parseInt(carrierData.limoVehicle) || 0,
@@ -199,6 +226,9 @@ serve(async (req) => {
       mcs150LastUpdate: mcs150LastUpdate,
       basicsData: basicsData || {},
     };
+
+    // Log the transformed data before storing
+    console.log('Transformed data:', transformedData);
 
     // Store the data in our database
     const { error: insertError } = await supabase.from('usdot_info').insert({
