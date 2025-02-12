@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 const MCS150Filing = () => {
   const [dotNumber, setDotNumber] = useState("");
@@ -22,7 +23,6 @@ const MCS150Filing = () => {
   return (
     <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-16">
-        {/* Header Section */}
         <div className="text-center space-y-8">
           <h1 className="text-4xl font-bold text-[#1A1F2C] mb-8">MCS-150 / Biennial Update</h1>
           
@@ -45,7 +45,6 @@ const MCS150Filing = () => {
           </Card>
         </div>
 
-        {/* Content Sections */}
         <section className="space-y-12 bg-[#edf7ff]/50 p-4 sm:p-8 rounded-xl shadow-sm">
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">What is an MCS-150?</h2>
@@ -59,6 +58,8 @@ const MCS150Filing = () => {
               <li>Maintain accurate carrier information in federal databases</li>
             </ul>
           </div>
+
+          <Separator className="my-8" />
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Consequences of Non-Compliance</h2>
@@ -84,6 +85,8 @@ const MCS150Filing = () => {
             </div>
           </div>
 
+          <Separator className="my-8" />
+
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Additional Filing Requirements</h2>
             <p className="text-gray-600 mb-4">You must also file an MCS-150 update within 30 days when:</p>
@@ -102,6 +105,8 @@ const MCS150Filing = () => {
               <li>Adding or reducing number of drivers</li>
             </ul>
           </div>
+
+          <Separator className="my-8" />
 
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">When Must You File?</h2>
@@ -189,7 +194,6 @@ const MCS150Filing = () => {
           </Button>
         </div>
 
-        {/* Disclaimer */}
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-[#8E9196] text-xs">
             This website is not affiliated with the Federal Motor Carrier Safety Administration (FMCSA). This website is operated by a private company that provides a private registration service for an additional fee. You are not required to use this site to register your MCS-150. You may file directly with the FMCSA at www.fmcsa.dot.gov.
