@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -40,45 +41,84 @@ function validateDOTNumber(dotNumber: string): string {
 
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('DEBUG: Starting carrier data fetch for DOT number:', dotNumber);
+  console.log('DEBUG: API Key length:', apiKey?.length);
+  console.log('DEBUG: API Key first 4 chars:', apiKey?.substring(0, 4));
   
   const validDOTNumber = validateDOTNumber(dotNumber);
   
-  // Use the snapshot endpoint which provides comprehensive carrier data
-  const url = `https://api.fmcsa.dot.gov/snapshot/carriers/${validDOTNumber}?webKey=${apiKey}`;
+  // Test a different endpoint format
+  const url = `https://api.fmcsa.dot.gov/snapshot/carriers/${validDOTNumber}`;
   console.log('DEBUG: Making request to:', url);
   
   try {
     if (!apiKey || apiKey.length < 32) {
+      console.error('DEBUG: Invalid API key length:', apiKey?.length);
       throw new Error('Invalid API key format');
     }
 
+    // First try without the webKey in the URL
     const response = await fetch(url, {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'X-API-Key': apiKey
       }
     });
     
-    console.log('DEBUG: Response status:', response.status);
+    console.log('DEBUG: Initial response status:', response.status);
+    console.log('DEBUG: Response headers:', JSON.stringify(Array.from(response.headers.entries())));
+    
     const responseText = await response.text();
     console.log('DEBUG: Raw response:', responseText);
+    console.log('DEBUG: Response content type:', response.headers.get('content-type'));
 
     if (!response.ok) {
+      console.error('DEBUG: Response not OK. Status:', response.status);
+      console.error('DEBUG: Response status text:', response.statusText);
+      
       if (response.status === 403) {
+        console.error('DEBUG: 403 Forbidden - likely an API key issue');
         throw new Error('API access forbidden - please check API key permissions');
       }
-      throw new Error(`HTTP error! status: ${response.status}`);
+      
+      // Try alternative URL format with webKey as query param
+      console.log('DEBUG: Trying alternative URL format...');
+      const altResponse = await fetch(`${url}?webKey=${apiKey}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('DEBUG: Alternative response status:', altResponse.status);
+      const altText = await altResponse.text();
+      console.log('DEBUG: Alternative raw response:', altText);
+      
+      if (!altResponse.ok) {
+        throw new Error(`Both API request attempts failed. Status: ${response.status}, Alt Status: ${altResponse.status}`);
+      }
+      
+      try {
+        return JSON.parse(altText);
+      } catch (e) {
+        console.error('DEBUG: Failed to parse alternative response:', e);
+        throw new Error('Invalid JSON in alternative response');
+      }
     }
 
     let data;
     try {
       data = JSON.parse(responseText);
+      console.log('DEBUG: Successfully parsed JSON response');
     } catch (e) {
-      console.error('Failed to parse JSON:', responseText);
+      console.error('DEBUG: Failed to parse JSON:', e);
+      console.error('DEBUG: Raw text that failed to parse:', responseText);
       throw new Error('Invalid JSON response from FMCSA API');
     }
 
     if (!data || !data.content) {
+      console.error('DEBUG: Missing expected data structure:', JSON.stringify(data));
       throw new Error('Empty or invalid response from FMCSA API');
     }
 
@@ -112,10 +152,11 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       basicsData: {},
     };
 
-    console.log('DEBUG: Mapped data:', mappedData);
+    console.log('DEBUG: Final mapped data:', JSON.stringify(mappedData, null, 2));
     return mappedData;
   } catch (error) {
     console.error('DEBUG: API request failed:', error);
+    console.error('DEBUG: Error stack:', error.stack);
     throw error;
   }
 }
