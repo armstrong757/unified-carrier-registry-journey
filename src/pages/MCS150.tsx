@@ -16,18 +16,27 @@ const MCS150 = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 6;
 
-  // Temporary mock data - will be replaced with API data
+  // Updated mock data to include all required properties
   const mockUSDOTData = {
     usdotNumber: "1523020",
     operatingStatus: "NOT AUTHORIZED",
     entityType: "CARRIER",
     legalName: "TOWN & COUNTRY EVENT RENTALS INC",
+    dbaName: "", // Added
     physicalAddress: "7725 AIRPORT BUSINESS PARK WAY VAN NUYS, CA 91406",
+    telephone: "", // Added
     powerUnits: 110,
-    drivers: 110,
+    busCount: 0, // Added
+    limoCount: 0, // Added
+    minibusCount: 0, // Added
+    motorcoachCount: 0, // Added
+    vanCount: 0, // Added
+    complaintCount: 0, // Added
+    outOfService: false, // Added
+    outOfServiceDate: null, // Added
+    mcNumber: "", // Added
     mcs150LastUpdate: "07/14/2022",
-    ein: "954695759",
-    mileageYear: "200000 (2022)",
+    basicsData: {}, // Added
   };
 
   const [formData, setFormData] = useState({
