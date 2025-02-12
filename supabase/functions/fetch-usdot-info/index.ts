@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -39,58 +40,60 @@ function validateDOTNumber(dotNumber: string): string {
 }
 
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
-  console.log('Fetching carrier data for DOT number:', dotNumber);
+  console.log('DEBUG: Starting carrier data fetch for DOT number:', dotNumber);
+  console.log('DEBUG: Using API key (first 4 chars):', apiKey.substring(0, 4));
   
   const validDOTNumber = validateDOTNumber(dotNumber);
   
   const url = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${validDOTNumber}?webKey=${apiKey}`;
-  console.log('Making request to:', url);
+  console.log('DEBUG: Request URL:', url);
   
   try {
+    console.log('DEBUG: Making API request...');
     const response = await fetch(url);
-    console.log('Response status:', response.status);
-    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+    console.log('DEBUG: Response received');
+    console.log('DEBUG: Response status:', response.status);
+    console.log('DEBUG: Response headers:', Object.fromEntries(response.headers.entries()));
     
     const responseData = await response.text();
-    console.log('Raw API response:', responseData);
+    console.log('DEBUG: Raw API response:', responseData);
     
+    // Check for common API error messages
     if (responseData.includes("Must provide WebKey")) {
-      console.error('Invalid or missing WebKey detected');
+      console.error('DEBUG: Invalid or missing WebKey detected');
       throw new Error('FMCSA API key appears to be invalid or missing');
+    }
+
+    if (responseData.includes("Invalid webkey")) {
+      console.error('DEBUG: Invalid webkey detected');
+      throw new Error('Invalid FMCSA API key');
     }
     
     if (!response.ok) {
-      console.error('FMCSA API Error:', responseData);
+      console.error('DEBUG: FMCSA API Error:', responseData);
       throw new Error(`FMCSA API Error (${response.status}): ${responseData}`);
     }
     
     let data;
     try {
       data = JSON.parse(responseData);
-      console.log('Parsed API response:', JSON.stringify(data, null, 2));
+      console.log('DEBUG: Successfully parsed JSON response');
+      console.log('DEBUG: Full API response data:', JSON.stringify(data, null, 2));
     } catch (e) {
-      console.error('Error parsing JSON:', e);
+      console.error('DEBUG: Error parsing JSON:', e);
       throw new Error('Invalid response format from FMCSA API');
     }
 
     if (!data) {
+      console.error('DEBUG: No data in API response');
       throw new Error('No data returned from FMCSA API');
     }
 
-    // Log each important field from the raw API response
-    console.log('Important fields from API:');
-    console.log('- Legal Name:', data.legalName);
-    console.log('- Operating Status:', data.allowToOperate);
-    console.log('- Entity Type:', data.carrierOperation);
-    console.log('- Address Components:', {
-      street: data.phyStreet,
-      city: data.phyCity,
-      state: data.phyState,
-      zip: data.phyZipCode
+    // Detailed logging of all received fields
+    console.log('DEBUG: Raw API fields received:', Object.keys(data));
+    Object.entries(data).forEach(([key, value]) => {
+      console.log(`DEBUG: ${key}:`, value);
     });
-    console.log('- Phone:', data.telephone);
-    console.log('- Power Units:', data.totalPowerUnits);
-    console.log('- MCS-150 Date:', data.mcs150FormDate);
 
     // Build the physical address string
     const physicalAddress = [
@@ -123,10 +126,10 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       basicsData: {},
     };
 
-    console.log('Mapped carrier data:', mappedData);
+    console.log('DEBUG: Final mapped data:', mappedData);
     return mappedData;
   } catch (error) {
-    console.error('Error in fetchCarrierData:', error);
+    console.error('DEBUG: Error in fetchCarrierData:', error);
     throw error;
   }
 }
@@ -175,11 +178,11 @@ serve(async (req) => {
       throw new Error('DOT number is required');
     }
     
-    console.log('Received request for DOT number:', dotNumber);
+    console.log('DEBUG: Processing request for DOT number:', dotNumber);
     
     const fmcsaApiKey = Deno.env.get('FMCSA_API_KEY');
     if (!fmcsaApiKey) {
-      console.error('FMCSA API key not configured');
+      console.error('DEBUG: FMCSA API key not configured');
       throw new Error('FMCSA API key not configured');
     }
 
@@ -196,12 +199,12 @@ serve(async (req) => {
       .maybeSingle();
 
     if (fetchError) {
-      console.error('Error fetching from database:', fetchError);
+      console.error('DEBUG: Error fetching from database:', fetchError);
       throw fetchError;
     }
 
     if (existingData) {
-      console.log('Found existing USDOT info:', dotNumber);
+      console.log('DEBUG: Found existing USDOT info:', existingData);
       const transformedData = {
         usdotNumber: existingData.usdot_number,
         operatingStatus: existingData.operating_status,
@@ -233,7 +236,7 @@ serve(async (req) => {
     }
 
     // Fetch carrier and BASIC data in parallel
-    console.log('Fetching new USDOT info from FMCSA API:', dotNumber);
+    console.log('DEBUG: Fetching new USDOT info from FMCSA API:', dotNumber);
     const [carrierData, basicsData] = await Promise.all([
       fetchCarrierData(dotNumber, fmcsaApiKey),
       fetchBasicsData(dotNumber, fmcsaApiKey)
@@ -269,11 +272,11 @@ serve(async (req) => {
     });
 
     if (insertError) {
-      console.error('Error storing USDOT info:', insertError);
+      console.error('DEBUG: Error storing USDOT info:', insertError);
       throw insertError;
     }
 
-    console.log('Successfully processed and stored USDOT info');
+    console.log('DEBUG: Successfully processed and stored USDOT info:', transformedData);
     return new Response(
       JSON.stringify(transformedData),
       {
@@ -281,7 +284,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error in fetch-usdot-info function:', error);
+    console.error('DEBUG: Error in fetch-usdot-info function:', error);
     return new Response(
       JSON.stringify({ 
         error: error.message,
