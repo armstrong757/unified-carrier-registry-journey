@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -43,8 +42,6 @@ function validateDOTNumber(dotNumber: string): string {
 
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('Fetching carrier data for DOT number:', dotNumber);
-  console.log('API Key length:', apiKey?.length);
-  console.log('API Key first 4 chars:', apiKey?.substring(0, 4));
   
   // Validate DOT number format
   const validDOTNumber = validateDOTNumber(dotNumber);
@@ -59,7 +56,6 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     const responseData = await response.text();
     console.log('Raw response text:', responseData);
     
-    // If we get the "Must provide WebKey" error, log it clearly
     if (responseData.includes("Must provide WebKey")) {
       console.error('Invalid or missing WebKey detected');
       throw new Error('FMCSA API key appears to be invalid or missing');
@@ -82,28 +78,31 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       throw new Error('No data returned from FMCSA API');
     }
 
-    // Map specific fields from FMCSA response
+    // Log raw data for debugging
+    console.log('Raw carrier data:', data);
+
+    // Map specific fields from FMCSA response, using raw values when available
     const mappedData = {
-      carrierOperation: data.carrierOperation || 'UNKNOWN',
-      legalName: data.legalName || 'NOT PROVIDED',
-      dbaName: data.dbaName || '',
-      allowToOperate: data.allowToOperate === 'Y' ? 'AUTHORIZED' : 'NOT AUTHORIZED',
-      phyStreet: data.phyStreet || '',
-      phyCity: data.phyCity || '',
-      phyState: data.phyState || '',
-      phyZipCode: data.phyZipCode || '',
-      telephone: data.telephone || 'NOT PROVIDED',
-      totalPowerUnits: parseInt(data.totalPowerUnits) || 0,
-      busVehicle: parseInt(data.busVehicle) || 0,
-      limoVehicle: parseInt(data.limoVehicle) || 0,
-      miniBusVehicle: parseInt(data.miniBusVehicle) || 0,
-      motorCoachVehicle: parseInt(data.motorCoachVehicle) || 0,
-      vanVehicle: parseInt(data.vanVehicle) || 0,
-      complaintCount: parseInt(data.complaintCount) || 0,
+      carrierOperation: data.carrierOperation,
+      legalName: data.legalName,
+      dbaName: data.dbaName,
+      allowToOperate: data.allowToOperate,
+      phyStreet: data.phyStreet,
+      phyCity: data.phyCity,
+      phyState: data.phyState,
+      phyZipCode: data.phyZipCode,
+      telephone: data.telephone,
+      totalPowerUnits: data.totalPowerUnits ? parseInt(data.totalPowerUnits) : 0,
+      busVehicle: data.busVehicle ? parseInt(data.busVehicle) : 0,
+      limoVehicle: data.limoVehicle ? parseInt(data.limoVehicle) : 0,
+      miniBusVehicle: data.miniBusVehicle ? parseInt(data.miniBusVehicle) : 0,
+      motorCoachVehicle: data.motorCoachVehicle ? parseInt(data.motorCoachVehicle) : 0,
+      vanVehicle: data.vanVehicle ? parseInt(data.vanVehicle) : 0,
+      complaintCount: data.complaintCount ? parseInt(data.complaintCount) : 0,
       outOfService: data.outOfService === 'Y',
-      outOfServiceDate: data.outOfServiceDate || null,
-      mcNumber: data.mcNumber || '',
-      mcs150FormDate: data.mcs150FormDate || null,
+      outOfServiceDate: data.outOfServiceDate,
+      mcNumber: data.mcNumber,
+      mcs150FormDate: data.mcs150FormDate,
     };
 
     console.log('Mapped carrier data:', mappedData);
@@ -152,7 +151,6 @@ async function fetchBasicsData(dotNumber: string, apiKey: string): Promise<any> 
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -229,22 +227,22 @@ serve(async (req) => {
     const outOfServiceDate = carrierData.outOfServiceDate ? new Date(carrierData.outOfServiceDate).toISOString().split('T')[0] : null;
     const mcs150LastUpdate = carrierData.mcs150FormDate ? new Date(carrierData.mcs150FormDate).toISOString().split('T')[0] : null;
 
-    // Create physical address string
+    // Create physical address string using actual values, not defaults
     const physicalAddress = [
       carrierData.phyStreet,
       carrierData.phyCity,
       carrierData.phyState,
       carrierData.phyZipCode
-    ].filter(Boolean).join(', ') || 'NOT PROVIDED';
+    ].filter(Boolean).join(', ');
 
-    // Transform FMCSA data to our format
+    // Transform FMCSA data to our format without adding unnecessary defaults
     const transformedData = {
       usdotNumber: dotNumber,
-      operatingStatus: carrierData.allowToOperate,
+      operatingStatus: carrierData.allowToOperate === 'Y' ? 'AUTHORIZED' : 'NOT AUTHORIZED',
       entityType: carrierData.carrierOperation,
       legalName: carrierData.legalName,
       dbaName: carrierData.dbaName,
-      physicalAddress: physicalAddress,
+      physicalAddress: physicalAddress || null,
       telephone: carrierData.telephone,
       powerUnits: carrierData.totalPowerUnits,
       busCount: carrierData.busVehicle,
@@ -253,7 +251,7 @@ serve(async (req) => {
       motorcoachCount: carrierData.motorCoachVehicle,
       vanCount: carrierData.vanVehicle,
       complaintCount: carrierData.complaintCount,
-      outOfService: carrierData.outOfService,
+      outOfService: carrierData.outOfService === 'Y',
       outOfServiceDate: outOfServiceDate,
       mcNumber: carrierData.mcNumber,
       mcs150LastUpdate: mcs150LastUpdate,
