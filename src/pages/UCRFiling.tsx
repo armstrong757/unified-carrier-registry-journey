@@ -141,13 +141,13 @@ const UCRFiling = () => {
         </section>
 
         {/* Fee Structure Table Section */}
-        <div className="space-y-6 max-w-2xl">
+        <div className="space-y-6">
           <h2 className="text-2xl font-bold text-[#1A1F2C] mb-4">UCR Filing Fee For 2025</h2>
           <p className="text-gray-600 leading-relaxed">
             Register for the <span className="font-medium">Unified Carrier Registration Plan</span> based on your fleet size to contribute to funding highway safety initiatives. Annual fees, due by December 31st, support state enforcement, road maintenance, and driving safety. New drivers or companies must pay before their first interstate trip to avoid fines and impoundment. Secure your <span className="italic font-semibold">UCR Registration</span> to travel freely across the United States and beyond!
           </p>
           
-          <div className="mt-8 border rounded-lg overflow-hidden">
+          <div className="mt-8 border rounded-lg overflow-hidden max-w-2xl">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -179,6 +179,13 @@ const UCRFiling = () => {
               </TableBody>
             </Table>
           </div>
+        </div>
+
+        {/* UCR Disclaimer */}
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <p className="text-[#8E9196] text-xs">
+            This website is not affiliated with the Unified Carrier Registration Plan. This website is operated by a private company that provides a private registration service for an additional fee. You are not required to use this site to register with the UCR Plan. You may register directly with the UCR Plan at www.ucr.gov.
+          </p>
         </div>
       </div>
     </div>
