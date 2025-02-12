@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -41,88 +40,84 @@ function validateDOTNumber(dotNumber: string): string {
 
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('DEBUG: Starting carrier data fetch for DOT number:', dotNumber);
-  console.log('DEBUG: Using API key:', apiKey);
   
   const validDOTNumber = validateDOTNumber(dotNumber);
   
   const url = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${validDOTNumber}?webKey=${apiKey}`;
-  console.log('DEBUG: Request URL:', url);
+  console.log('DEBUG: Making request to:', url);
   
   try {
-    console.log('DEBUG: Making API request...');
-    const response = await fetch(url);
-    console.log('DEBUG: Response received');
-    console.log('DEBUG: Response status:', response.status);
-    
-    const responseData = await response.text();
-    console.log('DEBUG: Raw API response:', responseData);
-    
-    // Check for common API error messages
-    if (responseData.includes("Must provide WebKey")) {
-      console.error('DEBUG: Invalid or missing WebKey detected');
-      throw new Error('FMCSA API key appears to be invalid or missing');
+    // Test the API key first
+    if (!apiKey || apiKey.length < 32) {
+      throw new Error('Invalid API key format');
     }
 
-    if (responseData.includes("Invalid webkey")) {
-      console.error('DEBUG: Invalid webkey detected');
-      throw new Error('Invalid FMCSA API key');
-    }
+    const response = await fetch(url);
+    console.log('DEBUG: Response status:', response.status);
     
+    const responseText = await response.text();
+    console.log('DEBUG: Raw response:', responseText);
+
+    // Enhanced error checking
+    if (responseText.includes('Invalid request')) {
+      throw new Error('Invalid request to FMCSA API');
+    }
+
+    if (responseText.includes('Rate limit exceeded')) {
+      throw new Error('FMCSA API rate limit exceeded');
+    }
+
     if (!response.ok) {
-      console.error('DEBUG: FMCSA API Error:', responseData);
-      throw new Error(`FMCSA API Error (${response.status}): ${responseData}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     let data;
     try {
-      data = JSON.parse(responseData);
-      console.log('DEBUG: Successfully parsed JSON response');
-      console.log('DEBUG: Full API response data:', JSON.stringify(data, null, 2));
+      data = JSON.parse(responseText);
     } catch (e) {
-      console.error('DEBUG: Error parsing JSON:', e);
-      throw new Error('Invalid response format from FMCSA API');
+      console.error('Failed to parse JSON:', responseText);
+      throw new Error('Invalid JSON response from FMCSA API');
     }
 
     if (!data) {
-      console.error('DEBUG: No data in API response');
-      throw new Error('No data returned from FMCSA API');
+      throw new Error('Empty response from FMCSA API');
     }
 
-    // Build the physical address string
-    const physicalAddress = [
-      data.phyStreet,
-      data.phyCity,
-      data.phyState,
-      data.phyZipCode
-    ].filter(Boolean).join(', ');
+    // Log the exact structure we received
+    console.log('DEBUG: API Response Structure:', JSON.stringify(data, null, 2));
 
-    // Map specific fields from FMCSA response to our format
+    // Map the data, with more defensive coding
     const mappedData = {
       usdotNumber: validDOTNumber,
-      operatingStatus: data.allowToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
-      entityType: data.carrierOperation || 'CARRIER',
-      legalName: data.legalName || '',
-      dbaName: data.dbaName || '',
-      physicalAddress: physicalAddress || '',
-      telephone: data.telephone || '',
-      powerUnits: data.totalPowerUnits ? parseInt(data.totalPowerUnits) : 0,
-      busCount: data.busTotal ? parseInt(data.busTotal) : 0,
-      limoCount: data.limousineTotal ? parseInt(data.limousineTotal) : 0,
-      minibusCount: data.minibusTotal ? parseInt(data.minibusTotal) : 0,
-      motorcoachCount: data.motorcoachTotal ? parseInt(data.motorcoachTotal) : 0,
-      vanCount: data.vanTotal ? parseInt(data.vanTotal) : 0,
-      complaintCount: data.totalComplaints ? parseInt(data.totalComplaints) : 0,
-      outOfService: data.oosStatus === 'Y',
-      outOfServiceDate: data.oosDate || null,
-      mcNumber: data.mcNumber || '',
-      mcs150LastUpdate: data.mcs150FormDate || '',
+      operatingStatus: data.carrier?.allowToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
+      entityType: data.carrier?.carrierOperation || 'UNKNOWN',
+      legalName: data.carrier?.legalName || 'NOT PROVIDED',
+      dbaName: data.carrier?.dbaName || '',
+      physicalAddress: [
+        data.carrier?.phyStreet,
+        data.carrier?.phyCity,
+        data.carrier?.phyState,
+        data.carrier?.phyZipCode
+      ].filter(Boolean).join(', ') || 'NOT PROVIDED',
+      telephone: data.carrier?.telephone || 'NOT PROVIDED',
+      powerUnits: parseInt(data.carrier?.totalPowerUnits) || 0,
+      busCount: parseInt(data.carrier?.busTotal) || 0,
+      limoCount: parseInt(data.carrier?.limousineTotal) || 0,
+      minibusCount: parseInt(data.carrier?.minibusTotal) || 0,
+      motorcoachCount: parseInt(data.carrier?.motorcoachTotal) || 0,
+      vanCount: parseInt(data.carrier?.vanTotal) || 0,
+      complaintCount: parseInt(data.carrier?.totalComplaints) || 0,
+      outOfService: data.carrier?.oosStatus === 'Y',
+      outOfServiceDate: data.carrier?.oosDate || null,
+      mcNumber: data.carrier?.mcNumber || '',
+      mcs150LastUpdate: data.carrier?.mcs150FormDate || null,
       basicsData: {},
     };
 
-    console.log('DEBUG: Final mapped data:', mappedData);
+    console.log('DEBUG: Mapped data:', mappedData);
     return mappedData;
   } catch (error) {
-    console.error('DEBUG: Error in fetchCarrierData:', error);
+    console.error('DEBUG: API request failed:', error);
     throw error;
   }
 }
@@ -167,24 +162,26 @@ serve(async (req) => {
 
   try {
     const { dotNumber } = await req.json();
+    
+    console.log('DEBUG: Received request for DOT number:', dotNumber);
+    
     if (!dotNumber) {
       throw new Error('DOT number is required');
     }
-    
-    console.log('DEBUG: Processing request for DOT number:', dotNumber);
-    
+
     const fmcsaApiKey = Deno.env.get('FMCSA_API_KEY');
     if (!fmcsaApiKey) {
-      console.error('DEBUG: FMCSA API key not configured');
       throw new Error('FMCSA API key not configured');
     }
+
+    console.log('DEBUG: API Key present:', !!fmcsaApiKey);
 
     // Create Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Check if we already have this DOT number in our database
+    // First try to get from cache
     const { data: existingData, error: fetchError } = await supabase
       .from('usdot_info')
       .select('*')
@@ -192,12 +189,12 @@ serve(async (req) => {
       .maybeSingle();
 
     if (fetchError) {
-      console.error('DEBUG: Error fetching from database:', fetchError);
+      console.error('Database fetch error:', fetchError);
       throw fetchError;
     }
 
     if (existingData) {
-      console.log('DEBUG: Found existing USDOT info:', existingData);
+      console.log('Found cached data for DOT:', dotNumber);
       const transformedData = {
         usdotNumber: existingData.usdot_number,
         operatingStatus: existingData.operating_status,
@@ -228,20 +225,17 @@ serve(async (req) => {
       );
     }
 
-    // Fetch carrier and BASIC data in parallel
-    console.log('DEBUG: Fetching new USDOT info from FMCSA API:', dotNumber);
-    const [carrierData, basicsData] = await Promise.all([
-      fetchCarrierData(dotNumber, fmcsaApiKey),
-      fetchBasicsData(dotNumber, fmcsaApiKey)
-    ]);
+    // If we get here, we need to fetch new data
+    console.log('Fetching fresh data from FMCSA API');
+    const carrierData = await fetchCarrierData(dotNumber, fmcsaApiKey);
+    const basicsData = await fetchBasicsData(dotNumber, fmcsaApiKey);
 
-    // Create transformed data object
     const transformedData = {
       ...carrierData,
       basicsData: basicsData || {},
     };
 
-    // Store the data in our database
+    // Store in cache
     const { error: insertError } = await supabase.from('usdot_info').insert({
       usdot_number: transformedData.usdotNumber,
       operating_status: transformedData.operatingStatus,
@@ -265,23 +259,21 @@ serve(async (req) => {
     });
 
     if (insertError) {
-      console.error('DEBUG: Error storing USDOT info:', insertError);
-      throw insertError;
+      console.error('Failed to cache data:', insertError);
     }
 
-    console.log('DEBUG: Successfully processed and stored USDOT info:', transformedData);
     return new Response(
       JSON.stringify(transformedData),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
-  } catch (error) {
-    console.error('DEBUG: Error in fetch-usdot-info function:', error);
+  } catch (error: any) {
+    console.error('Function error:', error);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error.message,
-        details: 'Please make sure you entered a valid DOT number. If the problem persists, contact support.'
+        details: 'Failed to fetch carrier data. Please verify your DOT number and try again.',
       }),
       {
         status: 500,
