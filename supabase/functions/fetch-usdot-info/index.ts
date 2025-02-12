@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -44,12 +43,11 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
   
   const validDOTNumber = validateDOTNumber(dotNumber);
   
-  // Updated to use the official FMCSA API endpoint
-  const url = `https://api.fmcsa.dot.gov/snapshot/usdot/${validDOTNumber}?webKey=${apiKey}`;
+  // Use the snapshot endpoint which provides comprehensive carrier data
+  const url = `https://api.fmcsa.dot.gov/snapshot/carriers/${validDOTNumber}?webKey=${apiKey}`;
   console.log('DEBUG: Making request to:', url);
   
   try {
-    // Test the API key first
     if (!apiKey || apiKey.length < 32) {
       throw new Error('Invalid API key format');
     }
@@ -60,21 +58,15 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
         'Content-Type': 'application/json'
       }
     });
-    console.log('DEBUG: Response status:', response.status);
     
+    console.log('DEBUG: Response status:', response.status);
     const responseText = await response.text();
     console.log('DEBUG: Raw response:', responseText);
 
-    // Enhanced error checking
-    if (responseText.includes('Invalid request')) {
-      throw new Error('Invalid request to FMCSA API');
-    }
-
-    if (responseText.includes('Rate limit exceeded')) {
-      throw new Error('FMCSA API rate limit exceeded');
-    }
-
     if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('API access forbidden - please check API key permissions');
+      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
@@ -86,38 +78,37 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       throw new Error('Invalid JSON response from FMCSA API');
     }
 
-    if (!data) {
-      throw new Error('Empty response from FMCSA API');
+    if (!data || !data.content) {
+      throw new Error('Empty or invalid response from FMCSA API');
     }
 
-    // Log the exact structure we received
     console.log('DEBUG: API Response Structure:', JSON.stringify(data, null, 2));
 
-    // Map the data based on the official FMCSA API response structure
+    const carrierData = data.content;
     const mappedData = {
       usdotNumber: validDOTNumber,
-      operatingStatus: data.content?.allowToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
-      entityType: data.content?.carrierOperation || 'UNKNOWN',
-      legalName: data.content?.legalName || 'NOT PROVIDED',
-      dbaName: data.content?.dbaName || '',
+      operatingStatus: carrierData.allowedToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
+      entityType: carrierData.operatingStatus || 'UNKNOWN',
+      legalName: carrierData.legalName || 'NOT PROVIDED',
+      dbaName: carrierData.dbaName || '',
       physicalAddress: [
-        data.content?.phyStreet,
-        data.content?.phyCity,
-        data.content?.phyState,
-        data.content?.phyZipcode
+        carrierData.physicalAddress,
+        carrierData.physicalCity,
+        carrierData.physicalState,
+        carrierData.physicalZipcode
       ].filter(Boolean).join(', ') || 'NOT PROVIDED',
-      telephone: data.content?.telephone || 'NOT PROVIDED',
-      powerUnits: parseInt(data.content?.totalPowerUnits) || 0,
-      busCount: parseInt(data.content?.totalBuses) || 0,
-      limoCount: parseInt(data.content?.totalLimousines) || 0,
-      minibusCount: parseInt(data.content?.totalMiniBuses) || 0,
-      motorcoachCount: parseInt(data.content?.totalMotorCoaches) || 0,
-      vanCount: parseInt(data.content?.totalVans) || 0,
-      complaintCount: parseInt(data.content?.totalComplaints) || 0,
-      outOfService: data.content?.oosStatus === 'Y',
-      outOfServiceDate: data.content?.oosDate || null,
-      mcNumber: data.content?.mcNumber || '',
-      mcs150LastUpdate: data.content?.mcs150FormDate || null,
+      telephone: carrierData.phoneNumber || 'NOT PROVIDED',
+      powerUnits: parseInt(carrierData.totalPowerUnits) || 0,
+      busCount: parseInt(carrierData.totalBuses) || 0,
+      limoCount: parseInt(carrierData.totalLimousines) || 0,
+      minibusCount: parseInt(carrierData.totalMiniBuses) || 0,
+      motorcoachCount: parseInt(carrierData.totalMotorCoaches) || 0,
+      vanCount: parseInt(carrierData.totalVans) || 0,
+      complaintCount: parseInt(carrierData.totalComplaints) || 0,
+      outOfService: carrierData.oosStatus === 'Y',
+      outOfServiceDate: carrierData.oosDate || null,
+      mcNumber: carrierData.mcNumber || '',
+      mcs150LastUpdate: carrierData.mcs150FormDate || null,
       basicsData: {},
     };
 
@@ -133,9 +124,8 @@ async function fetchBasicsData(dotNumber: string, apiKey: string): Promise<any> 
   console.log('Fetching BASIC data for DOT number:', dotNumber);
   
   try {
-    // Updated to use the official FMCSA API endpoint
     const response = await fetch(
-      `https://api.fmcsa.dot.gov/safety/basic/${dotNumber}?webKey=${apiKey}`
+      `https://api.fmcsa.dot.gov/safety/carriers/${dotNumber}/basics?webKey=${apiKey}`
     );
     console.log('BASIC data response status:', response.status);
     
@@ -150,13 +140,14 @@ async function fetchBasicsData(dotNumber: string, apiKey: string): Promise<any> 
     }
     
     const data = await response.json();
-    if (!data) {
+    console.log('BASIC data response:', JSON.stringify(data, null, 2));
+    
+    if (!data || !data.content) {
       console.log('No BASIC data returned from FMCSA API');
       return null;
     }
     
-    console.log('Successfully fetched BASIC data');
-    return data;
+    return data.content;
   } catch (error) {
     console.error('Error in fetchBasicsData:', error);
     return null;
