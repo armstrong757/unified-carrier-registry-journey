@@ -34,6 +34,9 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
   const location = useLocation();
   const isUCRForm = location.pathname === "/ucr";
 
+  // Add debugging log to see the exact data we're receiving
+  console.log('USDOTSummary received data:', data);
+
   return (
     <Card className="bg-white/50 backdrop-blur-sm">
       <CardContent className="p-6">
@@ -43,16 +46,16 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           <div>
             <span className="font-medium">Operating Status: </span>
             <span className={data.operatingStatus === "NOT AUTHORIZED" ? "text-red-500 font-semibold" : ""}>
-              {data.operatingStatus}
+              {data.operatingStatus || 'Not Available'}
             </span>
           </div>
           <div>
             <span className="font-medium">Entity Type: </span>
-            {data.entityType}
+            {data.entityType || 'Not Available'}
           </div>
           <div>
             <span className="font-medium">Legal Name: </span>
-            {data.legalName}
+            {data.legalName || 'Not Available'}
           </div>
           {data.dbaName && (
             <div>
@@ -62,7 +65,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           )}
           <div>
             <span className="font-medium">Physical Address: </span>
-            {data.physicalAddress}
+            {data.physicalAddress || 'Not Available'}
           </div>
           {data.telephone && (
             <div>
@@ -72,7 +75,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           )}
           <div>
             <span className="font-medium">Power Units: </span>
-            {data.powerUnits}
+            {typeof data.powerUnits === 'number' ? data.powerUnits : 'Not Available'}
           </div>
           {data.busCount > 0 && (
             <div>
@@ -124,7 +127,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           )}
           <div>
             <span className="font-medium">MCS-150 Last Update: </span>
-            {data.mcs150LastUpdate}
+            {data.mcs150LastUpdate || 'Not Available'}
           </div>
 
           {isUCRForm && (
