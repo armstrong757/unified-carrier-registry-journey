@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import UCR from "./pages/UCR";
+import UCRFiling from "./pages/UCRFiling";
 import MCS150 from "./pages/MCS150";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
@@ -26,6 +27,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/ucr" element={<UCR />} />
+              <Route path="/ucr-filing" element={<UCRFiling />} />
               <Route path="/mcs150" element={<MCS150 />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/terms" element={<Terms />} />

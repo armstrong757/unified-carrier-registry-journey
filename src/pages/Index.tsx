@@ -24,7 +24,7 @@ const Index = () => {
               Verify your current status with Unified Carrier Registration.
             </p>
             <Button 
-              onClick={() => navigate("/ucr")}
+              onClick={() => navigate("/ucr-filing")}
               className="bg-white border-2 border-[#1A1F2C] text-[#1A1F2C] hover:bg-[#1A1F2C] hover:text-white transition-colors"
             >
               View Details
