@@ -12,16 +12,48 @@ interface USDOTData {
   operatingStatus: string;
   entityType: string;
   legalName: string;
+  dbaName: string;
   physicalAddress: string;
+  telephone: string;
   powerUnits: number;
-  drivers: number;
+  busCount: number;
+  limoCount: number;
+  minibusCount: number;
+  motorcoachCount: number;
+  vanCount: number;
+  complaintCount: number;
+  outOfService: boolean;
+  outOfServiceDate: string | null;
+  mcNumber: string;
   mcs150LastUpdate: string;
-  ein: string;
-  mileageYear: string;
+  basicsData: Record<string, any>;
+}
+
+async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
+  const response = await fetch(
+    `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}?webKey=${apiKey}`
+  )
+  if (!response.ok) {
+    throw new Error(`Carrier data fetch failed: ${response.status}`)
+  }
+  return response.json()
+}
+
+async function fetchBasicsData(dotNumber: string, apiKey: string): Promise<any> {
+  const response = await fetch(
+    `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}/basics?webKey=${apiKey}`
+  )
+  if (!response.ok) {
+    // Basics data might not be available for all carriers
+    if (response.status === 404) {
+      return null
+    }
+    throw new Error(`Basics data fetch failed: ${response.status}`)
+  }
+  return response.json()
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -54,12 +86,21 @@ serve(async (req) => {
           operatingStatus: existingData.operating_status,
           entityType: existingData.entity_type,
           legalName: existingData.legal_name,
+          dbaName: existingData.dba_name,
           physicalAddress: existingData.physical_address,
+          telephone: existingData.telephone,
           powerUnits: existingData.power_units,
-          drivers: existingData.drivers,
+          busCount: existingData.bus_count,
+          limoCount: existingData.limo_count,
+          minibusCount: existingData.minibus_count,
+          motorcoachCount: existingData.motorcoach_count,
+          vanCount: existingData.van_count,
+          complaintCount: existingData.complaint_count,
+          outOfService: existingData.out_of_service,
+          outOfServiceDate: existingData.out_of_service_date,
+          mcNumber: existingData.mc_number,
           mcs150LastUpdate: existingData.mcs150_last_update,
-          ein: existingData.ein,
-          mileageYear: existingData.mileage_year,
+          basicsData: existingData.basics_data,
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -67,39 +108,37 @@ serve(async (req) => {
       )
     }
 
-    // If not in database, fetch from FMCSA API
+    // Fetch carrier and BASIC data in parallel
     console.log('Fetching USDOT info from FMCSA API:', dotNumber)
-    const fmcsaResponse = await fetch(
-      `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}?webKey=${fmcsaApiKey}`
-    )
+    const [carrierData, basicsData] = await Promise.all([
+      fetchCarrierData(dotNumber, fmcsaApiKey),
+      fetchBasicsData(dotNumber, fmcsaApiKey).catch(error => {
+        console.warn('Failed to fetch BASIC data:', error)
+        return null
+      })
+    ])
 
-    if (!fmcsaResponse.ok) {
-      const errorText = await fmcsaResponse.text()
-      console.error('FMCSA API error response:', errorText)
-      
-      if (fmcsaResponse.status === 401) {
-        throw new Error('FMCSA API authentication failed. Please check the API key.')
-      } else if (fmcsaResponse.status === 404) {
-        throw new Error('USDOT number not found')
-      } else {
-        throw new Error(`FMCSA API error: ${fmcsaResponse.status} ${fmcsaResponse.statusText}`)
-      }
-    }
-
-    const fmcsaData = await fmcsaResponse.json()
-    
     // Transform FMCSA data to our format using the documented field names
     const transformedData: USDOTData = {
       usdotNumber: dotNumber,
-      operatingStatus: fmcsaData.allowToOperate === 'Y' ? 'AUTHORIZED' : 'NOT AUTHORIZED',
+      operatingStatus: carrierData.allowToOperate === 'Y' ? 'AUTHORIZED' : 'NOT AUTHORIZED',
       entityType: 'N/A', // Not provided in basic carrier response
-      legalName: fmcsaData.legalName || '',
-      physicalAddress: `${fmcsaData.phyStreet || ''}, ${fmcsaData.phyCity || ''}, ${fmcsaData.phyState || ''} ${fmcsaData.phyZip || ''}, ${fmcsaData.phyCountry || ''}`.trim(),
-      powerUnits: parseInt(fmcsaData.passengerVehicle) || 0,
-      drivers: 0, // Not provided in basic carrier response
-      mcs150LastUpdate: fmcsaData.snapShotDate || '',
-      ein: '', // Not provided in basic carrier response
-      mileageYear: '', // Not provided in basic carrier response
+      legalName: carrierData.legalName || '',
+      dbaName: carrierData.dbaName || '',
+      physicalAddress: `${carrierData.phyStreet || ''}, ${carrierData.phyCity || ''}, ${carrierData.phyState || ''} ${carrierData.phyZip || ''}, ${carrierData.phyCountry || ''}`.trim(),
+      telephone: carrierData.telephone || '',
+      powerUnits: parseInt(carrierData.passengerVehicle) || 0,
+      busCount: parseInt(carrierData.busVehicle) || 0,
+      limoCount: parseInt(carrierData.limoVehicle) || 0,
+      minibusCount: parseInt(carrierData.miniBusVehicle) || 0,
+      motorcoachCount: parseInt(carrierData.motorCoachVehicle) || 0,
+      vanCount: parseInt(carrierData.vanVehicle) || 0,
+      complaintCount: parseInt(carrierData.complaintCount) || 0,
+      outOfService: carrierData.outOfService === 'Y',
+      outOfServiceDate: carrierData.outOfServiceDate || null,
+      mcNumber: carrierData.mcNumber || '',
+      mcs150LastUpdate: carrierData.snapShotDate || '',
+      basicsData: basicsData || {},
     }
 
     // Store the data in our database
@@ -108,12 +147,21 @@ serve(async (req) => {
       operating_status: transformedData.operatingStatus,
       entity_type: transformedData.entityType,
       legal_name: transformedData.legalName,
+      dba_name: transformedData.dbaName,
       physical_address: transformedData.physicalAddress,
+      telephone: transformedData.telephone,
       power_units: transformedData.powerUnits,
-      drivers: transformedData.drivers,
+      bus_count: transformedData.busCount,
+      limo_count: transformedData.limoCount,
+      minibus_count: transformedData.minibusCount,
+      motorcoach_count: transformedData.motorcoachCount,
+      van_count: transformedData.vanCount,
+      complaint_count: transformedData.complaintCount,
+      out_of_service: transformedData.outOfService,
+      out_of_service_date: transformedData.outOfServiceDate,
+      mc_number: transformedData.mcNumber,
       mcs150_last_update: transformedData.mcs150LastUpdate,
-      ein: transformedData.ein,
-      mileage_year: transformedData.mileageYear,
+      basics_data: transformedData.basicsData,
     })
 
     if (insertError) {
