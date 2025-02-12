@@ -9,7 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      usdot_info: {
+        Row: {
+          created_at: string | null
+          drivers: number | null
+          ein: string | null
+          entity_type: string | null
+          id: string
+          legal_name: string | null
+          mcs150_last_update: string | null
+          mileage_year: string | null
+          operating_status: string | null
+          physical_address: string | null
+          power_units: number | null
+          updated_at: string | null
+          usdot_number: string
+        }
+        Insert: {
+          created_at?: string | null
+          drivers?: number | null
+          ein?: string | null
+          entity_type?: string | null
+          id?: string
+          legal_name?: string | null
+          mcs150_last_update?: string | null
+          mileage_year?: string | null
+          operating_status?: string | null
+          physical_address?: string | null
+          power_units?: number | null
+          updated_at?: string | null
+          usdot_number: string
+        }
+        Update: {
+          created_at?: string | null
+          drivers?: number | null
+          ein?: string | null
+          entity_type?: string | null
+          id?: string
+          legal_name?: string | null
+          mcs150_last_update?: string | null
+          mileage_year?: string | null
+          operating_status?: string | null
+          physical_address?: string | null
+          power_units?: number | null
+          updated_at?: string | null
+          usdot_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

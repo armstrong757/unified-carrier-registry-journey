@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import FormProgress from "@/components/UCRForm/FormProgress";
 import StepOne from "@/components/UCRForm/StepOne";
@@ -8,25 +8,28 @@ import StepThree from "@/components/UCRForm/StepThree";
 import StepFour from "@/components/UCRForm/StepFour";
 import USDOTSummary from "@/components/UCRForm/USDOTSummary";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const UCR = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
+  const [usdotData, setUsdotData] = useState<any>(null);
 
-  // Temporary mock data - will be replaced with API data
-  const mockUSDOTData = {
-    usdotNumber: "1523020",
-    operatingStatus: "NOT AUTHORIZED",
-    entityType: "CARRIER",
-    legalName: "TOWN & COUNTRY EVENT RENTALS INC",
-    physicalAddress: "7725 AIRPORT BUSINESS PARK WAY VAN NUYS, CA 91406",
-    powerUnits: 110,
-    drivers: 110,
-    mcs150LastUpdate: "07/14/2022",
-    ein: "954695759",
-    mileageYear: "200000 (2022)",
-  };
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('usdotData');
+    if (!storedData) {
+      toast({
+        title: "Error",
+        description: "No DOT information found. Please start from the UCR Filing page.",
+        variant: "destructive",
+      });
+      navigate('/ucr-filing');
+      return;
+    }
+    setUsdotData(JSON.parse(storedData));
+  }, [navigate, toast]);
 
   const [formData, setFormData] = useState({
     // Step 1
@@ -40,7 +43,7 @@ const UCR = () => {
     classifications: {},
 
     // Step 3
-    straightTrucks: 0,
+    straightTrucks: usdotData?.powerUnits || 0,
     passengerVehicles: 0,
     needsVehicleChanges: "no",
     addVehicles: "",
@@ -90,6 +93,10 @@ const UCR = () => {
     }
   };
 
+  if (!usdotData) {
+    return null; // Don't render anything while loading
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -121,7 +128,7 @@ const UCR = () => {
           
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              <USDOTSummary data={mockUSDOTData} />
+              <USDOTSummary data={usdotData} />
             </div>
           </div>
         </div>
