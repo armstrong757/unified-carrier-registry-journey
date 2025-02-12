@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import FormProgress from "@/components/UCRForm/FormProgress";
 import StepOne from "@/components/MCS150Form/StepOne";
 import StepTwo from "@/components/MCS150Form/StepTwo";
@@ -14,13 +14,22 @@ import USDOTSummary from "@/components/UCRForm/USDOTSummary";
 const MCS150 = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 6;
   const [usdotData, setUsdotData] = useState<any>(null);
 
   useEffect(() => {
+    const stateData = location.state?.usdotData;
+    if (stateData) {
+      console.log('Loading USDOT data from location state:', stateData);
+      setUsdotData(stateData);
+      return;
+    }
+
     const storedData = sessionStorage.getItem('usdotData');
     if (!storedData) {
+      console.log('No USDOT data found in session storage');
       toast({
         title: "Error",
         description: "No DOT information found. Please start from the MCS-150 Filing page.",
@@ -29,19 +38,29 @@ const MCS150 = () => {
       navigate('/mcs-150-filing');
       return;
     }
-    setUsdotData(JSON.parse(storedData));
-  }, [navigate, toast]);
+
+    try {
+      const parsedData = JSON.parse(storedData);
+      console.log('Loading USDOT data from session storage:', parsedData);
+      setUsdotData(parsedData);
+    } catch (error) {
+      console.error('Error parsing stored USDOT data:', error);
+      toast({
+        title: "Error",
+        description: "Invalid DOT information. Please try again.",
+        variant: "destructive",
+      });
+      navigate('/mcs-150-filing');
+    }
+  }, [navigate, toast, location]);
 
   const [formData, setFormData] = useState({
-    // Step 1 - Reason for Filing
     reasonForFiling: {
       biennialUpdate: true,
       reactivate: false,
       reapplication: false,
       outOfBusiness: false,
     },
-
-    // Step 2 - Changes
     hasChanges: "no",
     changesToMake: {
       companyInfo: false,
@@ -64,31 +83,27 @@ const MCS150 = () => {
       cargo: false,
       hazmat: false,
     },
-
-    // Step 3 - Company Information (Pre-filled from USDOT data)
     ownerName: "",
     principalAddress: {
-      address: usdotData?.physicalAddress?.split(',')[0]?.trim() || "",
-      city: usdotData?.physicalAddress?.split(',')[1]?.trim() || "",
-      state: usdotData?.physicalAddress?.split(',')[2]?.trim()?.split(' ')[0] || "",
-      zip: usdotData?.physicalAddress?.split(',')[2]?.trim()?.split(' ')[1] || "",
+      address: "",
+      city: "",
+      state: "",
+      zip: "",
       country: "USA",
     },
     mailingAddress: {
-      address: usdotData?.physicalAddress?.split(',')[0]?.trim() || "",
-      city: usdotData?.physicalAddress?.split(',')[1]?.trim() || "",
-      state: usdotData?.physicalAddress?.split(',')[2]?.trim()?.split(' ')[0] || "",
-      zip: usdotData?.physicalAddress?.split(',')[2]?.trim()?.split(' ')[1] || "",
+      address: "",
+      city: "",
+      state: "",
+      zip: "",
       country: "USA",
     },
-    businessPhone: usdotData?.telephone || "",
+    businessPhone: "",
     businessEmail: "",
-    companyName: usdotData?.legalName || "",
+    companyName: "",
     einSsn: "",
-
-    // Step 4 - Operations (Pre-filled from USDOT data)
     companyOperations: {
-      interstateCarrier: usdotData?.entityType === "CARRIER",
+      interstateCarrier: false,
       intrastatehazmatCarrier: false,
       intrastateNonHazmatCarrier: false,
       intrastateHazmatShipper: false,
@@ -102,38 +117,34 @@ const MCS150 = () => {
       trailers: { owned: 0, termLeased: 0, tripLeased: 0 },
       hazmatTrucks: { owned: 0, termLeased: 0, tripLeased: 0 },
       hazmatTrailers: { owned: 0, termLeased: 0, tripLeased: 0 },
-      motorCoach: { owned: usdotData?.motorcoachCount || 0, termLeased: 0, tripLeased: 0 },
+      motorCoach: { owned: 0, termLeased: 0, tripLeased: 0 },
       schoolBusSmall: { owned: 0, termLeased: 0, tripLeased: 0 },
       schoolBusMedium: { owned: 0, termLeased: 0, tripLeased: 0 },
-      schoolBusLarge: { owned: usdotData?.busCount || 0, termLeased: 0, tripLeased: 0 },
+      schoolBusLarge: { owned: 0, termLeased: 0, tripLeased: 0 },
       busLarge: { owned: 0, termLeased: 0, tripLeased: 0 },
-      vanSmall: { owned: usdotData?.vanCount || 0, termLeased: 0, tripLeased: 0 },
+      vanSmall: { owned: 0, termLeased: 0, tripLeased: 0 },
       vanMedium: { owned: 0, termLeased: 0, tripLeased: 0 },
-      limousineSmall: { owned: usdotData?.limoCount || 0, termLeased: 0, tripLeased: 0 },
+      limousineSmall: { owned: 0, termLeased: 0, tripLeased: 0 },
       limousineMedium: { owned: 0, termLeased: 0, tripLeased: 0 },
     },
     drivers: {
       interstate: "0",
       intrastate: "0",
-      total: (usdotData?.powerUnits || 0).toString(),
+      total: "0",
       cdl: "0",
     },
     hazmatDetails: {},
-
-    // Step 5 - Operator
     operator: {
       firstName: "",
       lastName: "",
       title: "",
       email: "",
-      phone: usdotData?.telephone || "",
+      phone: "",
       einSsn: "",
       milesDriven: "",
       licenseFile: null,
       signature: "",
     },
-
-    // Step 6 - Billing
     billing: {
       cardNumber: "",
       expiryDate: "",
@@ -142,6 +153,59 @@ const MCS150 = () => {
       termsAccepted: false,
     },
   });
+
+  useEffect(() => {
+    if (usdotData) {
+      console.log('Updating form data with USDOT data:', usdotData);
+      
+      const addressParts = usdotData.physicalAddress.split(',').map((part: string) => part.trim());
+      const [street = "", city = "", stateZip = ""] = addressParts;
+      const [state = "", zip = ""] = stateZip.split(' ');
+
+      setFormData(prev => ({
+        ...prev,
+        principalAddress: {
+          address: street,
+          city,
+          state,
+          zip,
+          country: "USA",
+        },
+        mailingAddress: {
+          address: street,
+          city,
+          state,
+          zip,
+          country: "USA",
+        },
+        businessPhone: usdotData.telephone || "",
+        companyName: usdotData.legalName || "",
+        vehicles: {
+          ...prev.vehicles,
+          motorCoach: { 
+            ...prev.vehicles.motorCoach,
+            owned: usdotData.motorcoachCount || 0 
+          },
+          schoolBusLarge: { 
+            ...prev.vehicles.schoolBusLarge,
+            owned: usdotData.busCount || 0 
+          },
+          vanSmall: { 
+            ...prev.vehicles.vanSmall,
+            owned: usdotData.vanCount || 0 
+          },
+          limousineSmall: { 
+            ...prev.vehicles.limousineSmall,
+            owned: usdotData.limoCount || 0 
+          },
+        },
+        drivers: {
+          ...prev.drivers,
+          total: (usdotData.powerUnits || 0).toString(),
+        },
+      }));
+    }
+  }, [usdotData]);
 
   const shouldSkipStep3 = () => {
     return (
