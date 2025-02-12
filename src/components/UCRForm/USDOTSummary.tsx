@@ -22,7 +22,8 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
   return (
     <Card className="bg-white/50 backdrop-blur-sm">
       <CardContent className="p-6">
-        <h2 className="text-lg font-semibold mb-4">USDOT#: {data.usdotNumber}</h2>
+        <h2 className="text-base font-semibold mb-2">USDOT#: {data.usdotNumber}</h2>
+        <hr className="border-t border-gray-300 mb-4" />
         <div className="space-y-2 text-sm">
           <div>
             <span className="font-medium">Operating Status: </span>
