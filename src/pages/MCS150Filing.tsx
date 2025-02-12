@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -31,11 +30,6 @@ const MCS150Filing = () => {
       
       if (!data) {
         throw new Error('No data returned from USDOT lookup');
-      }
-
-      // Check if the carrier is authorized
-      if (data.operatingStatus === 'NOT AUTHORIZED') {
-        throw new Error(`USDOT ${dotNumber} is not currently authorized to operate. Please verify the number or contact FMCSA for assistance.`);
       }
 
       console.log('USDOT data received:', data);

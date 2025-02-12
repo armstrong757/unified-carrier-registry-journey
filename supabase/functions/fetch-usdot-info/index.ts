@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -53,12 +52,6 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
 
     if (!data) {
       throw new Error('No data returned from FMCSA API');
-    }
-
-    // Check carrier status more comprehensively
-    if (data.carrierOperation === 'INACTIVE' || data.allowToOperate === 'N') {
-      console.error('Carrier is inactive or not authorized:', JSON.stringify(data));
-      throw new Error(`This carrier (USDOT ${dotNumber}) is not currently authorized to operate. Status: ${data.carrierOperation}, Allowed to Operate: ${data.allowToOperate}`);
     }
     
     console.log('Successfully parsed carrier data:', JSON.stringify(data));
