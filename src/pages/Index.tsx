@@ -43,7 +43,7 @@ const Index = () => {
               Update your USDOT and operating authority records with FMCSA.
             </p>
             <Button 
-              onClick={() => navigate("/mcs150")}
+              onClick={() => navigate("/mcs-150-filing")}
               className="bg-white border-2 border-[#1A1F2C] text-[#1A1F2C] hover:bg-[#1A1F2C] hover:text-white transition-colors"
             >
               View Details

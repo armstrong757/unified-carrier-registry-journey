@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -25,7 +24,7 @@ const MCS150Filing = () => {
       <div className="max-w-4xl mx-auto space-y-16">
         {/* Header Section */}
         <div className="text-center space-y-8">
-          <h1 className="text-4xl font-bold text-[#1A1F2C] mb-8">MCS-150 / Biennial Update Guide</h1>
+          <h1 className="text-4xl font-bold text-[#1A1F2C] mb-8">MCS-150 / Biennial Update</h1>
           
           <Card className="max-w-md mx-auto p-8 bg-white shadow-lg border-0">
             <form onSubmit={handleSubmit} className="space-y-6">
