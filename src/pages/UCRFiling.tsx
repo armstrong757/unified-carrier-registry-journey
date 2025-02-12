@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,10 @@ const UCRFiling = () => {
     if (dotNumber.trim()) {
       navigate("/ucr");
     }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -178,6 +183,15 @@ const UCRFiling = () => {
                 </TableRow>
               </TableBody>
             </Table>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button 
+              onClick={scrollToTop}
+              className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg"
+            >
+              File Your UCR
+            </Button>
           </div>
         </div>
 
