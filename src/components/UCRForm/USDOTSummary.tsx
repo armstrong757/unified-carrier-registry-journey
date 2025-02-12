@@ -9,12 +9,21 @@ interface USDOTData {
   operatingStatus: string;
   entityType: string;
   legalName: string;
+  dbaName: string;
   physicalAddress: string;
+  telephone: string;
   powerUnits: number;
-  drivers: number;
+  busCount: number;
+  limoCount: number;
+  minibusCount: number;
+  motorcoachCount: number;
+  vanCount: number;
+  complaintCount: number;
+  outOfService: boolean;
+  outOfServiceDate: string | null;
+  mcNumber: string;
   mcs150LastUpdate: string;
-  ein: string;
-  mileageYear: string;
+  basicsData: Record<string, any>;
 }
 
 interface USDOTSummaryProps {
@@ -45,30 +54,79 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             <span className="font-medium">Legal Name: </span>
             {data.legalName}
           </div>
+          {data.dbaName && (
+            <div>
+              <span className="font-medium">DBA Name: </span>
+              {data.dbaName}
+            </div>
+          )}
           <div>
             <span className="font-medium">Physical Address: </span>
             {data.physicalAddress}
           </div>
+          {data.telephone && (
+            <div>
+              <span className="font-medium">Telephone: </span>
+              {data.telephone}
+            </div>
+          )}
           <div>
             <span className="font-medium">Power Units: </span>
             {data.powerUnits}
           </div>
-          <div>
-            <span className="font-medium">Drivers: </span>
-            {data.drivers}
-          </div>
+          {data.busCount > 0 && (
+            <div>
+              <span className="font-medium">Buses: </span>
+              {data.busCount}
+            </div>
+          )}
+          {data.limoCount > 0 && (
+            <div>
+              <span className="font-medium">Limousines: </span>
+              {data.limoCount}
+            </div>
+          )}
+          {data.minibusCount > 0 && (
+            <div>
+              <span className="font-medium">Mini Buses: </span>
+              {data.minibusCount}
+            </div>
+          )}
+          {data.motorcoachCount > 0 && (
+            <div>
+              <span className="font-medium">Motor Coaches: </span>
+              {data.motorcoachCount}
+            </div>
+          )}
+          {data.vanCount > 0 && (
+            <div>
+              <span className="font-medium">Vans: </span>
+              {data.vanCount}
+            </div>
+          )}
+          {data.complaintCount > 0 && (
+            <div>
+              <span className="font-medium">Complaints: </span>
+              <span className="text-amber-600">{data.complaintCount}</span>
+            </div>
+          )}
+          {data.outOfService && (
+            <div className="text-red-500">
+              <span className="font-medium">Out of Service</span>
+              {data.outOfServiceDate && ` since ${data.outOfServiceDate}`}
+            </div>
+          )}
+          {data.mcNumber && (
+            <div>
+              <span className="font-medium">MC Number: </span>
+              {data.mcNumber}
+            </div>
+          )}
           <div>
             <span className="font-medium">MCS-150 Last Update: </span>
             {data.mcs150LastUpdate}
           </div>
-          <div>
-            <span className="font-medium">EIN: </span>
-            {data.ein}
-          </div>
-          <div className="mb-8">
-            <span className="font-medium">Mileage (Year): </span>
-            {data.mileageYear}
-          </div>
+
           {isUCRForm && (
             <div className="border-t border-gray-200 mt-8 pt-4">
               <div className="flex items-center gap-2">
