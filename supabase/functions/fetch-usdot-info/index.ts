@@ -30,56 +30,83 @@ interface USDOTData {
 }
 
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
-  const response = await fetch(
-    `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}?webKey=${apiKey}`
-  )
+  console.log('Fetching carrier data for DOT number:', dotNumber);
+  
+  // Remove any 'USDOT' prefix if present
+  dotNumber = dotNumber.replace(/^(USDOT)?/i, '').trim();
+  
+  const url = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}?webKey=${apiKey}`;
+  console.log('Making request to:', url);
+  
+  const response = await fetch(url);
+  console.log('Response status:', response.status);
+  
   if (!response.ok) {
-    throw new Error(`Carrier data fetch failed: ${response.status}`)
+    const errorText = await response.text();
+    console.error('FMCSA API Error:', errorText);
+    throw new Error(`Carrier data fetch failed: ${response.status} - ${errorText}`);
   }
-  return response.json()
+  
+  const data = await response.json();
+  console.log('Successfully fetched carrier data');
+  return data;
 }
 
 async function fetchBasicsData(dotNumber: string, apiKey: string): Promise<any> {
+  console.log('Fetching BASIC data for DOT number:', dotNumber);
+  
+  // Remove any 'USDOT' prefix if present
+  dotNumber = dotNumber.replace(/^(USDOT)?/i, '').trim();
+  
   const response = await fetch(
     `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}/basics?webKey=${apiKey}`
-  )
+  );
+  console.log('BASIC data response status:', response.status);
+  
   if (!response.ok) {
-    // Basics data might not be available for all carriers
     if (response.status === 404) {
-      return null
+      console.log('No BASIC data available for this carrier');
+      return null;
     }
-    throw new Error(`Basics data fetch failed: ${response.status}`)
+    const errorText = await response.text();
+    console.error('BASIC data fetch error:', errorText);
+    throw new Error(`Basics data fetch failed: ${response.status} - ${errorText}`);
   }
-  return response.json()
+  
+  const data = await response.json();
+  console.log('Successfully fetched BASIC data');
+  return data;
 }
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { dotNumber } = await req.json()
-    const fmcsaApiKey = Deno.env.get('FMCSA_API_KEY')
-
+    const { dotNumber } = await req.json();
+    console.log('Received request for DOT number:', dotNumber);
+    
+    const fmcsaApiKey = Deno.env.get('FMCSA_API_KEY');
     if (!fmcsaApiKey) {
-      throw new Error('FMCSA API key not configured')
+      console.error('FMCSA API key not configured');
+      throw new Error('FMCSA API key not configured');
     }
 
     // Create Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Check if we already have this DOT number in our database
     const { data: existingData } = await supabase
       .from('usdot_info')
       .select('*')
       .eq('usdot_number', dotNumber)
-      .single()
+      .maybeSingle();
 
     if (existingData) {
-      console.log('Found existing USDOT info:', dotNumber)
+      console.log('Found existing USDOT info:', dotNumber);
       return new Response(
         JSON.stringify({
           usdotNumber: existingData.usdot_number,
@@ -105,29 +132,29 @@ serve(async (req) => {
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
-      )
+      );
     }
 
     // Fetch carrier and BASIC data in parallel
-    console.log('Fetching USDOT info from FMCSA API:', dotNumber)
+    console.log('Fetching new USDOT info from FMCSA API:', dotNumber);
     const [carrierData, basicsData] = await Promise.all([
       fetchCarrierData(dotNumber, fmcsaApiKey),
       fetchBasicsData(dotNumber, fmcsaApiKey).catch(error => {
-        console.warn('Failed to fetch BASIC data:', error)
-        return null
+        console.warn('Failed to fetch BASIC data:', error);
+        return null;
       })
-    ])
+    ]);
 
-    // Transform FMCSA data to our format using the documented field names
+    // Transform FMCSA data to our format
     const transformedData: USDOTData = {
       usdotNumber: dotNumber,
       operatingStatus: carrierData.allowToOperate === 'Y' ? 'AUTHORIZED' : 'NOT AUTHORIZED',
-      entityType: 'N/A', // Not provided in basic carrier response
+      entityType: carrierData.carrierOperation || 'N/A',
       legalName: carrierData.legalName || '',
       dbaName: carrierData.dbaName || '',
       physicalAddress: `${carrierData.phyStreet || ''}, ${carrierData.phyCity || ''}, ${carrierData.phyState || ''} ${carrierData.phyZip || ''}, ${carrierData.phyCountry || ''}`.trim(),
       telephone: carrierData.telephone || '',
-      powerUnits: parseInt(carrierData.passengerVehicle) || 0,
+      powerUnits: parseInt(carrierData.totalPowerUnits) || 0,
       busCount: parseInt(carrierData.busVehicle) || 0,
       limoCount: parseInt(carrierData.limoVehicle) || 0,
       minibusCount: parseInt(carrierData.miniBusVehicle) || 0,
@@ -137,9 +164,9 @@ serve(async (req) => {
       outOfService: carrierData.outOfService === 'Y',
       outOfServiceDate: carrierData.outOfServiceDate || null,
       mcNumber: carrierData.mcNumber || '',
-      mcs150LastUpdate: carrierData.snapShotDate || '',
+      mcs150LastUpdate: carrierData.mcs150FormDate || '',
       basicsData: basicsData || {},
-    }
+    };
 
     // Store the data in our database
     const { error: insertError } = await supabase.from('usdot_info').insert({
@@ -162,27 +189,31 @@ serve(async (req) => {
       mc_number: transformedData.mcNumber,
       mcs150_last_update: transformedData.mcs150LastUpdate,
       basics_data: transformedData.basicsData,
-    })
+    });
 
     if (insertError) {
-      console.error('Error storing USDOT info:', insertError)
-      throw insertError
+      console.error('Error storing USDOT info:', insertError);
+      throw insertError;
     }
 
+    console.log('Successfully processed and stored USDOT info');
     return new Response(
       JSON.stringify(transformedData),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
-    )
+    );
   } catch (error) {
-    console.error('Error in fetch-usdot-info function:', error)
+    console.error('Error in fetch-usdot-info function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: 'Please make sure you entered a valid DOT number. If the problem persists, contact support.'
+      }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
-    )
+    );
   }
-})
+});
