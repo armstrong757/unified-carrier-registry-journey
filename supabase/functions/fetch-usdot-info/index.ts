@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -29,15 +28,27 @@ interface USDOTData {
   basicsData: Record<string, any>;
 }
 
+function validateDOTNumber(dotNumber: string): string {
+  // Remove any 'USDOT' prefix and all whitespace
+  const cleanDOTNumber = dotNumber.replace(/^(USDOT)?/i, '').replace(/\s+/g, '');
+  
+  // Check if it's exactly 7 digits
+  if (!/^\d{7}$/.test(cleanDOTNumber)) {
+    throw new Error('Invalid DOT number format. Must be exactly 7 digits.');
+  }
+  
+  return cleanDOTNumber;
+}
+
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('Fetching carrier data for DOT number:', dotNumber);
   console.log('API Key length:', apiKey?.length);
   console.log('API Key first 4 chars:', apiKey?.substring(0, 4));
   
-  // Remove any 'USDOT' prefix and all whitespace if present
-  dotNumber = dotNumber.replace(/^(USDOT)?/i, '').replace(/\s+/g, '');
+  // Validate DOT number format
+  const validDOTNumber = validateDOTNumber(dotNumber);
   
-  const url = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dotNumber}?webKey=${apiKey}`;
+  const url = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${validDOTNumber}?webKey=${apiKey}`;
   console.log('Making request to:', url);
   
   try {
