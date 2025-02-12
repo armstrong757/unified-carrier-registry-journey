@@ -31,6 +31,8 @@ interface USDOTData {
 
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('Fetching carrier data for DOT number:', dotNumber);
+  console.log('API Key length:', apiKey?.length);
+  console.log('API Key first 4 chars:', apiKey?.substring(0, 4));
   
   // Remove any 'USDOT' prefix and all whitespace if present
   dotNumber = dotNumber.replace(/^(USDOT)?/i, '').replace(/\s+/g, '');
@@ -44,6 +46,12 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     
     const responseData = await response.text();
     console.log('Raw response text:', responseData);
+    
+    // If we get the "Must provide WebKey" error, log it clearly
+    if (responseData.includes("Must provide WebKey")) {
+      console.error('Invalid or missing WebKey detected');
+      throw new Error('FMCSA API key appears to be invalid or missing');
+    }
     
     if (!response.ok) {
       console.error('FMCSA API Error:', responseData);
