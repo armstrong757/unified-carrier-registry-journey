@@ -65,7 +65,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             <span className="font-medium">EIN: </span>
             {data.ein}
           </div>
-          <div>
+          <div className="mb-2">
             <span className="font-medium">Mileage (Year): </span>
             {data.mileageYear}
           </div>
