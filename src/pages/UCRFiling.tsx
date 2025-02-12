@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -182,7 +183,7 @@ const UCRFiling = () => {
         </div>
 
         {/* UCR Disclaimer */}
-        <div className="max-w-3xl mx-auto px-4 text-center">
+        <div className="max-w-4xl mx-auto text-center">
           <p className="text-[#8E9196] text-xs">
             This website is not affiliated with the Unified Carrier Registration Plan. This website is operated by a private company that provides a private registration service for an additional fee. You are not required to use this site to register with the UCR Plan. You may register directly with the UCR Plan at www.ucr.gov.
           </p>
