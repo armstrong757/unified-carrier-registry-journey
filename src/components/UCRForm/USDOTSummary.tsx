@@ -1,5 +1,8 @@
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 interface USDOTData {
   usdotNumber: string;
@@ -19,6 +22,9 @@ interface USDOTSummaryProps {
 }
 
 const USDOTSummary = ({ data }: USDOTSummaryProps) => {
+  const location = useLocation();
+  const isUCRForm = location.pathname === "/ucr";
+
   return (
     <Card className="bg-white/50 backdrop-blur-sm">
       <CardContent className="p-6">
@@ -63,6 +69,26 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             <span className="font-medium">Mileage (Year): </span>
             {data.mileageYear}
           </div>
+          {isUCRForm && (
+            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200">
+              <a
+                href="/mcs150"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                Update MCS-150
+              </a>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-gray-500 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[280px] text-sm">
+                  The MCS-150 is the form used to apply for United States Department of Transportation (USDOT) Number. If you would like to update any of the information in this section, you must update your MCS-150 Form. You can click Update MCS-150 to be redirected to the update form.
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
