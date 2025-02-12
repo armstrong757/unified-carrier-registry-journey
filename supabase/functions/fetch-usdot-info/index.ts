@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -81,21 +82,32 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       throw new Error('No data returned from FMCSA API');
     }
 
-    // Log the specific fields we're interested in
-    console.log('Carrier data fields:', {
-      legalName: data.legalName,
-      dbaName: data.dbaName,
-      carrierOperation: data.carrierOperation,
-      allowToOperate: data.allowToOperate,
-      street: data.phyStreet,
-      city: data.phyCity,
-      state: data.phyState,
-      zip: data.phyZipCode,
-      telephone: data.telephone,
-      totalPowerUnits: data.totalPowerUnits,
-    });
-    
-    return data;
+    // Map specific fields from FMCSA response
+    const mappedData = {
+      carrierOperation: data.carrierOperation || 'UNKNOWN',
+      legalName: data.legalName || 'NOT PROVIDED',
+      dbaName: data.dbaName || '',
+      allowToOperate: data.allowToOperate === 'Y' ? 'AUTHORIZED' : 'NOT AUTHORIZED',
+      phyStreet: data.phyStreet || '',
+      phyCity: data.phyCity || '',
+      phyState: data.phyState || '',
+      phyZipCode: data.phyZipCode || '',
+      telephone: data.telephone || 'NOT PROVIDED',
+      totalPowerUnits: parseInt(data.totalPowerUnits) || 0,
+      busVehicle: parseInt(data.busVehicle) || 0,
+      limoVehicle: parseInt(data.limoVehicle) || 0,
+      miniBusVehicle: parseInt(data.miniBusVehicle) || 0,
+      motorCoachVehicle: parseInt(data.motorCoachVehicle) || 0,
+      vanVehicle: parseInt(data.vanVehicle) || 0,
+      complaintCount: parseInt(data.complaintCount) || 0,
+      outOfService: data.outOfService === 'Y',
+      outOfServiceDate: data.outOfServiceDate || null,
+      mcNumber: data.mcNumber || '',
+      mcs150FormDate: data.mcs150FormDate || null,
+    };
+
+    console.log('Mapped carrier data:', mappedData);
+    return mappedData;
   } catch (error) {
     console.error('Error in fetchCarrierData:', error);
     throw error;
@@ -217,31 +229,33 @@ serve(async (req) => {
     const outOfServiceDate = carrierData.outOfServiceDate ? new Date(carrierData.outOfServiceDate).toISOString().split('T')[0] : null;
     const mcs150LastUpdate = carrierData.mcs150FormDate ? new Date(carrierData.mcs150FormDate).toISOString().split('T')[0] : null;
 
-    // Transform FMCSA data to our format, with additional null checks
-    const transformedData: USDOTData = {
+    // Create physical address string
+    const physicalAddress = [
+      carrierData.phyStreet,
+      carrierData.phyCity,
+      carrierData.phyState,
+      carrierData.phyZipCode
+    ].filter(Boolean).join(', ') || 'NOT PROVIDED';
+
+    // Transform FMCSA data to our format
+    const transformedData = {
       usdotNumber: dotNumber,
-      operatingStatus: carrierData.allowToOperate === 'Y' ? 'AUTHORIZED' : 'NOT AUTHORIZED',
-      entityType: carrierData.carrierOperation || 'UNKNOWN',
-      legalName: carrierData.legalName || 'NOT PROVIDED',
-      dbaName: carrierData.dbaName || '',
-      physicalAddress: [
-        carrierData.phyStreet,
-        carrierData.phyCity,
-        carrierData.phyState,
-        carrierData.phyZipCode,
-        carrierData.phyCountry
-      ].filter(Boolean).join(', ') || 'NOT PROVIDED',
-      telephone: carrierData.telephone || 'NOT PROVIDED',
-      powerUnits: parseInt(carrierData.totalPowerUnits) || 0,
-      busCount: parseInt(carrierData.busVehicle) || 0,
-      limoCount: parseInt(carrierData.limoVehicle) || 0,
-      minibusCount: parseInt(carrierData.miniBusVehicle) || 0,
-      motorcoachCount: parseInt(carrierData.motorCoachVehicle) || 0,
-      vanCount: parseInt(carrierData.vanVehicle) || 0,
-      complaintCount: parseInt(carrierData.complaintCount) || 0,
-      outOfService: carrierData.outOfService === 'Y',
+      operatingStatus: carrierData.allowToOperate,
+      entityType: carrierData.carrierOperation,
+      legalName: carrierData.legalName,
+      dbaName: carrierData.dbaName,
+      physicalAddress: physicalAddress,
+      telephone: carrierData.telephone,
+      powerUnits: carrierData.totalPowerUnits,
+      busCount: carrierData.busVehicle,
+      limoCount: carrierData.limoVehicle,
+      minibusCount: carrierData.miniBusVehicle,
+      motorcoachCount: carrierData.motorCoachVehicle,
+      vanCount: carrierData.vanVehicle,
+      complaintCount: carrierData.complaintCount,
+      outOfService: carrierData.outOfService,
       outOfServiceDate: outOfServiceDate,
-      mcNumber: carrierData.mcNumber || '',
+      mcNumber: carrierData.mcNumber,
       mcs150LastUpdate: mcs150LastUpdate,
       basicsData: basicsData || {},
     };
