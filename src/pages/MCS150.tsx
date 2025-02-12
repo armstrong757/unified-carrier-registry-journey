@@ -9,11 +9,26 @@ import StepThree from "@/components/MCS150Form/StepThree";
 import StepFour from "@/components/MCS150Form/StepFour";
 import StepFive from "@/components/MCS150Form/StepFive";
 import StepSix from "@/components/MCS150Form/StepSix";
+import USDOTSummary from "@/components/UCRForm/USDOTSummary";
 
 const MCS150 = () => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 6;
+
+  // Temporary mock data - will be replaced with API data
+  const mockUSDOTData = {
+    usdotNumber: "1523020",
+    operatingStatus: "NOT AUTHORIZED",
+    entityType: "CARRIER",
+    legalName: "TOWN & COUNTRY EVENT RENTALS INC",
+    physicalAddress: "7725 AIRPORT BUSINESS PARK WAY VAN NUYS, CA 91406",
+    powerUnits: 110,
+    drivers: 110,
+    mcs150LastUpdate: "07/14/2022",
+    ein: "954695759",
+    mileageYear: "200000 (2022)",
+  };
 
   const [formData, setFormData] = useState({
     // Step 1 - Reason for Filing
@@ -204,27 +219,37 @@ const MCS150 = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8">
-          <h1 className="text-3xl font-bold text-primary mb-8 text-center">
-            MCS-150 Biennial Update
-          </h1>
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+              <h1 className="text-3xl font-bold text-primary mb-8 text-center">
+                MCS-150 Biennial Update
+              </h1>
 
-          <FormProgress currentStep={currentStep} totalSteps={totalSteps} />
+              <FormProgress currentStep={currentStep} totalSteps={totalSteps} />
 
-          {renderStep()}
+              {renderStep()}
 
-          <div className="flex justify-between mt-8">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              disabled={currentStep === 1}
-            >
-              Back
-            </Button>
-            <Button onClick={handleNext}>
-              {currentStep === totalSteps ? "Submit" : "Next"}
-            </Button>
+              <div className="flex justify-between mt-8">
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  disabled={currentStep === 1}
+                >
+                  Back
+                </Button>
+                <Button onClick={handleNext}>
+                  {currentStep === totalSteps ? "Submit" : "Next"}
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="lg:col-span-1">
+            <div className="sticky top-8">
+              <USDOTSummary data={mockUSDOTData} />
+            </div>
           </div>
         </div>
       </div>
