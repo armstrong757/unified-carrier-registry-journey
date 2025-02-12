@@ -172,6 +172,10 @@ serve(async (req) => {
       fetchBasicsData(dotNumber, fmcsaApiKey)
     ]);
 
+    // Parse dates properly
+    const outOfServiceDate = carrierData.outOfServiceDate ? new Date(carrierData.outOfServiceDate).toISOString().split('T')[0] : null;
+    const mcs150LastUpdate = carrierData.mcs150FormDate ? new Date(carrierData.mcs150FormDate).toISOString().split('T')[0] : null;
+
     // Transform FMCSA data to our format
     const transformedData: USDOTData = {
       usdotNumber: dotNumber,
@@ -189,9 +193,9 @@ serve(async (req) => {
       vanCount: parseInt(carrierData.vanVehicle) || 0,
       complaintCount: parseInt(carrierData.complaintCount) || 0,
       outOfService: carrierData.outOfService === 'Y',
-      outOfServiceDate: carrierData.outOfServiceDate || null,
+      outOfServiceDate: outOfServiceDate,
       mcNumber: carrierData.mcNumber || '',
-      mcs150LastUpdate: carrierData.mcs150FormDate || '',
+      mcs150LastUpdate: mcs150LastUpdate,
       basicsData: basicsData || {},
     };
 
@@ -244,3 +248,4 @@ serve(async (req) => {
     );
   }
 });
+
