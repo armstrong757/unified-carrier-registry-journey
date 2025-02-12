@@ -48,7 +48,7 @@ const UCRFiling = () => {
         </div>
 
         {/* Content Sections */}
-        <section className="space-y-12 bg-[#e9f5fe] p-8 rounded-xl shadow-sm">
+        <section className="space-y-12 bg-[#ecf6ff] p-8 rounded-xl shadow-sm">
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">What is UCR?</h2>
             <p className="text-gray-600 leading-relaxed">
