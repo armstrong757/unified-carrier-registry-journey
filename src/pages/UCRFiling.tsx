@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -41,7 +40,7 @@ const UCRFiling = () => {
                 onChange={(e) => setDotNumber(e.target.value)}
                 className="w-full text-lg py-6"
               />
-              <Button type="submit" className="w-full bg-[#1A1F2C] hover:bg-[#2A2F3C] text-white py-6 text-lg">
+              <Button type="submit" className="w-full bg-[#1EAEDB] hover:bg-[#1EAEDB]/90 text-white py-6 text-lg">
                 GET STARTED
               </Button>
             </form>
@@ -49,7 +48,7 @@ const UCRFiling = () => {
         </div>
 
         {/* Content Sections */}
-        <section className="space-y-12 bg-gray-50 p-8 rounded-xl shadow-sm">
+        <section className="space-y-12 bg-[#D3E4FD] p-8 rounded-xl shadow-sm">
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">What is UCR?</h2>
             <p className="text-gray-600 leading-relaxed">
