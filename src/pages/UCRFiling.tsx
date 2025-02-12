@@ -1,9 +1,16 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
 const UCRFiling = () => {
   const [dotNumber, setDotNumber] = useState("");
@@ -15,15 +22,6 @@ const UCRFiling = () => {
       navigate("/ucr");
     }
   };
-
-  const feeStructure = [
-    { vehicles: "0-2", fee: "$69" },
-    { vehicles: "3-5", fee: "$206" },
-    { vehicles: "6-20", fee: "$410" },
-    { vehicles: "21-100", fee: "$1,431" },
-    { vehicles: "101-1000", fee: "$6,820" },
-    { vehicles: "1001 or more", fee: "$66,597" },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -47,21 +45,6 @@ const UCRFiling = () => {
               </Button>
             </form>
           </Card>
-        </div>
-
-        {/* Fee Structure Grid */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-center text-[#1A1F2C] mb-8">UCR Filing Fee for 2025</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {feeStructure.map((tier, index) => (
-              <Card key={index} className="p-6 text-center bg-white hover:shadow-lg transition-shadow duration-300">
-                <h3 className="text-lg font-semibold text-[#1A1F2C] mb-2">
-                  {tier.vehicles} Vehicles
-                </h3>
-                <p className="text-2xl font-bold text-[#1A1F2C]">{tier.fee}</p>
-              </Card>
-            ))}
-          </div>
         </div>
 
         {/* Content Sections */}
@@ -156,6 +139,47 @@ const UCRFiling = () => {
             </ul>
           </div>
         </section>
+
+        {/* Fee Structure Table Section */}
+        <div className="mt-16 space-y-6">
+          <h2 className="text-2xl font-bold text-[#1A1F2C] mb-4">UCR Filing Fee For 2025</h2>
+          <p className="text-gray-600 leading-relaxed">
+            Register for the <span className="font-medium">Unified Carrier Registration Plan</span> based on your fleet size to contribute to funding highway safety initiatives. Annual fees, due by December 31st, support state enforcement, road maintenance, and driving safety. New drivers or companies must pay before their first interstate trip to avoid fines and impoundment. Secure your <span className="italic font-semibold">UCR Registration</span> to travel freely across the United States and beyond!
+          </p>
+          
+          <div className="mt-8 border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="bg-gray-50 text-[#1A1F2C] font-semibold">Truck Quantity</TableHead>
+                  <TableHead className="bg-gray-50 text-[#1A1F2C] font-semibold">Price</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">1 – 2 Trucks</TableCell>
+                  <TableCell>$176.00</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">3 – 5 Trucks</TableCell>
+                  <TableCell>$388.00</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">6 – 20 Trucks</TableCell>
+                  <TableCell>$609.00</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">21 – 100 Trucks</TableCell>
+                  <TableCell>$1449.00</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">100+ Trucks</TableCell>
+                  <TableCell>Contact Us</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
     </div>
   );
