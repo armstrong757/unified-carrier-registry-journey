@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -40,120 +41,58 @@ function validateDOTNumber(dotNumber: string): string {
 
 async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any> {
   console.log('DEBUG: Starting carrier data fetch for DOT number:', dotNumber);
-  console.log('DEBUG: API Key length:', apiKey?.length);
   
   const validDOTNumber = validateDOTNumber(dotNumber);
-  const baseUrl = 'https://api.fmcsa.dot.gov/snapshot/carriers';
+  const baseUrl = 'https://mobile.fmcsa.dot.gov/qc/services/carriers';
+  const url = `${baseUrl}/${validDOTNumber}?webKey=${apiKey}`;
   
-  // Try different API endpoint formats
-  const endpoints = [
-    {
-      url: `${baseUrl}/${validDOTNumber}`,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'X-API-Key': apiKey
-      }
-    },
-    {
-      url: `${baseUrl}/${validDOTNumber}?webKey=${apiKey}`,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    }
-  ];
-
-  let lastError = null;
-  
-  // Try each endpoint configuration
-  for (const endpoint of endpoints) {
-    try {
-      console.log('DEBUG: Trying endpoint:', endpoint.url);
-      const response = await fetch(endpoint.url, { headers: endpoint.headers });
-      console.log('DEBUG: Response status:', response.status);
-      
-      const responseText = await response.text();
-      console.log('DEBUG: Raw response:', responseText);
-      
-      if (!response.ok) {
-        console.error('DEBUG: Response not OK. Status:', response.status);
-        lastError = new Error(`HTTP error! status: ${response.status}`);
-        continue;
-      }
-
-      try {
-        const data = JSON.parse(responseText);
-        if (!data || !data.content) {
-          console.error('DEBUG: Invalid data structure:', JSON.stringify(data));
-          lastError = new Error('Invalid API response structure');
-          continue;
-        }
-
-        const carrierData = data.content;
-        return {
-          usdotNumber: validDOTNumber,
-          operatingStatus: carrierData.allowedToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
-          entityType: carrierData.operatingStatus || 'UNKNOWN',
-          legalName: carrierData.legalName || 'NOT PROVIDED',
-          dbaName: carrierData.dbaName || '',
-          physicalAddress: [
-            carrierData.physicalAddress,
-            carrierData.physicalCity,
-            carrierData.physicalState,
-            carrierData.physicalZipcode
-          ].filter(Boolean).join(', ') || 'NOT PROVIDED',
-          telephone: carrierData.phoneNumber || 'NOT PROVIDED',
-          powerUnits: parseInt(carrierData.totalPowerUnits) || 0,
-          busCount: parseInt(carrierData.totalBuses) || 0,
-          limoCount: parseInt(carrierData.totalLimousines) || 0,
-          minibusCount: parseInt(carrierData.totalMiniBuses) || 0,
-          motorcoachCount: parseInt(carrierData.totalMotorCoaches) || 0,
-          vanCount: parseInt(carrierData.totalVans) || 0,
-          complaintCount: parseInt(carrierData.totalComplaints) || 0,
-          outOfService: carrierData.oosStatus === 'Y',
-          outOfServiceDate: carrierData.oosDate || null,
-          mcNumber: carrierData.mcNumber || '',
-          mcs150LastUpdate: carrierData.mcs150FormDate || null,
-          basicsData: {},
-        };
-      } catch (parseError) {
-        console.error('DEBUG: Failed to parse JSON:', parseError);
-        lastError = parseError;
-      }
-    } catch (fetchError) {
-      console.error('DEBUG: Fetch error:', fetchError);
-      lastError = fetchError;
-    }
-  }
-
-  // If we get here, all attempts failed
-  throw lastError || new Error('Failed to fetch carrier data');
-}
-
-async function fetchBasicsData(dotNumber: string, apiKey: string): Promise<any> {
   try {
-    const url = `https://api.fmcsa.dot.gov/safety/carriers/${dotNumber}/basics?webKey=${apiKey}`;
-    console.log('DEBUG: Fetching BASIC data from:', url);
-    
+    console.log('DEBUG: Fetching from URL:', url);
     const response = await fetch(url);
-    console.log('DEBUG: BASIC data response status:', response.status);
+    console.log('DEBUG: Response status:', response.status);
+    
+    const responseText = await response.text();
+    console.log('DEBUG: Raw response:', responseText);
     
     if (!response.ok) {
-      if (response.status === 404) {
-        console.log('DEBUG: No BASIC data available');
-        return null;
-      }
-      const errorText = await response.text();
-      throw new Error(`BASIC data fetch failed (${response.status}): ${errorText}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
-    const data = await response.json();
-    return data.content || null;
+
+    const data = JSON.parse(responseText);
+    if (!data) {
+      throw new Error('Invalid API response structure');
+    }
+
+    // Map the API response to our interface
+    return {
+      usdotNumber: validDOTNumber,
+      operatingStatus: data.allowedToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
+      entityType: data.operatingStatus || 'UNKNOWN',
+      legalName: data.legalName || 'NOT PROVIDED',
+      dbaName: data.dbaName || '',
+      physicalAddress: [
+        data.physicalAddress,
+        data.physicalCity,
+        data.physicalState,
+        data.physicalZipcode
+      ].filter(Boolean).join(', ') || 'NOT PROVIDED',
+      telephone: data.phoneNumber || 'NOT PROVIDED',
+      powerUnits: parseInt(data.totalPowerUnits) || 0,
+      busCount: parseInt(data.totalBuses) || 0,
+      limoCount: parseInt(data.totalLimousines) || 0,
+      minibusCount: parseInt(data.totalMiniBuses) || 0,
+      motorcoachCount: parseInt(data.totalMotorCoaches) || 0,
+      vanCount: parseInt(data.totalVans) || 0,
+      complaintCount: parseInt(data.totalComplaints) || 0,
+      outOfService: data.oosStatus === 'Y',
+      outOfServiceDate: data.oosDate || null,
+      mcNumber: data.mcNumber || '',
+      mcs150LastUpdate: data.mcs150FormDate || null,
+      basicsData: {},
+    };
   } catch (error) {
-    console.error('DEBUG: Error fetching BASIC data:', error);
-    return null;
+    console.error('DEBUG: Error fetching carrier data:', error);
+    throw error;
   }
 }
 
@@ -230,35 +169,29 @@ serve(async (req) => {
     // Fetch fresh data
     console.log('DEBUG: Fetching fresh data');
     const carrierData = await fetchCarrierData(dotNumber, fmcsaApiKey);
-    const basicsData = await fetchBasicsData(dotNumber, fmcsaApiKey);
-
-    const finalData = {
-      ...carrierData,
-      basicsData: basicsData || {},
-    };
 
     // Cache the data
     console.log('DEBUG: Caching new data');
     const { error: insertError } = await supabase.from('usdot_info').insert({
-      usdot_number: finalData.usdotNumber,
-      operating_status: finalData.operatingStatus,
-      entity_type: finalData.entityType,
-      legal_name: finalData.legalName,
-      dba_name: finalData.dbaName,
-      physical_address: finalData.physicalAddress,
-      telephone: finalData.telephone,
-      power_units: finalData.powerUnits,
-      bus_count: finalData.busCount,
-      limo_count: finalData.limoCount,
-      minibus_count: finalData.minibusCount,
-      motorcoach_count: finalData.motorcoachCount,
-      van_count: finalData.vanCount,
-      complaint_count: finalData.complaintCount,
-      out_of_service: finalData.outOfService,
-      out_of_service_date: finalData.outOfServiceDate,
-      mc_number: finalData.mcNumber,
-      mcs150_last_update: finalData.mcs150LastUpdate,
-      basics_data: finalData.basicsData,
+      usdot_number: carrierData.usdotNumber,
+      operating_status: carrierData.operatingStatus,
+      entity_type: carrierData.entityType,
+      legal_name: carrierData.legalName,
+      dba_name: carrierData.dbaName,
+      physical_address: carrierData.physicalAddress,
+      telephone: carrierData.telephone,
+      power_units: carrierData.powerUnits,
+      bus_count: carrierData.busCount,
+      limo_count: carrierData.limoCount,
+      minibus_count: carrierData.minibusCount,
+      motorcoach_count: carrierData.motorcoachCount,
+      van_count: carrierData.vanCount,
+      complaint_count: carrierData.complaintCount,
+      out_of_service: carrierData.outOfService,
+      out_of_service_date: carrierData.outOfServiceDate,
+      mc_number: carrierData.mcNumber,
+      mcs150_last_update: carrierData.mcs150LastUpdate,
+      basics_data: carrierData.basicsData,
     });
 
     if (insertError) {
@@ -266,7 +199,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify(finalData),
+      JSON.stringify(carrierData),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: any) {
