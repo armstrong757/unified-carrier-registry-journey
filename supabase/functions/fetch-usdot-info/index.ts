@@ -144,6 +144,7 @@ serve(async (req) => {
 
     const fmcsaApiKey = Deno.env.get('FMCSA_API_KEY');
     console.log('DEBUG: API Key present:', !!fmcsaApiKey);
+    console.log('DEBUG: API Key length:', fmcsaApiKey?.length || 0);
     
     if (!fmcsaApiKey) {
       throw new Error('FMCSA API key not configured');
@@ -154,7 +155,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Check cache first
+    // Check cache first, but log the decision process
     console.log('DEBUG: Checking cache for DOT:', dotNumber);
     const { data: existingData, error: fetchError } = await supabase
       .from('usdot_info')
@@ -168,7 +169,7 @@ serve(async (req) => {
     }
 
     if (existingData) {
-      console.log('DEBUG: Found cached data');
+      console.log('DEBUG: Found cached data, returning without API call');
       return new Response(
         JSON.stringify({
           usdotNumber: existingData.usdot_number,
@@ -196,11 +197,11 @@ serve(async (req) => {
     }
 
     // Fetch fresh data
-    console.log('DEBUG: Fetching fresh data');
+    console.log('DEBUG: No cache found, fetching fresh data from FMCSA API');
     const carrierData = await fetchCarrierData(dotNumber, fmcsaApiKey);
 
-    // Cache the data
-    console.log('DEBUG: Caching new data');
+    // Cache the new data
+    console.log('DEBUG: Caching new API response data');
     const { error: insertError } = await supabase.from('usdot_info').insert({
       usdot_number: carrierData.usdotNumber,
       operating_status: carrierData.operatingStatus,
@@ -247,3 +248,4 @@ serve(async (req) => {
     );
   }
 });
+
