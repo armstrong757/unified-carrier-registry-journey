@@ -54,16 +54,17 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
         'Accept': 'application/json'
       }
     });
-    console.log('DEBUG: Response status:', response.status);
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('DEBUG: Error response:', errorText);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    console.log('DEBUG: Response status:', response.status);
+    console.log('DEBUG: Response headers:', Object.fromEntries(response.headers.entries()));
+    
     const responseText = await response.text();
-    console.log('DEBUG: Raw response:', responseText);
+    console.log('DEBUG: Raw response text:', responseText);
+
+    if (!response.ok) {
+      console.error('DEBUG: Error response:', responseText);
+      throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
+    }
 
     if (!responseText) {
       throw new Error('Empty response from FMCSA API');
@@ -72,6 +73,7 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     let data;
     try {
       data = JSON.parse(responseText);
+      console.log('DEBUG: Full parsed response structure:', JSON.stringify(data, null, 2));
     } catch (parseError) {
       console.error('DEBUG: JSON parse error:', parseError);
       throw new Error('Failed to parse FMCSA API response');
@@ -81,41 +83,44 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       throw new Error('Invalid API response structure');
     }
 
-    console.log('DEBUG: Parsed response data:', data);
+    // Try accessing data both with and without content wrapper
+    const carrierData = data.content || data;
+    console.log('DEBUG: Carrier data being used:', carrierData);
 
     // Map the API response to our interface with improved error handling
     const result = {
       usdotNumber: validDOTNumber,
-      operatingStatus: data.content?.allowedToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
-      entityType: data.content?.operatingStatus || 'UNKNOWN',
-      legalName: data.content?.legalName || 'NOT PROVIDED',
-      dbaName: data.content?.dbaName || '',
+      operatingStatus: carrierData.allowedToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
+      entityType: carrierData.operatingStatus || 'UNKNOWN',
+      legalName: carrierData.legalName || 'NOT PROVIDED',
+      dbaName: carrierData.dbaName || '',
       physicalAddress: [
-        data.content?.physicalAddress,
-        data.content?.physicalCity,
-        data.content?.physicalState,
-        data.content?.physicalZipcode
+        carrierData.physicalAddress,
+        carrierData.physicalCity,
+        carrierData.physicalState,
+        carrierData.physicalZipcode
       ].filter(Boolean).join(', ') || 'NOT PROVIDED',
-      telephone: data.content?.phoneNumber || 'NOT PROVIDED',
-      powerUnits: parseInt(data.content?.totalPowerUnits) || 0,
-      busCount: parseInt(data.content?.totalBuses) || 0,
-      limoCount: parseInt(data.content?.totalLimousines) || 0,
-      minibusCount: parseInt(data.content?.totalMiniBuses) || 0,
-      motorcoachCount: parseInt(data.content?.totalMotorCoaches) || 0,
-      vanCount: parseInt(data.content?.totalVans) || 0,
-      complaintCount: parseInt(data.content?.totalComplaints) || 0,
-      outOfService: data.content?.oosStatus === 'Y',
-      outOfServiceDate: data.content?.oosDate || null,
-      mcNumber: data.content?.mcNumber || '',
-      mcs150LastUpdate: data.content?.mcs150FormDate || null,
+      telephone: carrierData.phoneNumber || 'NOT PROVIDED',
+      powerUnits: parseInt(carrierData.totalPowerUnits) || 0,
+      busCount: parseInt(carrierData.totalBuses) || 0,
+      limoCount: parseInt(carrierData.totalLimousines) || 0,
+      minibusCount: parseInt(carrierData.totalMiniBuses) || 0,
+      motorcoachCount: parseInt(carrierData.totalMotorCoaches) || 0,
+      vanCount: parseInt(carrierData.totalVans) || 0,
+      complaintCount: parseInt(carrierData.totalComplaints) || 0,
+      outOfService: carrierData.oosStatus === 'Y',
+      outOfServiceDate: carrierData.oosDate || null,
+      mcNumber: carrierData.mcNumber || '',
+      mcs150LastUpdate: carrierData.mcs150FormDate || null,
       basicsData: {},
     };
 
-    console.log('DEBUG: Mapped response data:', result);
+    console.log('DEBUG: Final mapped response:', result);
     return result;
 
   } catch (error) {
     console.error('DEBUG: Error fetching carrier data:', error);
+    console.error('DEBUG: Error stack:', error.stack);
     throw error;
   }
 }
