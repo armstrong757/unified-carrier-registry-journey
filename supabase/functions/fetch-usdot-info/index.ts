@@ -87,7 +87,6 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
     const carrierData = data.content || data;
     console.log('DEBUG: Carrier data being used:', carrierData);
 
-    // Map the API response to our interface with improved error handling
     const result = {
       usdotNumber: validDOTNumber,
       operatingStatus: carrierData.allowedToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
@@ -112,7 +111,7 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       outOfServiceDate: carrierData.oosDate || null,
       mcNumber: carrierData.mcNumber || '',
       mcs150LastUpdate: carrierData.mcs150FormDate || null,
-      basicsData: {},
+      basicsData: data.basics || {},
     };
 
     console.log('DEBUG: Final mapped response:', result);
@@ -150,12 +149,11 @@ serve(async (req) => {
       throw new Error('FMCSA API key not configured');
     }
 
-    // Create Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Check cache first, but log the decision process
+    // Check cache but with timestamp validation
     console.log('DEBUG: Checking cache for DOT:', dotNumber);
     const { data: existingData, error: fetchError } = await supabase
       .from('usdot_info')
@@ -168,8 +166,14 @@ serve(async (req) => {
       throw fetchError;
     }
 
-    if (existingData) {
-      console.log('DEBUG: Found cached data, returning without API call');
+    const now = new Date();
+    const cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    const shouldRefresh = !existingData || 
+                         !existingData.updated_at || 
+                         (now.getTime() - new Date(existingData.updated_at).getTime()) > cacheExpiry;
+
+    if (existingData && !shouldRefresh) {
+      console.log('DEBUG: Using valid cached data');
       return new Response(
         JSON.stringify({
           usdotNumber: existingData.usdot_number,
@@ -196,36 +200,66 @@ serve(async (req) => {
       );
     }
 
-    // Fetch fresh data
-    console.log('DEBUG: No cache found, fetching fresh data from FMCSA API');
+    console.log('DEBUG: Fetching fresh data from FMCSA API');
     const carrierData = await fetchCarrierData(dotNumber, fmcsaApiKey);
 
-    // Cache the new data
-    console.log('DEBUG: Caching new API response data');
-    const { error: insertError } = await supabase.from('usdot_info').insert({
-      usdot_number: carrierData.usdotNumber,
-      operating_status: carrierData.operatingStatus,
-      entity_type: carrierData.entityType,
-      legal_name: carrierData.legalName,
-      dba_name: carrierData.dbaName,
-      physical_address: carrierData.physicalAddress,
-      telephone: carrierData.telephone,
-      power_units: carrierData.powerUnits,
-      bus_count: carrierData.busCount,
-      limo_count: carrierData.limoCount,
-      minibus_count: carrierData.minibusCount,
-      motorcoach_count: carrierData.motorcoachCount,
-      van_count: carrierData.vanCount,
-      complaint_count: carrierData.complaintCount,
-      out_of_service: carrierData.outOfService,
-      out_of_service_date: carrierData.outOfServiceDate,
-      mc_number: carrierData.mcNumber,
-      mcs150_last_update: carrierData.mcs150LastUpdate,
-      basics_data: carrierData.basicsData,
-    });
+    if (existingData) {
+      console.log('DEBUG: Updating existing cache entry');
+      const { error: updateError } = await supabase
+        .from('usdot_info')
+        .update({
+          operating_status: carrierData.operatingStatus,
+          entity_type: carrierData.entityType,
+          legal_name: carrierData.legalName,
+          dba_name: carrierData.dbaName,
+          physical_address: carrierData.physicalAddress,
+          telephone: carrierData.telephone,
+          power_units: carrierData.powerUnits,
+          bus_count: carrierData.busCount,
+          limo_count: carrierData.limoCount,
+          minibus_count: carrierData.minibusCount,
+          motorcoach_count: carrierData.motorcoachCount,
+          van_count: carrierData.vanCount,
+          complaint_count: carrierData.complaintCount,
+          out_of_service: carrierData.outOfService,
+          out_of_service_date: carrierData.outOfServiceDate,
+          mc_number: carrierData.mcNumber,
+          mcs150_last_update: carrierData.mcs150LastUpdate,
+          basics_data: carrierData.basicsData,
+          updated_at: now.toISOString()
+        })
+        .eq('usdot_number', dotNumber);
 
-    if (insertError) {
-      console.error('DEBUG: Cache insert error:', insertError);
+      if (updateError) {
+        console.error('DEBUG: Cache update error:', updateError);
+      }
+    } else {
+      console.log('DEBUG: Creating new cache entry');
+      const { error: insertError } = await supabase.from('usdot_info').insert({
+        usdot_number: carrierData.usdotNumber,
+        operating_status: carrierData.operatingStatus,
+        entity_type: carrierData.entityType,
+        legal_name: carrierData.legalName,
+        dba_name: carrierData.dbaName,
+        physical_address: carrierData.physicalAddress,
+        telephone: carrierData.telephone,
+        power_units: carrierData.powerUnits,
+        bus_count: carrierData.busCount,
+        limo_count: carrierData.limoCount,
+        minibus_count: carrierData.minibusCount,
+        motorcoach_count: carrierData.motorcoachCount,
+        van_count: carrierData.vanCount,
+        complaint_count: carrierData.complaintCount,
+        out_of_service: carrierData.outOfService,
+        out_of_service_date: carrierData.outOfServiceDate,
+        mc_number: carrierData.mcNumber,
+        mcs150_last_update: carrierData.mcs150LastUpdate,
+        basics_data: carrierData.basicsData,
+      });
+
+      if (insertError) {
+        console.error('DEBUG: Cache insert error:', insertError);
+      }
     }
 
     return new Response(
@@ -248,4 +282,3 @@ serve(async (req) => {
     );
   }
 });
-
