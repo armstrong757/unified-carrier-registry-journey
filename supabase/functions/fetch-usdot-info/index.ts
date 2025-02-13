@@ -46,7 +46,13 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
   const url = `${baseUrl}/${validDOTNumber}?webKey=${apiKey}`;
   
   try {
-    console.log('DEBUG: Fetching from URL:', url);
+    console.log('DEBUG: Fetching from URL:', url.replace(apiKey, '[REDACTED]'));
+    
+    // Log pre-fetch state
+    console.log('DEBUG: Starting fetch with headers:', {
+      'Accept': 'application/json'
+    });
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -54,37 +60,47 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       }
     });
     
+    // Immediately log response details
+    console.log('DEBUG: Initial response received');
     console.log('DEBUG: Response status:', response.status);
     console.log('DEBUG: Response headers:', Object.fromEntries(response.headers.entries()));
     
     const responseText = await response.text();
-    console.log('DEBUG: Raw response text:', responseText);
+    console.log('DEBUG: Raw response length:', responseText.length);
+    console.log('DEBUG: First 500 chars of response:', responseText.substring(0, 500));
 
     if (!response.ok) {
-      console.error('DEBUG: Error response:', responseText);
+      console.error('DEBUG: Error response status:', response.status);
+      console.error('DEBUG: Error response statusText:', response.statusText);
+      console.error('DEBUG: Error response body:', responseText);
       throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
     }
 
     if (!responseText) {
+      console.error('DEBUG: Empty response received');
       throw new Error('Empty response from FMCSA API');
     }
 
     let data;
     try {
       data = JSON.parse(responseText);
-      console.log('DEBUG: Full parsed response structure:', JSON.stringify(data, null, 2));
+      console.log('DEBUG: Successfully parsed JSON response');
+      console.log('DEBUG: Response data structure:', Object.keys(data));
     } catch (parseError) {
       console.error('DEBUG: JSON parse error:', parseError);
+      console.error('DEBUG: Invalid JSON received:', responseText);
       throw new Error('Failed to parse FMCSA API response');
     }
 
     if (!data) {
+      console.error('DEBUG: Null data after parsing');
       throw new Error('Invalid API response structure');
     }
 
     // Try accessing data both with and without content wrapper
     const carrierData = data.content || data;
-    console.log('DEBUG: Carrier data being used:', carrierData);
+    console.log('DEBUG: Using data structure:', carrierData ? 'content wrapper' : 'direct data');
+    console.log('DEBUG: Available fields:', Object.keys(carrierData));
 
     const result = {
       usdotNumber: validDOTNumber,
@@ -113,11 +129,11 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
       basicsData: data.basics || {},
     };
 
-    console.log('DEBUG: Final mapped response:', result);
+    console.log('DEBUG: Mapped final result:', result);
     return result;
 
   } catch (error) {
-    console.error('DEBUG: Error fetching carrier data:', error);
+    console.error('DEBUG: Error in fetchCarrierData:', error);
     console.error('DEBUG: Error stack:', error.stack);
     throw error;
   }
