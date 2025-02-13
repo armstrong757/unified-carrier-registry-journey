@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -168,38 +167,21 @@ serve(async (req) => {
 
     const now = new Date();
     const cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-    const shouldRefresh = !existingData || 
-                         !existingData.updated_at || 
-                         (now.getTime() - new Date(existingData.updated_at).getTime()) > cacheExpiry;
 
-    if (existingData && !shouldRefresh) {
-      console.log('DEBUG: Using valid cached data');
-      return new Response(
-        JSON.stringify({
-          usdotNumber: existingData.usdot_number,
-          operatingStatus: existingData.operating_status,
-          entityType: existingData.entity_type,
-          legalName: existingData.legal_name,
-          dbaName: existingData.dba_name,
-          physicalAddress: existingData.physical_address,
-          telephone: existingData.telephone,
-          powerUnits: existingData.power_units,
-          busCount: existingData.bus_count,
-          limoCount: existingData.limo_count,
-          minibusCount: existingData.minibus_count,
-          motorcoachCount: existingData.motorcoach_count,
-          vanCount: existingData.van_count,
-          complaintCount: existingData.complaint_count,
-          outOfService: existingData.out_of_service,
-          outOfServiceDate: existingData.out_of_service_date,
-          mcNumber: existingData.mc_number,
-          mcs150LastUpdate: existingData.mcs150_last_update,
-          basicsData: existingData.basics_data,
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Log cache expiration details
+    if (existingData) {
+      const lastUpdate = new Date(existingData.updated_at || '');
+      const timeSinceUpdate = now.getTime() - lastUpdate.getTime();
+      console.log('DEBUG: Cache details:', {
+        lastUpdate: lastUpdate.toISOString(),
+        timeSinceUpdate: `${Math.floor(timeSinceUpdate / (1000 * 60))} minutes`,
+        cacheExpiry: `${cacheExpiry / (1000 * 60 * 60)} hours`,
+        isExpired: timeSinceUpdate > cacheExpiry
+      });
     }
 
+    // Force a refresh for testing
+    console.log('DEBUG: Forcing fresh API call for testing');
     console.log('DEBUG: Fetching fresh data from FMCSA API');
     const carrierData = await fetchCarrierData(dotNumber, fmcsaApiKey);
 
