@@ -48,48 +48,72 @@ async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<any>
   
   try {
     console.log('DEBUG: Fetching from URL:', url);
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
     console.log('DEBUG: Response status:', response.status);
     
-    const responseText = await response.text();
-    console.log('DEBUG: Raw response:', responseText);
-    
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('DEBUG: Error response:', errorText);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = JSON.parse(responseText);
+    const responseText = await response.text();
+    console.log('DEBUG: Raw response:', responseText);
+
+    if (!responseText) {
+      throw new Error('Empty response from FMCSA API');
+    }
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('DEBUG: JSON parse error:', parseError);
+      throw new Error('Failed to parse FMCSA API response');
+    }
+
     if (!data) {
       throw new Error('Invalid API response structure');
     }
 
-    // Map the API response to our interface
-    return {
+    console.log('DEBUG: Parsed response data:', data);
+
+    // Map the API response to our interface with improved error handling
+    const result = {
       usdotNumber: validDOTNumber,
-      operatingStatus: data.allowedToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
-      entityType: data.operatingStatus || 'UNKNOWN',
-      legalName: data.legalName || 'NOT PROVIDED',
-      dbaName: data.dbaName || '',
+      operatingStatus: data.content?.allowedToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
+      entityType: data.content?.operatingStatus || 'UNKNOWN',
+      legalName: data.content?.legalName || 'NOT PROVIDED',
+      dbaName: data.content?.dbaName || '',
       physicalAddress: [
-        data.physicalAddress,
-        data.physicalCity,
-        data.physicalState,
-        data.physicalZipcode
+        data.content?.physicalAddress,
+        data.content?.physicalCity,
+        data.content?.physicalState,
+        data.content?.physicalZipcode
       ].filter(Boolean).join(', ') || 'NOT PROVIDED',
-      telephone: data.phoneNumber || 'NOT PROVIDED',
-      powerUnits: parseInt(data.totalPowerUnits) || 0,
-      busCount: parseInt(data.totalBuses) || 0,
-      limoCount: parseInt(data.totalLimousines) || 0,
-      minibusCount: parseInt(data.totalMiniBuses) || 0,
-      motorcoachCount: parseInt(data.totalMotorCoaches) || 0,
-      vanCount: parseInt(data.totalVans) || 0,
-      complaintCount: parseInt(data.totalComplaints) || 0,
-      outOfService: data.oosStatus === 'Y',
-      outOfServiceDate: data.oosDate || null,
-      mcNumber: data.mcNumber || '',
-      mcs150LastUpdate: data.mcs150FormDate || null,
+      telephone: data.content?.phoneNumber || 'NOT PROVIDED',
+      powerUnits: parseInt(data.content?.totalPowerUnits) || 0,
+      busCount: parseInt(data.content?.totalBuses) || 0,
+      limoCount: parseInt(data.content?.totalLimousines) || 0,
+      minibusCount: parseInt(data.content?.totalMiniBuses) || 0,
+      motorcoachCount: parseInt(data.content?.totalMotorCoaches) || 0,
+      vanCount: parseInt(data.content?.totalVans) || 0,
+      complaintCount: parseInt(data.content?.totalComplaints) || 0,
+      outOfService: data.content?.oosStatus === 'Y',
+      outOfServiceDate: data.content?.oosDate || null,
+      mcNumber: data.content?.mcNumber || '',
+      mcs150LastUpdate: data.content?.mcs150FormDate || null,
       basicsData: {},
     };
+
+    console.log('DEBUG: Mapped response data:', result);
+    return result;
+
   } catch (error) {
     console.error('DEBUG: Error fetching carrier data:', error);
     throw error;
