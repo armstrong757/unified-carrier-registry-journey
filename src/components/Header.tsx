@@ -39,7 +39,7 @@ const Header = () => {
               </button>
 
               {/* Desktop Navigation */}
-              <nav className="hidden md:flex space-x-8">
+              <nav className="hidden md:flex space-x-8 text-sm">
                 <Link
                   to="/filings"
                   className="text-gray-600 hover:text-[#517fa4] transition-colors"
@@ -63,7 +63,7 @@ const Header = () => {
               {/* Mobile Navigation */}
               {isMenuOpen && (
                 <div className="md:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
-                  <nav className="flex flex-col p-4">
+                  <nav className="flex flex-col p-4 text-sm">
                     <Link
                       to="/filings"
                       className="py-2 text-gray-600 hover:text-[#517fa4] transition-colors"
