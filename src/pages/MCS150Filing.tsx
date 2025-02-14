@@ -6,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
 const MCS150Filing = () => {
   const [dotNumber, setDotNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +13,6 @@ const MCS150Filing = () => {
   const {
     toast
   } = useToast();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dotNumber.trim()) return;
@@ -53,14 +51,12 @@ const MCS150Filing = () => {
       setIsLoading(false);
     }
   };
-
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
-
   return <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-[16px]">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8 mb-16">
@@ -218,7 +214,7 @@ const MCS150Filing = () => {
               <div className="md:col-span-2">
                 <h3 className="text-xl font-semibold text-gray-600 mb-4">Additional Filing Triggers</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-3">
-                  <li>Biennial Update is required every two years</li>
+                  <li>Every two years for required Biennial Update</li>
                   <li>Making any other significant business changes</li>
                   <li>Reapplying after new entrant revocation</li>
                 </ul>
@@ -334,5 +330,4 @@ const MCS150Filing = () => {
       </div>
     </div>;
 };
-
 export default MCS150Filing;
