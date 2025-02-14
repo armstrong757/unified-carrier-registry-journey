@@ -210,7 +210,7 @@ const UCRFiling = () => {
             <h2 className="text-2xl text-gray-600 mb-6 font-semibold">Fee Structure</h2>
             <div className="space-y-6">
               <div className="text-gray-600 mb-8">
-                <p className="mb-4">Based on fleet size</p>
+                
                 <p className="font-semibold mb-2">Fees support:</p>
                 <ul className="list-disc pl-5 space-y-2">
                   <li>State enforcement programs</li>
