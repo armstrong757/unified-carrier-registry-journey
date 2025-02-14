@@ -281,11 +281,7 @@ const UCRFiling = () => {
                       </TableRow>
                       <TableRow>
                         <TableCell className="font-medium">1,001 or more Trucks</TableCell>
-                        <TableCell>$66,597.00</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">Broker/Leasing Company</TableCell>
-                        <TableCell>$176.00</TableCell>
+                        <TableCell>Contact Us</TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
