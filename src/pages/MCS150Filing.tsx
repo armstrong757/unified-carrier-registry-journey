@@ -148,7 +148,7 @@ const MCS150Filing = () => {
 
         <div className="space-y-8">
           <section id="what-is-mcs150" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-600 mb-6">What is an MCS-150?</h2>
+            <h2 className="text-2xl text-gray-600 mb-6 font-semibold">What is an MCS-150?</h2>
             <p className="text-gray-600 leading-relaxed">
               The MCS-150 is a required form from the Federal Motor Carrier Safety Administration (FMCSA) for obtaining or renewing your USDOT number. This form collects essential data about your trucking business for safety purposes and is used to:
             </p>
@@ -161,7 +161,7 @@ const MCS150Filing = () => {
           </section>
 
           <section id="consequences" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-600 mb-6">Non-Compliance Penalties</h2>
+            <h2 className="text-2xl text-gray-600 mb-6 font-semibold">Non-Compliance Penalties</h2>
             <div className="space-y-6">
               <div>
                 <h3 className="text-xl font-semibold text-[#1A1F2C] mb-4">Penalties</h3>
@@ -185,7 +185,7 @@ const MCS150Filing = () => {
           </section>
 
           <section id="filing-requirements" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-600 mb-6">Filing Requirements</h2>
+            <h2 className="text-2xl text-gray-600 mb-6 font-semibold">Filing Requirements</h2>
             <p className="text-gray-600 mb-6">You must file an MCS-150 update within 30 days when making changes in any of these categories:</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -222,7 +222,7 @@ const MCS150Filing = () => {
           </section>
 
           <section id="when-to-file" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-600 mb-6">When Must You File?</h2>
+            <h2 className="text-2xl text-gray-600 mb-6 font-semibold">When Must You File?</h2>
             
             <div className="space-y-8">
               <div>
@@ -298,7 +298,7 @@ const MCS150Filing = () => {
           </section>
 
           <section id="fee-structure" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-600 mb-6">Fee Structure</h2>
+            <h2 className="text-2xl text-gray-600 mb-6 font-semibold">Fee Structure</h2>
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-lg border border-gray-100">
                 <p className="text-gray-600 mb-4 text-base">
