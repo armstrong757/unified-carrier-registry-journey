@@ -29,10 +29,8 @@ const Index = () => {
             <div className="w-16 h-16 bg-[#edf7ff]/50 rounded-lg flex items-center justify-center mb-4">
               <FileText className="w-8 h-8 text-[#517fa4]" />
             </div>
-            <h2 className="text-xl font-semibold mb-2 text-zinc-950">
-              MCS-150 BIENNIAL UPDATE
-            </h2>
-            <p className="text-gray-600 mb-6">Update your USDOT and operating records with FMCSA.</p>
+            <h2 className="text-xl font-semibold mb-2 text-zinc-950">MCS-150 </h2>
+            <p className="text-gray-600 mb-6">Update your USDOT and Biennial Update  with FMCSA.</p>
             <Button onClick={() => navigate("/mcs-150-filing")} className="bg-white border-2 border-[#517fa4] text-[#517fa4] hover:bg-[#517fa4] hover:text-white transition-colors">
               View Details
             </Button>
