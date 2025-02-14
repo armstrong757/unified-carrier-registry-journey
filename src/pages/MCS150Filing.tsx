@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -33,11 +34,7 @@ const MCS150Filing = () => {
       }
 
       console.log('USDOT data received:', data);
-
-      // Store the USDOT data in sessionStorage
       sessionStorage.setItem('usdotData', JSON.stringify(data));
-      
-      // Navigate to the MCS-150 form
       navigate("/mcs150", { state: { usdotData: data } });
     } catch (error: any) {
       console.error('Error fetching USDOT info:', error);
@@ -85,7 +82,26 @@ const MCS150Filing = () => {
           </Card>
         </div>
 
-        <section className="space-y-12 bg-[#edf7ff]/50 p-4 sm:p-8 rounded-xl shadow-sm">
+        {/* Table of Contents */}
+        <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+          <h2 className="text-xl font-semibold text-[#1A1F2C] mb-4">Table of Contents</h2>
+          <nav className="space-y-2">
+            <a href="#what-is-mcs150" className="block text-[#517fa4] hover:text-[#517fa4]/80">
+              What is an MCS-150?
+            </a>
+            <a href="#consequences" className="block text-[#517fa4] hover:text-[#517fa4]/80">
+              Consequences of Non-Compliance
+            </a>
+            <a href="#filing-requirements" className="block text-[#517fa4] hover:text-[#517fa4]/80">
+              Additional Filing Requirements
+            </a>
+            <a href="#when-to-file" className="block text-[#517fa4] hover:text-[#517fa4]/80">
+              When Must You File?
+            </a>
+          </nav>
+        </div>
+
+        <section id="what-is-mcs150" className="space-y-12 bg-[#edf7ff]/50 p-4 sm:p-8 rounded-xl shadow-sm">
           <div>
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">What is an MCS-150?</h2>
             <p className="text-gray-600 leading-relaxed">
@@ -101,7 +117,7 @@ const MCS150Filing = () => {
 
           <Separator className="my-8" />
 
-          <div>
+          <div id="consequences">
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Consequences of Non-Compliance</h2>
             <div className="space-y-6">
               <div>
@@ -127,7 +143,7 @@ const MCS150Filing = () => {
 
           <Separator className="my-8" />
 
-          <div>
+          <div id="filing-requirements">
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Additional Filing Requirements</h2>
             <p className="text-gray-600 mb-4">You must also file an MCS-150 update within 30 days when:</p>
             <ul className="list-disc pl-5 text-gray-600 space-y-3">
@@ -148,7 +164,7 @@ const MCS150Filing = () => {
 
           <Separator className="my-8" />
 
-          <div>
+          <div id="when-to-file">
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">When Must You File?</h2>
             
             <div className="space-y-8">
@@ -245,3 +261,4 @@ const MCS150Filing = () => {
 };
 
 export default MCS150Filing;
+
