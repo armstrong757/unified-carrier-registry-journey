@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -151,6 +150,40 @@ const UCRFiling = () => {
             >
               Fee Structure
             </a>
+            <a 
+              href="#legal-framework" 
+              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#legal-framework')?.scrollIntoView({ 
+                  behavior: 'smooth',
+                  block: 'start',
+                  inline: 'nearest'
+                });
+                setTimeout(() => {
+                  window.scrollBy(0, -20);
+                }, 800);
+              }}
+            >
+              Legal Framework
+            </a>
+            <a 
+              href="#participating-states" 
+              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#participating-states')?.scrollIntoView({ 
+                  behavior: 'smooth',
+                  block: 'start',
+                  inline: 'nearest'
+                });
+                setTimeout(() => {
+                  window.scrollBy(0, -20);
+                }, 800);
+              }}
+            >
+              Participating States
+            </a>
           </nav>
         </div>
 
@@ -186,6 +219,17 @@ const UCRFiling = () => {
           <section id="fee-structure" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Fee Structure</h2>
             <div className="space-y-6">
+              <div className="text-gray-600 mb-8">
+                <p className="mb-4">Based on fleet size</p>
+                <p className="font-semibold mb-2">Fees support:</p>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>State enforcement programs</li>
+                  <li>Road maintenance</li>
+                  <li>Highway safety initiatives</li>
+                  <li>State motor carrier registration programs</li>
+                </ul>
+              </div>
+              
               <div>
                 <h3 className="text-xl font-semibold text-[#1A1F2C] mb-4">UCR Filing Fee For 2025</h3>
                 <div className="mt-8 border rounded-lg overflow-hidden bg-white sm:w-[80%]">
@@ -229,6 +273,51 @@ const UCRFiling = () => {
                   </Table>
                 </div>
               </div>
+            </div>
+          </section>
+
+          <section id="legal-framework" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
+            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Legal Framework</h2>
+            <p className="text-gray-600 mb-4">The UCR program operates under:</p>
+            <ul className="list-disc pl-5 text-gray-600 space-y-3">
+              <li>Unified Carrier Registration Act of 2005</li>
+              <li>Code of Federal Regulations Title 49 Section 367</li>
+              <li>Federal Motor Carrier Safety Administration (FMCSA) oversight</li>
+            </ul>
+          </section>
+
+          <section id="participating-states" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
+            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Participating States</h2>
+            <p className="text-gray-600 mb-4">Currently, 41 U.S. states participate in the UCR program</p>
+            
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-[#1A1F2C] mb-3">Non-participating states:</h3>
+              <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                <li>Arizona</li>
+                <li>District of Columbia</li>
+                <li>Florida</li>
+                <li>Hawaii</li>
+                <li>Maryland</li>
+                <li>New Jersey</li>
+                <li>Nevada</li>
+                <li>Oregon</li>
+                <li>Vermont</li>
+                <li>Wyoming</li>
+              </ul>
+            </div>
+
+            <p className="text-gray-600 italic mb-6">
+              Note: Even if based in a non-participating state, registration is required if operating in participating states.
+            </p>
+
+            <div>
+              <h3 className="text-lg font-semibold text-[#1A1F2C] mb-3">Base State Selection:</h3>
+              <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                <li>Register in your home state if it participates in UCR</li>
+                <li>If your state doesn't participate, select the nearest participating state</li>
+                <li>Canadian-based businesses must also comply when operating in participating states</li>
+                <li>Must be completed before any interstate operations</li>
+              </ul>
             </div>
           </section>
         </div>
