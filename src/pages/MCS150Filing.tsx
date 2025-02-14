@@ -249,20 +249,20 @@ const MCS150Filing = () => {
 
                   <div className="bg-white p-4 rounded-lg">
                     <p className="font-medium mb-2">The last digit determines the month:</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      <div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      <div className="space-y-2">
                         <p className="text-gray-600">1 - January</p>
                         <p className="text-gray-600">2 - February</p>
                         <p className="text-gray-600">3 - March</p>
                         <p className="text-gray-600">4 - April</p>
                       </div>
-                      <div>
+                      <div className="space-y-2">
                         <p className="text-gray-600">5 - May</p>
                         <p className="text-gray-600">6 - June</p>
                         <p className="text-gray-600">7 - July</p>
                         <p className="text-gray-600">8 - August</p>
                       </div>
-                      <div>
+                      <div className="space-y-2">
                         <p className="text-gray-600">9 - September</p>
                         <p className="text-gray-600">0 - October</p>
                       </div>
