@@ -50,7 +50,7 @@ const UCRFiling = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8 mb-[150px]">
+    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8 mb-16">
           <h1 className="text-4xl font-bold text-[#1A1F2C] mb-8">UCR Registration</h1>
