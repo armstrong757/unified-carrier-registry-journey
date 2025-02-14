@@ -144,6 +144,19 @@ const MCS150Filing = () => {
           }}>
               When Must You File?
             </a>
+            <a href="#fee-structure" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
+            e.preventDefault();
+            document.querySelector('#fee-structure')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
+              Fee Structure
+            </a>
           </nav>
         </div>
 
@@ -307,7 +320,7 @@ const MCS150Filing = () => {
                   <span className="text-2xl font-bold text-[#517fa4]">$149</span>
                 </div>
                 <p className="text-gray-600">
-                  Our service fee is a simple, flat rate of $149 for all MCS-150 filings, regardless of:
+                  Our service fee is a simple, flat rate of <span className="font-bold text-gray-600">$149</span> for all MCS-150 filings, regardless of:
                 </p>
                 <ul className="list-disc pl-5 mt-4 text-gray-600 space-y-2">
                   <li>Filing reason (biennial update, reactivation, or changes)</li>
