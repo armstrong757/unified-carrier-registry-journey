@@ -6,30 +6,33 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-
 const UCRFiling = () => {
   const [dotNumber, setDotNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dotNumber.trim()) {
       toast({
         title: "Error",
         description: "Please enter a DOT number",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
-        body: { dotNumber: dotNumber.trim() }
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('fetch-usdot-info', {
+        body: {
+          dotNumber: dotNumber.trim()
+        }
       });
-
       if (error) throw error;
       sessionStorage.setItem('usdotData', JSON.stringify(data));
       navigate("/ucr");
@@ -38,19 +41,19 @@ const UCRFiling = () => {
       toast({
         title: "Error",
         description: "Failed to fetch DOT information. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
-
-  return (
-    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
+  return <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-[20px]">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8 mb-16">
           <h1 className="text-4xl font-bold text-[#1A1F2C] mb-8">UCR Registration</h1>
@@ -58,20 +61,9 @@ const UCRFiling = () => {
           <Card className="max-w-md mx-auto p-8 bg-white shadow-lg border-0">
             <form onSubmit={handleSubmit} className="space-y-6">
               <h2 className="text-xl font-semibold text-center mb-6">Enter DOT Number To Start</h2>
-              <Input
-                type="text"
-                placeholder="Enter USDOT Number here"
-                value={dotNumber}
-                onChange={(e) => setDotNumber(e.target.value)}
-                className="w-full text-lg py-6"
-                disabled={isLoading}
-              />
+              <Input type="text" placeholder="Enter USDOT Number here" value={dotNumber} onChange={e => setDotNumber(e.target.value)} className="w-full text-lg py-6" disabled={isLoading} />
               <div className="flex justify-center">
-                <Button 
-                  type="submit" 
-                  className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8"
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8" disabled={isLoading}>
                   {isLoading ? "LOADING..." : "GET STARTED"}
                 </Button>
               </div>
@@ -82,89 +74,69 @@ const UCRFiling = () => {
         <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
           <h2 className="text-xl font-semibold text-[#1A1F2C] mb-4">Table of Contents</h2>
           <nav className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-gray-600">
-            <a 
-              href="#what-is-ucr" 
-              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#what-is-ucr')?.scrollIntoView({ 
-                  behavior: 'smooth',
-                  block: 'start',
-                  inline: 'nearest'
-                });
-                setTimeout(() => {
-                  window.scrollBy(0, -20);
-                }, 800);
-              }}
-            >
+            <a href="#what-is-ucr" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
+            e.preventDefault();
+            document.querySelector('#what-is-ucr')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               What is UCR?
             </a>
-            <a 
-              href="#who-needs" 
-              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#who-needs')?.scrollIntoView({ 
-                  behavior: 'smooth',
-                  block: 'start',
-                  inline: 'nearest'
-                });
-                setTimeout(() => {
-                  window.scrollBy(0, -20);
-                }, 800);
-              }}
-            >
+            <a href="#who-needs" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
+            e.preventDefault();
+            document.querySelector('#who-needs')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               Who Needs to Register?
             </a>
-            <a 
-              href="#penalties" 
-              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#penalties')?.scrollIntoView({ 
-                  behavior: 'smooth',
-                  block: 'start',
-                  inline: 'nearest'
-                });
-                setTimeout(() => {
-                  window.scrollBy(0, -20);
-                }, 800);
-              }}
-            >
+            <a href="#penalties" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
+            e.preventDefault();
+            document.querySelector('#penalties')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               Non-Compliance Penalties
             </a>
-            <a 
-              href="#participating-states" 
-              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#participating-states')?.scrollIntoView({ 
-                  behavior: 'smooth',
-                  block: 'start',
-                  inline: 'nearest'
-                });
-                setTimeout(() => {
-                  window.scrollBy(0, -20);
-                }, 800);
-              }}
-            >
+            <a href="#participating-states" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
+            e.preventDefault();
+            document.querySelector('#participating-states')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               Participating States
             </a>
-            <a 
-              href="#fee-structure" 
-              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#fee-structure')?.scrollIntoView({ 
-                  behavior: 'smooth',
-                  block: 'start',
-                  inline: 'nearest'
-                });
-                setTimeout(() => {
-                  window.scrollBy(0, -20);
-                }, 800);
-              }}
-            >
+            <a href="#fee-structure" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
+            e.preventDefault();
+            document.querySelector('#fee-structure')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               Fee Structure
             </a>
           </nav>
@@ -293,10 +265,7 @@ const UCRFiling = () => {
 
         <div className="text-center mt-20">
           <div className="mb-[150px]">
-            <Button 
-              onClick={scrollToTop}
-              className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg"
-            >
+            <Button onClick={scrollToTop} className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg">
               File Your UCR
             </Button>
           </div>
@@ -308,8 +277,6 @@ const UCRFiling = () => {
           </p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default UCRFiling;
