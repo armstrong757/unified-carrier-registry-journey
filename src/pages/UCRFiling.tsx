@@ -72,7 +72,7 @@ const UCRFiling = () => {
         </div>
 
         <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-          <h2 className="text-xl font-semibold text-[#1A1F2C] mb-4">Table of Contents</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-600">Table of Contents</h2>
           <nav className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-gray-600">
             <a href="#what-is-ucr" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
             e.preventDefault();
