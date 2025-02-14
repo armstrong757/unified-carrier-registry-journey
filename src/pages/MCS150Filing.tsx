@@ -6,13 +6,13 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+
 const MCS150Filing = () => {
   const [dotNumber, setDotNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dotNumber.trim()) return;
@@ -51,13 +51,16 @@ const MCS150Filing = () => {
       setIsLoading(false);
     }
   };
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
-  return <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-[16px]">
+
+  return (
+    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8 mb-16">
           <h1 className="font-bold text-[#1A1F2C] mb-8 py-0 my-[30px] text-3xl">MCS-150 / Biennial Update</h1>
@@ -65,9 +68,20 @@ const MCS150Filing = () => {
           <Card className="max-w-md mx-auto p-8 bg-white shadow-lg border-0">
             <form onSubmit={handleSubmit} className="space-y-6">
               <h2 className="text-xl font-semibold text-center mb-6">Enter DOT Number To Start</h2>
-              <Input type="text" placeholder="Enter USDOT Number here" value={dotNumber} onChange={e => setDotNumber(e.target.value)} className="w-full text-lg py-6" disabled={isLoading} />
+              <Input
+                type="text"
+                placeholder="Enter USDOT Number here"
+                value={dotNumber}
+                onChange={(e) => setDotNumber(e.target.value)}
+                className="w-full text-lg py-6"
+                disabled={isLoading}
+              />
               <div className="flex justify-center">
-                <Button type="submit" className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8"
+                  disabled={isLoading}
+                >
                   {isLoading ? "Loading..." : "GET STARTED"}
                 </Button>
               </div>
@@ -283,20 +297,53 @@ const MCS150Filing = () => {
               </div>
             </div>
           </section>
+
+          <section id="fee-structure" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
+            <h2 className="text-2xl font-bold text-gray-600 mb-6">Fee Structure</h2>
+            <div className="space-y-6">
+              <div className="bg-white p-6 rounded-lg border border-gray-100">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-lg font-semibold text-gray-700">Flat Rate Fee</span>
+                  <span className="text-2xl font-bold text-[#517fa4]">$149</span>
+                </div>
+                <p className="text-gray-600">
+                  Our service fee is a simple, flat rate of $149 for all MCS-150 filings, regardless of:
+                </p>
+                <ul className="list-disc pl-5 mt-4 text-gray-600 space-y-2">
+                  <li>Filing reason (biennial update, reactivation, or changes)</li>
+                  <li>Company size or fleet size</li>
+                  <li>Type of operation</li>
+                  <li>Filing frequency</li>
+                </ul>
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-500 italic">
+                    Fee includes processing of your MCS-150 filing and submission to FMCSA. Additional FMCSA fees may apply for certain types of filings.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
         <div className="text-center mt-20">
           <div className="mb-[150px]">
-            <Button onClick={scrollToTop} className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg">
+            <Button 
+              onClick={scrollToTop}
+              className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg"
+            >
               File Your MCS-150
             </Button>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto text-center mb-[150px]">
-          <p className="text-[#8E9196] text-xs">This website is not affiliated with the Federal Motor Carrier Safety Administration (FMCSA). This website is operated by a private company that provides a registration service for an additional fee. You are not required to use this site to register your MCS-150. You may file with the FMCSA at www.fmcsa.dot.gov.</p>
+          <p className="text-[#8E9196] text-xs">
+            This website is not affiliated with the Federal Motor Carrier Safety Administration (FMCSA). This website is operated by a private company that provides a private registration service for an additional fee. You are not required to use this site to register your MCS-150. You may file directly with the FMCSA at www.fmcsa.dot.gov.
+          </p>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default MCS150Filing;
