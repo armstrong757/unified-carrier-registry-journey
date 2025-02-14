@@ -6,13 +6,13 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
 const MCS150Filing = () => {
   const [dotNumber, setDotNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dotNumber.trim()) return;
@@ -51,16 +51,13 @@ const MCS150Filing = () => {
       setIsLoading(false);
     }
   };
-
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
-
-  return (
-    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
+  return <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8 mb-16">
           <h1 className="font-bold text-[#1A1F2C] mb-8 py-0 my-[30px] text-3xl">MCS-150 / Biennial Update</h1>
@@ -68,20 +65,9 @@ const MCS150Filing = () => {
           <Card className="max-w-md mx-auto p-8 bg-white shadow-lg border-0">
             <form onSubmit={handleSubmit} className="space-y-6">
               <h2 className="text-xl font-semibold text-center mb-6">Enter DOT Number To Start</h2>
-              <Input
-                type="text"
-                placeholder="Enter USDOT Number here"
-                value={dotNumber}
-                onChange={(e) => setDotNumber(e.target.value)}
-                className="w-full text-lg py-6"
-                disabled={isLoading}
-              />
+              <Input type="text" placeholder="Enter USDOT Number here" value={dotNumber} onChange={e => setDotNumber(e.target.value)} className="w-full text-lg py-6" disabled={isLoading} />
               <div className="flex justify-center">
-                <Button 
-                  type="submit" 
-                  className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8"
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8" disabled={isLoading}>
                   {isLoading ? "Loading..." : "GET STARTED"}
                 </Button>
               </div>
@@ -93,68 +79,68 @@ const MCS150Filing = () => {
           <h2 className="text-xl font-semibold text-[#1A1F2C] mb-4">Table of Contents</h2>
           <nav className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-gray-600">
             <a href="#what-is-mcs150" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
-              e.preventDefault();
-              document.querySelector('#what-is-mcs150')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-                inline: 'nearest'
-              });
-              setTimeout(() => {
-                window.scrollBy(0, -20);
-              }, 800);
-            }}>
+            e.preventDefault();
+            document.querySelector('#what-is-mcs150')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               What is an MCS-150?
             </a>
             <a href="#consequences" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
-              e.preventDefault();
-              document.querySelector('#consequences')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-                inline: 'nearest'
-              });
-              setTimeout(() => {
-                window.scrollBy(0, -20);
-              }, 800);
-            }}>
+            e.preventDefault();
+            document.querySelector('#consequences')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               Non-Compliance Penalties
             </a>
             <a href="#filing-requirements" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
-              e.preventDefault();
-              document.querySelector('#filing-requirements')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-                inline: 'nearest'
-              });
-              setTimeout(() => {
-                window.scrollBy(0, -20);
-              }, 800);
-            }}>
+            e.preventDefault();
+            document.querySelector('#filing-requirements')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               Filing Requirements
             </a>
             <a href="#when-to-file" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
-              e.preventDefault();
-              document.querySelector('#when-to-file')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-                inline: 'nearest'
-              });
-              setTimeout(() => {
-                window.scrollBy(0, -20);
-              }, 800);
-            }}>
+            e.preventDefault();
+            document.querySelector('#when-to-file')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               When Must You File?
             </a>
             <a href="#fee-structure" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
-              e.preventDefault();
-              document.querySelector('#fee-structure')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-                inline: 'nearest'
-              });
-              setTimeout(() => {
-                window.scrollBy(0, -20);
-              }, 800);
-            }}>
+            e.preventDefault();
+            document.querySelector('#fee-structure')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               Fee Structure
             </a>
           </nav>
@@ -315,7 +301,7 @@ const MCS150Filing = () => {
             <h2 className="text-2xl font-bold text-gray-600 mb-6">Fee Structure</h2>
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-lg border border-gray-100">
-                <p className="text-gray-600 text-lg mb-4">
+                <p className="text-gray-600 mb-4 text-base">
                   Our service fee is a simple, flat rate of <span className="font-semibold">$149</span> for all MCS-150 filings, regardless of:
                 </p>
                 <ul className="list-disc pl-5 text-gray-600 space-y-2">
@@ -331,10 +317,7 @@ const MCS150Filing = () => {
 
         <div className="text-center mt-20">
           <div className="mb-[150px]">
-            <Button 
-              onClick={scrollToTop}
-              className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg"
-            >
+            <Button onClick={scrollToTop} className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg">
               File Your MCS-150
             </Button>
           </div>
@@ -346,8 +329,6 @@ const MCS150Filing = () => {
           </p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default MCS150Filing;
