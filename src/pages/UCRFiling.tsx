@@ -176,7 +176,7 @@ const UCRFiling = () => {
             <p className="text-gray-600 mb-4">Currently, 41 U.S. states participate in the UCR program</p>
             
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-[#1A1F2C] mb-3">Non-participating states:</h3>
+              <h3 className="text-lg font-semibold mb-3 text-gray-600">Non-participating states:</h3>
               <ul className="list-disc pl-5 text-gray-600 space-y-2">
                 <li>Arizona</li>
                 <li>District of Columbia</li>
@@ -196,7 +196,7 @@ const UCRFiling = () => {
             </p>
 
             <div>
-              <h3 className="text-lg font-semibold text-[#1A1F2C] mb-3">Base State Selection:</h3>
+              <h3 className="text-lg font-semibold mb-3 text-gray-600">Base State Selection:</h3>
               <ul className="list-disc pl-5 text-gray-600 space-y-2">
                 <li>Register in your home state if it participates in UCR</li>
                 <li>If your state doesn't participate, select the nearest participating state</li>
@@ -221,7 +221,7 @@ const UCRFiling = () => {
               </div>
               
               <div>
-                <h3 className="text-xl font-semibold text-[#1A1F2C] mb-4">UCR Filing Fee For 2025</h3>
+                <h3 className="text-xl font-semibold mb-4 text-gray-600">UCR Filing Fee For 2025</h3>
                 <div className="mt-8 border rounded-lg overflow-hidden bg-white sm:w-[53%]">
                   <Table>
                     <TableHeader>
