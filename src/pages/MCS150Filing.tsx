@@ -6,53 +6,58 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
 const MCS150Filing = () => {
   const [dotNumber, setDotNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dotNumber.trim()) return;
-
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
-        body: { dotNumber: dotNumber.trim() }
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('fetch-usdot-info', {
+        body: {
+          dotNumber: dotNumber.trim()
+        }
       });
-
       if (error) {
         console.error('Supabase function error:', error);
         throw new Error(error.message || 'Failed to fetch DOT information');
       }
-      
       if (!data) {
         throw new Error('No data returned from USDOT lookup');
       }
-
       console.log('USDOT data received:', data);
       sessionStorage.setItem('usdotData', JSON.stringify(data));
-      navigate("/mcs150", { state: { usdotData: data } });
+      navigate("/mcs150", {
+        state: {
+          usdotData: data
+        }
+      });
     } catch (error: any) {
       console.error('Error fetching USDOT info:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to fetch DOT information. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
-
-  return (
-    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
+  return <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-[16px]">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8 mb-16">
           <h1 className="text-4xl font-bold text-[#1A1F2C] mb-8">MCS-150 / Biennial Update</h1>
@@ -60,20 +65,9 @@ const MCS150Filing = () => {
           <Card className="max-w-md mx-auto p-8 bg-white shadow-lg border-0">
             <form onSubmit={handleSubmit} className="space-y-6">
               <h2 className="text-xl font-semibold text-center mb-6">Enter DOT Number To Start</h2>
-              <Input
-                type="text"
-                placeholder="Enter USDOT Number here"
-                value={dotNumber}
-                onChange={(e) => setDotNumber(e.target.value)}
-                className="w-full text-lg py-6"
-                disabled={isLoading}
-              />
+              <Input type="text" placeholder="Enter USDOT Number here" value={dotNumber} onChange={e => setDotNumber(e.target.value)} className="w-full text-lg py-6" disabled={isLoading} />
               <div className="flex justify-center">
-                <Button 
-                  type="submit" 
-                  className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8"
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8" disabled={isLoading}>
                   {isLoading ? "Loading..." : "GET STARTED"}
                 </Button>
               </div>
@@ -84,72 +78,56 @@ const MCS150Filing = () => {
         <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
           <h2 className="text-xl font-semibold text-[#1A1F2C] mb-4">Table of Contents</h2>
           <nav className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-gray-600">
-            <a 
-              href="#what-is-mcs150" 
-              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#what-is-mcs150')?.scrollIntoView({ 
-                  behavior: 'smooth',
-                  block: 'start',
-                  inline: 'nearest'
-                });
-                setTimeout(() => {
-                  window.scrollBy(0, -20);
-                }, 800);
-              }}
-            >
+            <a href="#what-is-mcs150" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
+            e.preventDefault();
+            document.querySelector('#what-is-mcs150')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               What is an MCS-150?
             </a>
-            <a 
-              href="#consequences" 
-              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#consequences')?.scrollIntoView({ 
-                  behavior: 'smooth',
-                  block: 'start',
-                  inline: 'nearest'
-                });
-                setTimeout(() => {
-                  window.scrollBy(0, -20);
-                }, 800);
-              }}
-            >
+            <a href="#consequences" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
+            e.preventDefault();
+            document.querySelector('#consequences')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               Non-Compliance Penalties
             </a>
-            <a 
-              href="#filing-requirements" 
-              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#filing-requirements')?.scrollIntoView({ 
-                  behavior: 'smooth',
-                  block: 'start',
-                  inline: 'nearest'
-                });
-                setTimeout(() => {
-                  window.scrollBy(0, -20);
-                }, 800);
-              }}
-            >
+            <a href="#filing-requirements" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
+            e.preventDefault();
+            document.querySelector('#filing-requirements')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               Filing Requirements
             </a>
-            <a 
-              href="#when-to-file" 
-              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#when-to-file')?.scrollIntoView({ 
-                  behavior: 'smooth',
-                  block: 'start',
-                  inline: 'nearest'
-                });
-                setTimeout(() => {
-                  window.scrollBy(0, -20);
-                }, 800);
-              }}
-            >
+            <a href="#when-to-file" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
+            e.preventDefault();
+            document.querySelector('#when-to-file')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+              inline: 'nearest'
+            });
+            setTimeout(() => {
+              window.scrollBy(0, -20);
+            }, 800);
+          }}>
               When Must You File?
             </a>
           </nav>
@@ -309,23 +287,16 @@ const MCS150Filing = () => {
 
         <div className="text-center mt-20">
           <div className="mb-[150px]">
-            <Button 
-              onClick={scrollToTop}
-              className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg"
-            >
+            <Button onClick={scrollToTop} className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg">
               File Your MCS-150
             </Button>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto text-center mb-[150px]">
-          <p className="text-[#8E9196] text-xs">
-            This website is not affiliated with the Federal Motor Carrier Safety Administration (FMCSA). This website is operated by a private company that provides a private registration service for an additional fee. You are not required to use this site to register your MCS-150. You may file directly with the FMCSA at www.fmcsa.dot.gov.
-          </p>
+          <p className="text-[#8E9196] text-xs">This website is not affiliated with the Federal Motor Carrier Safety Administration (FMCSA). This website is operated by a private company that provides a registration service for an additional fee. You are not required to use this site to register your MCS-150. You may file with the FMCSA at www.fmcsa.dot.gov.</p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default MCS150Filing;
