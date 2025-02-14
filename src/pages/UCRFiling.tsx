@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -292,13 +291,15 @@ const UCRFiling = () => {
           </section>
         </div>
 
-        <div className="text-center mt-20 mb-[150px]">
-          <Button 
-            onClick={scrollToTop}
-            className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg"
-          >
-            File Your UCR
-          </Button>
+        <div className="text-center mt-20">
+          <div className="mb-[150px]">
+            <Button 
+              onClick={scrollToTop}
+              className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg"
+            >
+              File Your UCR
+            </Button>
+          </div>
         </div>
 
         <div className="max-w-4xl mx-auto text-center">
