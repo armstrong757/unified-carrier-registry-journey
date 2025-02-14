@@ -164,7 +164,7 @@ const MCS150Filing = () => {
             <h2 className="text-2xl text-gray-600 mb-6 font-semibold">Non-Compliance Penalties</h2>
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-semibold text-[#1A1F2C] mb-4">Penalties</h3>
+                <h3 className="text-xl font-semibold mb-4 text-gray-600">Penalties</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-3">
                   <li>Fines up to $1,000 per day</li>
                   <li>Maximum penalty of $10,000</li>
@@ -172,7 +172,7 @@ const MCS150Filing = () => {
                 </ul>
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-[#1A1F2C] mb-4">Impact on Operations</h3>
+                <h3 className="text-xl font-semibold mb-4 text-gray-600">Impact on Operations</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-3">
                   <li>Potential shutdown of operations</li>
                   <li>Loss of operating authority</li>
@@ -190,7 +190,7 @@ const MCS150Filing = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-xl font-semibold text-gray-600 mb-4">Company Info Changes</h3>
+                <h3 className="text-xl font-semibold mb-4 text-gray-600">Company Info Changes</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-3">
                   <li>Changing your address, phone, or email</li>
                   <li>Changing your company name</li>
@@ -226,7 +226,7 @@ const MCS150Filing = () => {
             
             <div className="space-y-8">
               <div>
-                <h3 className="text-xl font-semibold text-[#1A1F2C] mb-4">Regular Biennial Updates</h3>
+                <h3 className="text-xl font-semibold mb-4 text-gray-600">Regular Biennial Updates</h3>
                 <p className="text-gray-600 mb-4">Your filing schedule is determined by your USDOT number:</p>
                 
                 <div className="space-y-4">
@@ -263,7 +263,7 @@ const MCS150Filing = () => {
               </div>
 
               <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-[#1A1F2C] mb-4">Special Situations</h3>
+                <h3 className="text-xl font-semibold mb-4 text-gray-600">Special Situations</h3>
                 
                 <div>
                   <h4 className="font-semibold text-[#1A1F2C] mb-2">New Businesses</h4>
