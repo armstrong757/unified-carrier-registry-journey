@@ -144,7 +144,7 @@ const UCRFiling = () => {
 
         <div className="space-y-8">
           <section id="what-is-ucr" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-600 mb-6">What is UCR?</h2>
+            <h2 className="text-2xl text-gray-600 mb-6 font-semibold">What is UCR?</h2>
             <p className="text-gray-600 leading-relaxed">
               The Unified Carrier Registration (UCR) is a federally mandated program established in 2005 that requires motor carriers and businesses engaged in interstate commerce to register and pay annual fees. This program applies to all companies with an active USDOT number that transport goods across state lines.
             </p>
