@@ -60,7 +60,7 @@ const MCS150Filing = () => {
   return <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-[16px]">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8 mb-16">
-          <h1 className="text-4xl font-bold text-[#1A1F2C] mb-8">MCS-150 / Biennial Update</h1>
+          <h1 className="font-bold text-[#1A1F2C] mb-8 py-0 my-[30px] text-3xl">MCS-150 / Biennial Update</h1>
           
           <Card className="max-w-md mx-auto p-8 bg-white shadow-lg border-0">
             <form onSubmit={handleSubmit} className="space-y-6">
