@@ -157,7 +157,7 @@ const MCS150Filing = () => {
 
         <div className="space-y-8">
           <section id="what-is-mcs150" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">What is an MCS-150?</h2>
+            <h2 className="text-2xl font-bold text-gray-600 mb-6">What is an MCS-150?</h2>
             <p className="text-gray-600 leading-relaxed">
               The MCS-150 is a required form from the Federal Motor Carrier Safety Administration (FMCSA) for obtaining or renewing your USDOT number. This form collects essential data about your trucking business for safety purposes and is used to:
             </p>
@@ -170,7 +170,7 @@ const MCS150Filing = () => {
           </section>
 
           <section id="consequences" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Non-Compliance Penalties</h2>
+            <h2 className="text-2xl font-bold text-gray-600 mb-6">Non-Compliance Penalties</h2>
             <div className="space-y-6">
               <div>
                 <h3 className="text-xl font-semibold text-[#1A1F2C] mb-4">Penalties</h3>
@@ -194,7 +194,7 @@ const MCS150Filing = () => {
           </section>
 
           <section id="filing-requirements" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Filing Requirements</h2>
+            <h2 className="text-2xl font-bold text-gray-600 mb-6">Filing Requirements</h2>
             <p className="text-gray-600 mb-4">You must also file an MCS-150 update within 30 days when:</p>
             <ul className="list-disc pl-5 text-gray-600 space-y-3">
               <li>Changing your contact information (address, phone, email)</li>
@@ -213,7 +213,7 @@ const MCS150Filing = () => {
           </section>
 
           <section id="when-to-file" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">When Must You File?</h2>
+            <h2 className="text-2xl font-bold text-gray-600 mb-6">When Must You File?</h2>
             
             <div className="space-y-8">
               <div>
