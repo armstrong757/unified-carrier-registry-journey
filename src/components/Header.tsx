@@ -10,9 +10,7 @@ const Header = () => {
   // Hide navigation on form pages and legal/support pages
   const shouldHideNav = [
     '/ucr', 
-    '/ucr-filing', 
     '/mcs150', 
-    '/mcs-150-filing',
     '/terms',
     '/privacy',
     '/refund',
