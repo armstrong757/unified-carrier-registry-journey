@@ -291,7 +291,7 @@ const UCRFiling = () => {
           </section>
         </div>
 
-        <div className="text-center mt-20">
+        <div className="text-center mt-20 mb-[150px]">
           <Button 
             onClick={scrollToTop}
             className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 px-8 text-lg"
@@ -300,7 +300,7 @@ const UCRFiling = () => {
           </Button>
         </div>
 
-        <div className="max-w-4xl mx-auto text-center mb-[150px]">
+        <div className="max-w-4xl mx-auto text-center">
           <p className="text-[#8E9196] text-xs">
             This website is not affiliated with the Unified Carrier Registration Plan. This website is operated by a private company that provides a private registration service for an additional fee. You are not required to use this site to register with the UCR Plan. You may register directly with the UCR Plan at www.ucr.gov.
           </p>
