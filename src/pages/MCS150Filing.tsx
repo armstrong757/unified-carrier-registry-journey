@@ -53,7 +53,7 @@ const MCS150Filing = () => {
 
   return (
     <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-16">
+      <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8">
           <h1 className="text-4xl font-bold text-[#1A1F2C] mb-8">MCS-150 / Biennial Update</h1>
           
@@ -81,64 +81,78 @@ const MCS150Filing = () => {
           </Card>
         </div>
 
-        <div className="sticky top-4 z-10 transition-all duration-300 ease-in-out">
-          <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-            <h2 className="text-xl font-semibold text-[#1A1F2C] mb-4">Table of Contents</h2>
-            <nav className="grid grid-cols-2 gap-x-4 gap-y-2">
-              <a 
-                href="#what-is-mcs150" 
-                className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.querySelector('#what-is-mcs150')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                }}
-              >
-                What is an MCS-150?
-              </a>
-              <a 
-                href="#consequences" 
-                className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.querySelector('#consequences')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                }}
-              >
-                Consequences of Non-Compliance
-              </a>
-              <a 
-                href="#filing-requirements" 
-                className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.querySelector('#filing-requirements')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                }}
-              >
-                Additional Filing Requirements
-              </a>
-              <a 
-                href="#when-to-file" 
-                className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.querySelector('#when-to-file')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                }}
-              >
-                When Must You File?
-              </a>
-            </nav>
-          </div>
+        <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+          <h2 className="text-xl font-semibold text-[#1A1F2C] mb-4">Table of Contents</h2>
+          <nav className="grid grid-cols-2 gap-x-4 gap-y-2">
+            <a 
+              href="#what-is-mcs150" 
+              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#what-is-mcs150')?.scrollIntoView({ 
+                  behavior: 'smooth',
+                  block: 'start',
+                  inline: 'nearest'
+                });
+                setTimeout(() => {
+                  window.scrollBy(0, -20);
+                }, 800);
+              }}
+            >
+              What is an MCS-150?
+            </a>
+            <a 
+              href="#consequences" 
+              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#consequences')?.scrollIntoView({ 
+                  behavior: 'smooth',
+                  block: 'start',
+                  inline: 'nearest'
+                });
+                setTimeout(() => {
+                  window.scrollBy(0, -20);
+                }, 800);
+              }}
+            >
+              Consequences of Non-Compliance
+            </a>
+            <a 
+              href="#filing-requirements" 
+              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#filing-requirements')?.scrollIntoView({ 
+                  behavior: 'smooth',
+                  block: 'start',
+                  inline: 'nearest'
+                });
+                setTimeout(() => {
+                  window.scrollBy(0, -20);
+                }, 800);
+              }}
+            >
+              Additional Filing Requirements
+            </a>
+            <a 
+              href="#when-to-file" 
+              className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#when-to-file')?.scrollIntoView({ 
+                  behavior: 'smooth',
+                  block: 'start',
+                  inline: 'nearest'
+                });
+                setTimeout(() => {
+                  window.scrollBy(0, -20);
+                }, 800);
+              }}
+            >
+              When Must You File?
+            </a>
+          </nav>
         </div>
 
         <section id="what-is-mcs150" className="space-y-12 bg-[#edf7ff]/50 p-4 sm:p-8 rounded-xl shadow-sm">
