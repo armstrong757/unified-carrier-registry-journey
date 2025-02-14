@@ -249,7 +249,7 @@ const MCS150Filing = () => {
 
                   <div className="bg-white p-4 rounded-lg">
                     <p className="font-medium mb-2">The last digit determines the month:</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       <div>
                         <p className="text-gray-600">1 - January</p>
                         <p className="text-gray-600">2 - February</p>
