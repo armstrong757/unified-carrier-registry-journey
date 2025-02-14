@@ -188,7 +188,7 @@ const UCRFiling = () => {
             <div className="space-y-6">
               <div>
                 <h3 className="text-xl font-semibold text-[#1A1F2C] mb-4">UCR Filing Fee For 2025</h3>
-                <div className="mt-8 border rounded-lg overflow-hidden w-full sm:w-[50%] mx-auto">
+                <div className="mt-8 border rounded-lg overflow-hidden bg-white sm:w-[80%]">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -198,7 +198,7 @@ const UCRFiling = () => {
                     </TableHeader>
                     <TableBody>
                       <TableRow>
-                        <TableCell className="font-medium">1 – 2 Trucks</TableCell>
+                        <TableCell className="font-medium">0 – 2 Trucks</TableCell>
                         <TableCell>$176.00</TableCell>
                       </TableRow>
                       <TableRow>
@@ -211,11 +211,19 @@ const UCRFiling = () => {
                       </TableRow>
                       <TableRow>
                         <TableCell className="font-medium">21 – 100 Trucks</TableCell>
-                        <TableCell>$1449.00</TableCell>
+                        <TableCell>$1,449.00</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium">100+ Trucks</TableCell>
-                        <TableCell>Contact Us</TableCell>
+                        <TableCell className="font-medium">101 – 1,000 Trucks</TableCell>
+                        <TableCell>$6,816.00</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="font-medium">1,001 or more Trucks</TableCell>
+                        <TableCell>$66,597.00</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="font-medium">Broker/Leasing Company</TableCell>
+                        <TableCell>$176.00</TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
