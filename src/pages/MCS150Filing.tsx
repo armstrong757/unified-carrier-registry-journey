@@ -324,9 +324,7 @@ const MCS150Filing = () => {
         </div>
 
         <div className="max-w-4xl mx-auto text-center mb-[150px]">
-          <p className="text-[#8E9196] text-xs">
-            This website is not affiliated with the Federal Motor Carrier Safety Administration (FMCSA). This website is operated by a private company that provides a private registration service for an additional fee. You are not required to use this site to register your MCS-150. You may file directly with the FMCSA at www.fmcsa.dot.gov.
-          </p>
+          <p className="text-[#8E9196] text-xs">This website is not affiliated with the Federal Motor Carrier Safety Administration (FMCSA). Itis operated by a private company that provides a registration service for an additional fee. You are not required to use this site to register your MCS-150. You may file directly with the FMCSA at www.fmcsa.dot.gov.</p>
         </div>
       </div>
     </div>;
