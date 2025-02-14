@@ -16,9 +16,7 @@ const Index = () => {
               <Globe className="w-8 h-8 text-[#517fa4]" />
             </div>
             <h2 className="text-xl font-semibold mb-2 text-zinc-950">UCR</h2>
-            <p className="text-gray-600 mb-6">
-              Verify your current status with Unified Carrier Registration.
-            </p>
+            <p className="text-gray-600 mb-6">Stay in compliance with the Unified Carrier Registration.</p>
             <Button onClick={() => navigate("/ucr-filing")} className="bg-white border-2 border-[#517fa4] text-[#517fa4] hover:bg-[#517fa4] hover:text-white transition-colors">
               View Details
             </Button>
@@ -30,7 +28,7 @@ const Index = () => {
               <FileText className="w-8 h-8 text-[#517fa4]" />
             </div>
             <h2 className="text-xl font-semibold mb-2 text-zinc-950">MCS-150 </h2>
-            <p className="text-gray-600 mb-6">Update your USDOT and Biennial Update  with FMCSA.</p>
+            <p className="text-gray-600 mb-6">Update your USDOT and Biennial Update with the FMCSA.</p>
             <Button onClick={() => navigate("/mcs-150-filing")} className="bg-white border-2 border-[#517fa4] text-[#517fa4] hover:bg-[#517fa4] hover:text-white transition-colors">
               View Details
             </Button>
