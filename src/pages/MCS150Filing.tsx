@@ -93,68 +93,68 @@ const MCS150Filing = () => {
           <h2 className="text-xl font-semibold text-[#1A1F2C] mb-4">Table of Contents</h2>
           <nav className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-gray-600">
             <a href="#what-is-mcs150" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
-            e.preventDefault();
-            document.querySelector('#what-is-mcs150')?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-              inline: 'nearest'
-            });
-            setTimeout(() => {
-              window.scrollBy(0, -20);
-            }, 800);
-          }}>
+              e.preventDefault();
+              document.querySelector('#what-is-mcs150')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+              });
+              setTimeout(() => {
+                window.scrollBy(0, -20);
+              }, 800);
+            }}>
               What is an MCS-150?
             </a>
             <a href="#consequences" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
-            e.preventDefault();
-            document.querySelector('#consequences')?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-              inline: 'nearest'
-            });
-            setTimeout(() => {
-              window.scrollBy(0, -20);
-            }, 800);
-          }}>
+              e.preventDefault();
+              document.querySelector('#consequences')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+              });
+              setTimeout(() => {
+                window.scrollBy(0, -20);
+              }, 800);
+            }}>
               Non-Compliance Penalties
             </a>
             <a href="#filing-requirements" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
-            e.preventDefault();
-            document.querySelector('#filing-requirements')?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-              inline: 'nearest'
-            });
-            setTimeout(() => {
-              window.scrollBy(0, -20);
-            }, 800);
-          }}>
+              e.preventDefault();
+              document.querySelector('#filing-requirements')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+              });
+              setTimeout(() => {
+                window.scrollBy(0, -20);
+              }, 800);
+            }}>
               Filing Requirements
             </a>
             <a href="#when-to-file" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
-            e.preventDefault();
-            document.querySelector('#when-to-file')?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-              inline: 'nearest'
-            });
-            setTimeout(() => {
-              window.scrollBy(0, -20);
-            }, 800);
-          }}>
+              e.preventDefault();
+              document.querySelector('#when-to-file')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+              });
+              setTimeout(() => {
+                window.scrollBy(0, -20);
+              }, 800);
+            }}>
               When Must You File?
             </a>
             <a href="#fee-structure" className="text-[#517fa4] hover:text-[#517fa4]/80 transition-colors" onClick={e => {
-            e.preventDefault();
-            document.querySelector('#fee-structure')?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-              inline: 'nearest'
-            });
-            setTimeout(() => {
-              window.scrollBy(0, -20);
-            }, 800);
-          }}>
+              e.preventDefault();
+              document.querySelector('#fee-structure')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+              });
+              setTimeout(() => {
+                window.scrollBy(0, -20);
+              }, 800);
+            }}>
               Fee Structure
             </a>
           </nav>
