@@ -315,24 +315,15 @@ const MCS150Filing = () => {
             <h2 className="text-2xl font-bold text-gray-600 mb-6">Fee Structure</h2>
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-lg border border-gray-100">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-semibold text-gray-700">Flat Rate Fee</span>
-                  <span className="text-2xl font-bold text-[#517fa4]">$149</span>
-                </div>
-                <p className="text-gray-600">
-                  Our service fee is a simple, flat rate of <span className="font-bold text-gray-600">$149</span> for all MCS-150 filings, regardless of:
+                <p className="text-gray-600 text-lg mb-4">
+                  Our service fee is a simple, flat rate of <span className="font-semibold">$149</span> for all MCS-150 filings, regardless of:
                 </p>
-                <ul className="list-disc pl-5 mt-4 text-gray-600 space-y-2">
+                <ul className="list-disc pl-5 text-gray-600 space-y-2">
                   <li>Filing reason (biennial update, reactivation, or changes)</li>
                   <li>Company size or fleet size</li>
                   <li>Type of operation</li>
                   <li>Filing frequency</li>
                 </ul>
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500 italic">
-                    Fee includes processing of your MCS-150 filing and submission to FMCSA. Additional FMCSA fees may apply for certain types of filings.
-                  </p>
-                </div>
               </div>
             </div>
           </section>
