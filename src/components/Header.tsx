@@ -7,8 +7,17 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Hide navigation on form pages
-  const shouldHideNav = ['/ucr', '/ucr-filing', '/mcs150', '/mcs-150-filing'].includes(location.pathname);
+  // Hide navigation on form pages and legal/support pages
+  const shouldHideNav = [
+    '/ucr', 
+    '/ucr-filing', 
+    '/mcs150', 
+    '/mcs-150-filing',
+    '/terms',
+    '/privacy',
+    '/refund',
+    '/contact'
+  ].includes(location.pathname);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
