@@ -151,7 +151,7 @@ const UCRFiling = () => {
           </section>
 
           <section id="who-needs" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-600 mb-6">Who Needs to Register?</h2>
+            <h2 className="text-2xl text-gray-600 mb-6 font-semibold">Who Needs to Register?</h2>
             <ul className="list-disc pl-5 text-gray-600 space-y-3">
               <li>Operate commercial motor vehicles in interstate commerce</li>
               <li>Are a motor carrier (private, exempt, or for-hire)</li>
@@ -162,7 +162,7 @@ const UCRFiling = () => {
           </section>
 
           <section id="penalties" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-600 mb-6">Non-Compliance Penalties</h2>
+            <h2 className="text-2xl text-gray-600 mb-6 font-semibold">Non-Compliance Penalties</h2>
             <ul className="list-disc pl-5 text-gray-600 space-y-3">
               <li>Fines ranging from $100 to $5,000</li>
               <li>Vehicle detention or impoundment</li>
@@ -172,7 +172,7 @@ const UCRFiling = () => {
           </section>
 
           <section id="participating-states" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-600 mb-6">Participating States</h2>
+            <h2 className="text-2xl text-gray-600 mb-6 font-semibold">Participating States</h2>
             <p className="text-gray-600 mb-4">Currently, 41 U.S. states participate in the UCR program</p>
             
             <div className="mb-6">
@@ -207,7 +207,7 @@ const UCRFiling = () => {
           </section>
 
           <section id="fee-structure" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-600 mb-6">Fee Structure</h2>
+            <h2 className="text-2xl text-gray-600 mb-6 font-semibold">Fee Structure</h2>
             <div className="space-y-6">
               <div className="text-gray-600 mb-8">
                 <p className="mb-4">Based on fleet size</p>
