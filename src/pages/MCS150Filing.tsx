@@ -199,9 +199,9 @@ const MCS150Filing = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-xl font-semibold text-gray-600 mb-4">Company Information Changes</h3>
+                <h3 className="text-xl font-semibold text-gray-600 mb-4">Company Info Changes</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-3">
-                  <li>Changing your contact information (address, phone, email)</li>
+                  <li>Changing your address, phone, or email</li>
                   <li>Changing your company name</li>
                   <li>Changing company ownership</li>
                   <li>Ceasing operations</li>
