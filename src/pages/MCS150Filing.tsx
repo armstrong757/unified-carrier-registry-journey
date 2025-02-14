@@ -54,7 +54,7 @@ const MCS150Filing = () => {
   return (
     <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center space-y-8">
+        <div className="text-center space-y-8 mb-16">
           <h1 className="text-4xl font-bold text-[#1A1F2C] mb-8">MCS-150 / Biennial Update</h1>
           
           <Card className="max-w-md mx-auto p-8 bg-white shadow-lg border-0">
@@ -116,7 +116,7 @@ const MCS150Filing = () => {
                 }, 800);
               }}
             >
-              Consequences of Non-Compliance
+              Non-Compliance Penalties
             </a>
             <a 
               href="#filing-requirements" 
@@ -133,7 +133,7 @@ const MCS150Filing = () => {
                 }, 800);
               }}
             >
-              Additional Filing Requirements
+              Filing Requirements
             </a>
             <a 
               href="#when-to-file" 
@@ -155,8 +155,8 @@ const MCS150Filing = () => {
           </nav>
         </div>
 
-        <section id="what-is-mcs150" className="space-y-12 bg-[#edf7ff]/50 p-4 sm:p-8 rounded-xl shadow-sm">
-          <div>
+        <div className="space-y-8">
+          <section id="what-is-mcs150" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">What is an MCS-150?</h2>
             <p className="text-gray-600 leading-relaxed">
               The MCS-150 is a required form from the Federal Motor Carrier Safety Administration (FMCSA) for obtaining or renewing your USDOT number. This form collects essential data about your trucking business for safety purposes and is used to:
@@ -167,12 +167,10 @@ const MCS150Filing = () => {
               <li>Track Hazardous Materials Regulations (HMR) compliance</li>
               <li>Maintain accurate carrier information in federal databases</li>
             </ul>
-          </div>
+          </section>
 
-          <Separator className="my-8" />
-
-          <div id="consequences">
-            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Consequences of Non-Compliance</h2>
+          <section id="consequences" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
+            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Non-Compliance Penalties</h2>
             <div className="space-y-6">
               <div>
                 <h3 className="text-xl font-semibold text-[#1A1F2C] mb-4">Penalties</h3>
@@ -193,12 +191,10 @@ const MCS150Filing = () => {
                 </ul>
               </div>
             </div>
-          </div>
+          </section>
 
-          <Separator className="my-8" />
-
-          <div id="filing-requirements">
-            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Additional Filing Requirements</h2>
+          <section id="filing-requirements" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
+            <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">Filing Requirements</h2>
             <p className="text-gray-600 mb-4">You must also file an MCS-150 update within 30 days when:</p>
             <ul className="list-disc pl-5 text-gray-600 space-y-3">
               <li>Changing your contact information (address, phone, email)</li>
@@ -214,11 +210,9 @@ const MCS150Filing = () => {
               <li>Changing company ownership</li>
               <li>Adding or reducing number of drivers</li>
             </ul>
-          </div>
+          </section>
 
-          <Separator className="my-8" />
-
-          <div id="when-to-file">
+          <section id="when-to-file" className="bg-[#edf7ff]/50 p-8 rounded-xl shadow-sm">
             <h2 className="text-2xl font-bold text-[#1A1F2C] mb-6">When Must You File?</h2>
             
             <div className="space-y-8">
@@ -292,8 +286,8 @@ const MCS150Filing = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
 
         <div className="text-center mt-20">
           <Button 
