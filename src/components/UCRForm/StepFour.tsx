@@ -134,10 +134,11 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
           <CardContent className="pt-6">
             <h3 className="text-sm font-semibold text-primary mb-4">Order Details</h3>
             <div className="space-y-4">
+              <div className="text-gray-600 text-sm">
+                Total Vehicles: {totalVehicles} Vehicle{totalVehicles !== 1 ? 's' : ''}
+              </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-sm">
-                  Registration Fee ({totalVehicles} Vehicle{totalVehicles !== 1 ? 's' : ''}):
-                </span>
+                <span className="text-gray-600 text-sm">Registration Fee:</span>
                 <span className="text-sm font-semibold">{displayedFee}</span>
               </div>
               <p className="text-gray-500 text-[12px] italic">
