@@ -2,7 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 interface USDOTData {
   usdotNumber: string;
@@ -33,9 +33,6 @@ interface USDOTSummaryProps {
 const USDOTSummary = ({ data }: USDOTSummaryProps) => {
   const location = useLocation();
   const isUCRForm = location.pathname === "/ucr";
-
-  // Add debugging log to see the exact data we're receiving
-  console.log('USDOTSummary received data:', data);
 
   return (
     <Card className="bg-white/50 backdrop-blur-sm">
@@ -133,14 +130,14 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           {isUCRForm && (
             <div className="border-t border-gray-200 mt-8 pt-4">
               <div className="flex items-center gap-2">
-                <a
-                  href="/mcs150"
+                <Link
+                  to="/mcs150"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  state={{ usdotData: data }}
                   className="text-accent hover:text-accent/80 hover:underline"
                 >
                   Update MCS-150
-                </a>
+                </Link>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="h-4 w-4 text-gray-500 cursor-help" />
