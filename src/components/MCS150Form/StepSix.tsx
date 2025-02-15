@@ -124,16 +124,7 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 text-sm">Filing Fee:</span>
-                <span className="text-sm">$10</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-sm">Processing Fee:</span>
-                <span className="text-sm">$5</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between items-center font-medium">
-                <span className="text-gray-600 text-sm">Total Cost:*</span>
-                <span className="text-sm">$15</span>
+                <span className="text-sm font-semibold">$149.00</span>
               </div>
               <p className="text-gray-500 text-[12px] italic">
                 *Includes any required government fees and our charge for providing this service.

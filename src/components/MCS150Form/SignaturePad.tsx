@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from "react";
-import { Canvas } from "fabric"; // Import Canvas directly
+import { Canvas } from "fabric";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -16,17 +16,19 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
   useEffect(() => {
     if (!canvasRef.current) return;
 
+    // Clear any existing canvas
+    if (fabricRef.current) {
+      fabricRef.current.dispose();
+    }
+
     const canvas = new Canvas(canvasRef.current, {
       isDrawingMode: true,
-      width: isMobile ? 200 : 250, // Reduced width, even smaller on mobile
-      height: 120, // Slightly reduced height for better proportions
+      width: isMobile ? 300 : 400,
+      height: 150,
       backgroundColor: 'white',
     });
 
-    // Initialize canvas first
-    canvas.renderAll();
-
-    // Then set the brush properties
+    // Configure brush settings
     if (canvas.freeDrawingBrush) {
       canvas.freeDrawingBrush.width = 2;
       canvas.freeDrawingBrush.color = "#000000";
@@ -34,12 +36,14 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
 
     fabricRef.current = canvas;
 
+    // Update signature data whenever a path is created
     canvas.on('path:created', () => {
       if (canvas) {
-        onChange(canvas.toDataURL());
+        onChange(canvas.toDataURL('image/png'));
       }
     });
 
+    // Clean up
     return () => {
       canvas.dispose();
     };
@@ -56,11 +60,11 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
 
   return (
     <div className="space-y-2">
-      <div className="border rounded-md p-2 bg-white flex justify-center">
-        <canvas ref={canvasRef} className="max-w-full" />
+      <div className="border rounded-md p-2 bg-white">
+        <canvas ref={canvasRef} />
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-500">Draw with mouse or finger</span>
+        <span className="text-sm text-gray-500">Draw your signature here</span>
         <Button
           type="button"
           variant="outline"
