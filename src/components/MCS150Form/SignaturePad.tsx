@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from "react";
-import { Canvas } from "fabric";
+import { Canvas, PencilBrush } from "fabric";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -28,13 +28,16 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
       backgroundColor: 'white',
     });
 
-    // Configure brush settings
-    canvas.freeDrawingBrush.width = 2;
-    canvas.freeDrawingBrush.color = "#000000";
+    // Initialize the brush
+    const pencilBrush = new PencilBrush(canvas);
+    pencilBrush.width = 2;
+    pencilBrush.color = "#000000";
+    canvas.freeDrawingBrush = pencilBrush;
 
-    // Add mouse:move event to ensure drawing is working
-    canvas.on('mouse:move', (event) => {
-      if (canvas.isDrawingMode && event.e.buttons === 1) {
+    // Add mouse events
+    canvas.on('mouse:move', function(event) {
+      const mouseEvent = event.e as MouseEvent;
+      if (canvas.isDrawingMode && mouseEvent.buttons === 1) {
         canvas.renderAll();
       }
     });
