@@ -301,7 +301,7 @@ const MCS150 = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto mcs-form-container mb-[150px]">
+      <div className="max-w-7xl mx-auto mcs-form-container mb-[250px]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8">
