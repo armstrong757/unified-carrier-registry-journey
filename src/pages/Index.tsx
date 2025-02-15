@@ -1,8 +1,16 @@
+
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Globe, FileText } from "lucide-react";
+
 const Index = () => {
   const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
   return <div className="min-h-screen bg-gray-50 flex flex-col items-center px-4 py-12 sm:py-16">
       <div className="w-full max-w-7xl mx-auto">
         <h1 className="text-3xl sm:text-4xl font-bold text-center text-[#517fa4] mb-16">
@@ -17,7 +25,7 @@ const Index = () => {
             </div>
             <h2 className="text-xl font-semibold mb-2 text-zinc-950">UCR</h2>
             <p className="text-gray-600 mb-6">Stay in compliance with the Unified Carrier Registration.</p>
-            <Button onClick={() => navigate("/ucr-filing")} className="bg-white border-2 border-[#517fa4] text-[#517fa4] hover:bg-[#517fa4] hover:text-white transition-colors">
+            <Button onClick={() => handleNavigation("/ucr-filing")} className="bg-white border-2 border-[#517fa4] text-[#517fa4] hover:bg-[#517fa4] hover:text-white transition-colors">
               View Details
             </Button>
           </div>
@@ -29,7 +37,7 @@ const Index = () => {
             </div>
             <h2 className="text-xl font-semibold mb-2 text-zinc-950">MCS-150 </h2>
             <p className="text-gray-600 mb-6">Update your USDOT and Biennial Update with the FMCSA.</p>
-            <Button onClick={() => navigate("/mcs-150-filing")} className="bg-white border-2 border-[#517fa4] text-[#517fa4] hover:bg-[#517fa4] hover:text-white transition-colors">
+            <Button onClick={() => handleNavigation("/mcs-150-filing")} className="bg-white border-2 border-[#517fa4] text-[#517fa4] hover:bg-[#517fa4] hover:text-white transition-colors">
               View Details
             </Button>
           </div>
@@ -37,4 +45,5 @@ const Index = () => {
       </div>
     </div>;
 };
+
 export default Index;
