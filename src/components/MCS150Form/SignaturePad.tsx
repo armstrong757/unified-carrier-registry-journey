@@ -29,23 +29,26 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
     });
 
     // Configure brush settings
-    if (canvas.freeDrawingBrush) {
-      canvas.freeDrawingBrush.width = 2;
-      canvas.freeDrawingBrush.color = "#000000";
-    }
+    canvas.freeDrawingBrush.width = 2;
+    canvas.freeDrawingBrush.color = "#000000";
 
-    fabricRef.current = canvas;
-
-    // Update signature data whenever a path is created
-    canvas.on('path:created', () => {
-      if (canvas) {
-        onChange(canvas.toDataURL({
-          format: 'png',
-          quality: 1,
-          multiplier: 1
-        }));
+    // Add mouse:move event to ensure drawing is working
+    canvas.on('mouse:move', (event) => {
+      if (canvas.isDrawingMode && event.e.buttons === 1) {
+        canvas.renderAll();
       }
     });
+
+    // Update signature data whenever the mouse is released
+    canvas.on('mouse:up', () => {
+      onChange(canvas.toDataURL({
+        format: 'png',
+        quality: 1,
+        multiplier: 1
+      }));
+    });
+
+    fabricRef.current = canvas;
 
     // Clean up
     return () => {
@@ -65,7 +68,7 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
   return (
     <div className="space-y-2">
       <div className="border rounded-md p-2 bg-white">
-        <canvas ref={canvasRef} />
+        <canvas ref={canvasRef} className="touch-none" />
       </div>
       <div className="flex items-center justify-between">
         <span className="text-sm text-gray-500">Draw your signature here</span>
