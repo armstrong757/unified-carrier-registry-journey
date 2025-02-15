@@ -39,7 +39,11 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
     // Update signature data whenever a path is created
     canvas.on('path:created', () => {
       if (canvas) {
-        onChange(canvas.toDataURL('image/png'));
+        onChange(canvas.toDataURL({
+          format: 'png',
+          quality: 1,
+          multiplier: 1
+        }));
       }
     });
 
