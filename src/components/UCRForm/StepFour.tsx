@@ -135,7 +135,7 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
             <h3 className="text-sm font-semibold text-primary mb-4">Order Details</h3>
             <div className="space-y-4">
               <div className="text-gray-600 text-sm">
-                Total Vehicles: {totalVehicles} Vehicle{totalVehicles !== 1 ? 's' : ''}
+                Total Vehicles: {totalVehicles}
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 text-sm">Registration Fee:</span>
