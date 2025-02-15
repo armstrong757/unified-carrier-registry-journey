@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { calculateUCRFee } from "@/utils/ucrFeeCalculator";
 
 interface StepFourProps {
   formData: any;
@@ -11,6 +12,19 @@ interface StepFourProps {
 }
 
 const StepFour = ({ formData, setFormData }: StepFourProps) => {
+  // Calculate total vehicles
+  const totalVehicles = 
+    (formData.straightTrucks || 0) + 
+    (formData.passengerVehicles || 0);
+
+  // Calculate UCR fee
+  const ucrFee = calculateUCRFee(totalVehicles);
+  const serviceFee = 149; // Fixed service fee
+  const totalCost = ucrFee + serviceFee;
+
+  const displayedFee = ucrFee === 0 ? "Contact Us" : `$${ucrFee.toFixed(2)}`;
+  const displayedTotal = ucrFee === 0 ? "Contact Us" : `$${totalCost.toFixed(2)}`;
+
   return (
     <div className="space-y-6 animate-fadeIn">
       <h2 className="text-2xl font-bold text-primary">Billing Information</h2>
@@ -123,13 +137,19 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
             <h3 className="text-sm font-semibold text-primary mb-4">Order Details</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-sm">Registration Fee:</span>
-                <span className="text-sm">1 Vehicle</span>
+                <span className="text-gray-600 text-sm">
+                  Registration Fee ({totalVehicles} Vehicle{totalVehicles !== 1 ? 's' : ''}):
+                </span>
+                <span className="text-sm">{displayedFee}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 text-sm">Service Fee:</span>
+                <span className="text-sm">${serviceFee.toFixed(2)}</span>
               </div>
               <Separator />
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-sm">Total Cost:*</span>
-                <span className="text-sm">$149</span>
+              <div className="flex justify-between items-center font-semibold">
+                <span className="text-gray-600 text-sm">Total Cost:</span>
+                <span className="text-sm">{displayedTotal}</span>
               </div>
               <p className="text-gray-500 text-[12px] italic">
                 *Includes any required government fees and our charge for providing this service.
