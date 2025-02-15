@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -51,6 +52,15 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
           onValueChange={(value) => {
             setFormData({ ...formData, needsVehicleChanges: value });
             setShowVehicleInputs(value === "yes");
+            if (value === "no") {
+              // Reset the add/exclude values when switching to "no"
+              setFormData({
+                ...formData,
+                needsVehicleChanges: value,
+                addVehicles: 0,
+                excludeVehicles: 0
+              });
+            }
           }}
         >
           <div className="flex items-center space-x-2">
@@ -74,9 +84,9 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
                 id="addVehicles"
                 type="number"
                 min="0"
-                value={formData.addVehicles}
+                value={formData.addVehicles || 0}
                 onChange={(e) =>
-                  setFormData({ ...formData, addVehicles: e.target.value })
+                  setFormData({ ...formData, addVehicles: parseInt(e.target.value) || 0 })
                 }
               />
             </div>
@@ -90,9 +100,9 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
                 id="excludeVehicles"
                 type="number"
                 min="0"
-                value={formData.excludeVehicles}
+                value={formData.excludeVehicles || 0}
                 onChange={(e) =>
-                  setFormData({ ...formData, excludeVehicles: e.target.value })
+                  setFormData({ ...formData, excludeVehicles: parseInt(e.target.value) || 0 })
                 }
               />
             </div>
