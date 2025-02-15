@@ -59,6 +59,12 @@ const Header = () => {
                 >
                   Free Resources
                 </Link>
+                <Link
+                  to="/contact"
+                  className="text-gray-600 hover:text-[#517fa4] transition-colors"
+                >
+                  Contact Support
+                </Link>
               </nav>
 
               {/* Mobile Navigation */}
@@ -79,6 +85,13 @@ const Header = () => {
                     >
                       Free Resources
                     </Link>
+                    <Link
+                      to="/contact"
+                      className="py-2 text-gray-600 hover:text-[#517fa4] transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Contact Support
+                    </Link>
                   </nav>
                 </div>
               )}
@@ -91,3 +104,4 @@ const Header = () => {
 };
 
 export default Header;
+
