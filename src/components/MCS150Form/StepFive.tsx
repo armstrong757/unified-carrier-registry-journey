@@ -151,14 +151,14 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
           <Label htmlFor="licenseFile">
             Upload Driver License <span className="text-red-500">*</span>
           </Label>
-          <div className="relative flex items-center w-full">
+          <div className="relative flex items-center w-full h-10">
             <label
               htmlFor="licenseFile"
-              className="inline-flex items-center px-4 py-2 bg-gray-50 rounded-l border border-input cursor-pointer hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center px-4 h-full bg-gray-50 rounded-l border border-input cursor-pointer hover:bg-gray-100 transition-colors text-muted-foreground text-sm md:text-sm"
             >
               Choose File
             </label>
-            <div className="flex-1 px-3 py-2 border border-l-0 border-input rounded-r truncate">
+            <div className="flex-1 px-3 h-full flex items-center border border-l-0 border-input rounded-r truncate">
               {selectedFileName || ""}
             </div>
             <Input
