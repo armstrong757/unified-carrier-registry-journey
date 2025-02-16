@@ -35,7 +35,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
   const isUCRForm = location.pathname === "/ucr";
 
   return (
-    <Card className="bg-white/50 backdrop-blur-sm">
+    <Card className="bg-white/80 animate-fadeIn will-change-transform">
       <CardContent className="p-6">
         <h2 className="text-base font-semibold mb-4">USDOT#: {data.usdotNumber}</h2>
         <hr className="border-t border-gray-300 my-4" />
