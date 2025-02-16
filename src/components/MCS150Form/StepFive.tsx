@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import SignaturePad from "./SignaturePad";
+import { useState } from "react";
 
 interface StepFiveProps {
   formData: any;
@@ -11,6 +12,7 @@ interface StepFiveProps {
 
 const StepFive = ({ formData, setFormData }: StepFiveProps) => {
   const { toast } = useToast();
+  const [selectedFileName, setSelectedFileName] = useState<string>("");
 
   const updateOperator = (field: string, value: string) => {
     setFormData({
@@ -33,6 +35,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
         });
         return;
       }
+      setSelectedFileName(file.name);
       setFormData({
         ...formData,
         operator: {
@@ -148,13 +151,22 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
           <Label htmlFor="licenseFile">
             Upload Driver License <span className="text-red-500">*</span>
           </Label>
-          <div className="relative">
+          <div className="relative flex items-center w-full">
+            <label
+              htmlFor="licenseFile"
+              className="inline-flex items-center px-4 py-2 bg-gray-50 rounded-l border border-input cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              Choose File
+            </label>
+            <div className="flex-1 px-3 py-2 border border-l-0 border-input rounded-r truncate">
+              {selectedFileName || ""}
+            </div>
             <Input
               id="licenseFile"
               type="file"
               accept=".pdf,.jpg,.jpeg,.png"
               onChange={handleFileUpload}
-              className="cursor-pointer w-full bg-gray-50 file:bg-gray-50 file:border-0 file:text-gray-600 file:cursor-pointer"
+              className="sr-only"
             />
           </div>
           <p className="text-sm text-gray-500">Upload a copy of your license (PDF, JPG, PNG)</p>
