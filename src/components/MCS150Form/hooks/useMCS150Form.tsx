@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -127,8 +128,22 @@ export const useMCS150Form = () => {
             setFormData(resumedFiling.form_data);
             setCurrentStep(resumedFiling.last_step_completed || 1);
           } else {
+            // Ensure we have a valid USDOT number
+            if (!stateData.usdotNumber) {
+              toast({
+                title: "Error",
+                description: "Invalid USDOT number. Please start from the beginning.",
+                variant: "destructive",
+              });
+              navigate('/mcs-150-filing');
+              return;
+            }
             const filing = await createFiling(stateData.usdotNumber, 'mcs150', formData);
-            setFilingId(filing.id);
+            if (filing) {
+              setFilingId(filing.id);
+            } else {
+              throw new Error('Failed to create filing');
+            }
           }
         } catch (error) {
           console.error('Error initializing filing:', error);
@@ -137,6 +152,7 @@ export const useMCS150Form = () => {
             description: "Failed to initialize filing. Please try again.",
             variant: "destructive",
           });
+          navigate('/mcs-150-filing');
         }
       };
       
@@ -157,11 +173,18 @@ export const useMCS150Form = () => {
 
     try {
       const parsedData = JSON.parse(storedData);
+      if (!parsedData.usdotNumber) {
+        throw new Error('Invalid USDOT data');
+      }
       setUsdotData(parsedData);
       const initializeFiling = async () => {
         try {
           const filing = await createFiling(parsedData.usdotNumber, 'mcs150', formData);
-          setFilingId(filing.id);
+          if (filing) {
+            setFilingId(filing.id);
+          } else {
+            throw new Error('Failed to create filing');
+          }
         } catch (error) {
           console.error('Error creating filing:', error);
           toast({
@@ -169,6 +192,7 @@ export const useMCS150Form = () => {
             description: "Failed to initialize filing. Please try again.",
             variant: "destructive",
           });
+          navigate('/mcs-150-filing');
         }
       };
       initializeFiling();
