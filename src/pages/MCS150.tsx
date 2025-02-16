@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -33,11 +32,10 @@ const MCS150 = () => {
       const initializeFiling = async () => {
         try {
           if (resumedFiling) {
-            // If resuming, use the existing filing
             setFilingId(resumedFiling.id);
             setFormData(resumedFiling.form_data);
+            setCurrentStep(resumedFiling.last_step_completed || 1);
           } else {
-            // Create new filing
             const filing = await createFiling(stateData.usdotNumber, 'mcs150', formData);
             setFilingId(filing.id);
           }
@@ -190,7 +188,7 @@ const MCS150 = () => {
       expiryDate: "",
       cvv: "",
       cardName: "",
-      cardType: "credit", // This is now properly nested under billing
+      cardType: "credit",
       termsAccepted: false,
     },
   });
@@ -290,7 +288,8 @@ const MCS150 = () => {
     if (currentStep < totalSteps) {
       try {
         if (filingId) {
-          await updateFilingData(filingId, formData);
+          const nextStep = getNextStep(currentStep);
+          await updateFilingData(filingId, formData, nextStep);
         }
         setCurrentStep(getNextStep(currentStep));
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -322,20 +321,18 @@ const MCS150 = () => {
     }
   };
 
-  const handleBack = () => {
+  const handleBack = async () => {
     if (currentStep > 1) {
-      if (formData.reasonForFiling.outOfBusiness && currentStep === 5) {
-        setCurrentStep(1);
-      } else if (currentStep === 5) {
-        if (!shouldSkipStep4()) setCurrentStep(4);
-        else if (!shouldSkipStep3()) setCurrentStep(3);
-        else setCurrentStep(2);
-      } else if (currentStep === 4 && shouldSkipStep3()) {
-        setCurrentStep(2);
-      } else {
+      try {
+        if (filingId) {
+          const previousStep = currentStep - 1;
+          await updateFilingData(filingId, formData, previousStep);
+        }
         setCurrentStep(currentStep - 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) {
+        console.error('Error updating step:', error);
       }
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
