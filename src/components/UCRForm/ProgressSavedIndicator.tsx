@@ -8,7 +8,7 @@ import {
 
 const ProgressSavedIndicator = () => {
   return (
-    <div className="mt-4 bg-white/50 backdrop-blur-sm rounded-lg border p-6 flex items-start gap-2">
+    <div className="mt-4 bg-white/50 backdrop-blur-sm rounded-lg border px-6 py-3 flex items-start gap-2">
       <span className="text-[14px] text-gray-600">Your Progress is Saved</span>
       <Tooltip>
         <TooltipTrigger asChild>
