@@ -1,18 +1,16 @@
-
 import { useEffect, useRef } from "react";
 import { Canvas, PencilBrush } from "fabric";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-
 interface SignaturePadProps {
   onChange: (signature: string) => void;
 }
-
-const SignaturePad = ({ onChange }: SignaturePadProps) => {
+const SignaturePad = ({
+  onChange
+}: SignaturePadProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricRef = useRef<Canvas | null>(null);
   const isMobile = useIsMobile();
-
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -20,12 +18,11 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
     if (fabricRef.current) {
       fabricRef.current.dispose();
     }
-
     const canvas = new Canvas(canvasRef.current, {
       isDrawingMode: true,
       width: isMobile ? 300 : 400,
       height: 150,
-      backgroundColor: 'white',
+      backgroundColor: 'white'
     });
 
     // Initialize the brush
@@ -35,7 +32,7 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
     canvas.freeDrawingBrush = pencilBrush;
 
     // Add mouse events
-    canvas.on('mouse:move', function(event) {
+    canvas.on('mouse:move', function (event) {
       const mouseEvent = event.e as MouseEvent;
       if (canvas.isDrawingMode && mouseEvent.buttons === 1) {
         canvas.renderAll();
@@ -50,7 +47,6 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
         multiplier: 1
       }));
     });
-
     fabricRef.current = canvas;
 
     // Clean up
@@ -58,7 +54,6 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
       canvas.dispose();
     };
   }, [onChange, isMobile]);
-
   const handleClear = () => {
     if (fabricRef.current) {
       fabricRef.current.clear();
@@ -67,25 +62,16 @@ const SignaturePad = ({ onChange }: SignaturePadProps) => {
       onChange('');
     }
   };
-
-  return (
-    <div className="space-y-2">
+  return <div className="space-y-2">
       <div className="border rounded-md p-2 bg-white">
         <canvas ref={canvasRef} className="touch-none" />
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-500">Draw your signature here</span>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleClear}
-        >
+        <span className="text-sm text-gray-500">Draw your signature (mouse or finger)</span>
+        <Button type="button" variant="outline" size="sm" onClick={handleClear}>
           Clear
         </Button>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SignaturePad;
