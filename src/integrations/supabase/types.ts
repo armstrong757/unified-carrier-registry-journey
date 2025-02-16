@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string | null
+          email: string | null
           filing_type: Database["public"]["Enums"]["filing_type"]
           form_data: Json
           id: string
@@ -23,6 +24,7 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           created_at?: string | null
+          email?: string | null
           filing_type: Database["public"]["Enums"]["filing_type"]
           form_data?: Json
           id?: string
@@ -33,6 +35,7 @@ export type Database = {
         Update: {
           completed_at?: string | null
           created_at?: string | null
+          email?: string | null
           filing_type?: Database["public"]["Enums"]["filing_type"]
           form_data?: Json
           id?: string
