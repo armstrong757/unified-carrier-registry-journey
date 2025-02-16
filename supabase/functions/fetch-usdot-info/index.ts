@@ -14,6 +14,8 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const startTime = performance.now();
+  
   try {
     const body = await req.json();
     const { dotNumber, requestSource = 'unknown' } = body;
@@ -33,13 +35,17 @@ serve(async (req) => {
 
     // First check the cache
     const cachedData = await cacheManager.getCachedData(dotNumber);
+    const endTime = performance.now();
+    const responseTime = Math.round(endTime - startTime);
+
     if (cachedData) {
-      // Log the API request with cache hit
+      // Log the API request with cache hit and response time
       await cacheManager.logApiRequest({
         usdotNumber: dotNumber,
         requestType: 'carrier_data',
         requestSource,
-        cacheHit: true
+        cacheHit: true,
+        responseTime
       });
       
       console.log('DEBUG: Returning cached data for DOT:', dotNumber);
@@ -53,12 +59,13 @@ serve(async (req) => {
     console.log('DEBUG: Fetching fresh data for DOT:', dotNumber);
     const carrierData = await fetchCarrierData(dotNumber, fmcsaApiKey);
     
-    // Log the API request before caching
+    // Log the API request with cache miss and response time
     await cacheManager.logApiRequest({
       usdotNumber: dotNumber,
       requestType: 'carrier_data',
       requestSource,
-      cacheHit: false
+      cacheHit: false,
+      responseTime
     });
 
     // Update the cache with new data

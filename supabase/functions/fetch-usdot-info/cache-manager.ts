@@ -7,6 +7,7 @@ interface ApiRequestLog {
   requestType: string;
   requestSource: string;
   cacheHit: boolean;
+  responseTime?: number;
   filingId?: string;
 }
 
@@ -80,7 +81,9 @@ export class CacheManager {
           request_type: request.requestType,
           request_source: request.requestSource,
           cache_hit: request.cacheHit,
-          filing_id: request.filingId
+          filing_id: request.filingId,
+          response_time_ms: request.responseTime,
+          request_timestamp: new Date().toISOString()
         }]);
 
       if (error) {
@@ -88,24 +91,6 @@ export class CacheManager {
       }
     } catch (error) {
       console.error('DEBUG: Failed to log API request:', error);
-    }
-  }
-
-  async updateRequestCacheStatus(dotNumber: string, cacheHit: boolean): Promise<void> {
-    try {
-      const { error } = await this.supabase
-        .from('api_requests')
-        .update({ cache_hit: cacheHit })
-        .eq('usdot_number', dotNumber)
-        .is('cache_hit', false)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (error) {
-        console.error('DEBUG: Failed to update cache status:', error);
-      }
-    } catch (error) {
-      console.error('DEBUG: Failed to update request cache status:', error);
     }
   }
 }

@@ -16,7 +16,9 @@ export type Database = {
           filing_id: string | null
           id: string
           request_source: string | null
+          request_timestamp: string | null
           request_type: string
+          response_time_ms: number | null
           usdot_number: string
         }
         Insert: {
@@ -25,7 +27,9 @@ export type Database = {
           filing_id?: string | null
           id?: string
           request_source?: string | null
+          request_timestamp?: string | null
           request_type: string
+          response_time_ms?: number | null
           usdot_number: string
         }
         Update: {
@@ -34,7 +38,9 @@ export type Database = {
           filing_id?: string | null
           id?: string
           request_source?: string | null
+          request_timestamp?: string | null
           request_type?: string
+          response_time_ms?: number | null
           usdot_number?: string
         }
         Relationships: [
@@ -230,7 +236,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      api_request_analytics: {
+        Row: {
+          avg_response_time: number | null
+          cache_hit_rate: number | null
+          time_bucket: string | null
+          total_requests: number | null
+          unique_dots: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_active_draft_filing: {
@@ -238,6 +253,16 @@ export type Database = {
           p_usdot: string
         }
         Returns: boolean
+      }
+      check_api_abuse: {
+        Args: {
+          p_minutes?: number
+          p_threshold?: number
+        }
+        Returns: {
+          usdot_number: string
+          request_count: number
+        }[]
       }
       generate_resume_token: {
         Args: Record<PropertyKey, never>
