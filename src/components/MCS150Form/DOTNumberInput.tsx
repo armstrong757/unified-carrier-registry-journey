@@ -9,6 +9,16 @@ import { useBotProtection } from "@/hooks/use-bot-protection";
 import { useNavigate } from "react-router-dom";
 import { USDOTData } from "@/types/filing";
 
+// Type guard to check if an unknown value is a USDOTData
+function isUSDOTData(data: unknown): data is USDOTData {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'usdotNumber' in data &&
+    typeof (data as USDOTData).usdotNumber === 'string'
+  );
+}
+
 export const DOTNumberInput = () => {
   const [dotNumber, setDotNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +40,7 @@ export const DOTNumberInput = () => {
       const cachedData = sessionStorage.getItem('usdotData');
       if (cachedData) {
         const parsedData = JSON.parse(cachedData);
-        if (parsedData.usdotNumber === dotNumber.trim()) {
+        if (isUSDOTData(parsedData) && parsedData.usdotNumber === dotNumber.trim()) {
           console.log('Using sessionStorage data for DOT:', dotNumber);
           navigate("/mcs150", {
             state: {
@@ -65,13 +75,18 @@ export const DOTNumberInput = () => {
         // Safely extract USDOT data from form_data
         let usdotData: USDOTData;
         if (typeof existingFiling.form_data === 'object' && existingFiling.form_data !== null) {
+          const formData = existingFiling.form_data;
+          
           // Check if usdotData exists in form_data
-          if ('usdotData' in existingFiling.form_data) {
-            usdotData = existingFiling.form_data.usdotData as USDOTData;
+          if ('usdotData' in formData && isUSDOTData(formData.usdotData)) {
+            usdotData = formData.usdotData;
+          } else if (isUSDOTData(formData)) {
+            // If not, check if form_data itself is USDOTData
+            usdotData = formData;
           } else {
-            // If not, assume form_data itself contains the USDOT data
-            usdotData = existingFiling.form_data as USDOTData;
+            throw new Error('Invalid USDOT data format in filing');
           }
+          
           sessionStorage.setItem('usdotData', JSON.stringify(usdotData));
           navigate("/mcs150", {
             state: {
@@ -89,13 +104,20 @@ export const DOTNumberInput = () => {
           requestSource: 'mcs150_form'
         }
       });
+      
       if (error) {
         console.error('Supabase function error:', error);
         throw new Error(error.message || 'Failed to fetch DOT information');
       }
+      
       if (!data) {
         throw new Error('No data returned from USDOT lookup');
       }
+      
+      if (!isUSDOTData(data)) {
+        throw new Error('Invalid response format from USDOT lookup');
+      }
+      
       console.log('USDOT data received:', data);
       sessionStorage.setItem('usdotData', JSON.stringify(data));
       navigate("/mcs150", {
