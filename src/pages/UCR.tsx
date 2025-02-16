@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import FormProgress from "@/components/UCRForm/FormProgress";
@@ -6,6 +7,7 @@ import StepTwo from "@/components/UCRForm/StepTwo";
 import StepThree from "@/components/UCRForm/StepThree";
 import StepFour from "@/components/UCRForm/StepFour";
 import USDOTSummary from "@/components/UCRForm/USDOTSummary";
+import ProgressSavedIndicator from "@/components/UCRForm/ProgressSavedIndicator";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createFiling, updateFilingData, createTransaction } from "@/utils/filingUtils";
@@ -180,7 +182,7 @@ const UCR = () => {
   };
 
   if (!usdotData) {
-    return null; // Don't render anything while loading
+    return null;
   }
 
   return (
@@ -215,6 +217,7 @@ const UCR = () => {
           <div className="lg:col-span-1">
             <div className="sticky top-8">
               <USDOTSummary data={usdotData} />
+              <ProgressSavedIndicator />
             </div>
           </div>
         </div>

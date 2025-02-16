@@ -11,6 +11,7 @@ import StepFour from "@/components/MCS150Form/StepFour";
 import StepFive from "@/components/MCS150Form/StepFive";
 import StepSix from "@/components/MCS150Form/StepSix";
 import USDOTSummary from "@/components/UCRForm/USDOTSummary";
+import ProgressSavedIndicator from "@/components/UCRForm/ProgressSavedIndicator";
 import { createFiling, updateFilingData, createTransaction } from "@/utils/filingUtils";
 
 const MCS150 = () => {
@@ -358,7 +359,7 @@ const MCS150 = () => {
   };
 
   if (!usdotData) {
-    return null; // Don't render anything while loading
+    return null;
   }
 
   return (
@@ -393,6 +394,7 @@ const MCS150 = () => {
           <div className="lg:col-span-1">
             <div className="sticky top-8">
               <USDOTSummary data={usdotData} />
+              <ProgressSavedIndicator />
             </div>
           </div>
         </div>
