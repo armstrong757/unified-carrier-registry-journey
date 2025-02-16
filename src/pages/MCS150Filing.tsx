@@ -76,6 +76,10 @@ const MCS150Filing = () => {
           <h1 className="font-bold text-[#1A1F2C] mb-8 py-0 my-[30px] text-3xl">
             MCS-150 / Biennial Update
           </h1>
+          <p className="text-gray-600 text-sm max-w-2xl mx-auto">
+            Your progress is automatically saved as you complete the form. If you need to step away, 
+            we'll send you a link to continue where you left off.
+          </p>
           <DOTNumberInput />
         </div>
 

@@ -72,6 +72,10 @@ const UCRFiling = () => {
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8 mb-16">
           <h1 className="font-bold text-[#1A1F2C] mb-8 text-3xl my-[30px]">UCR Registration</h1>
+          <p className="text-gray-600 text-sm max-w-2xl mx-auto">
+            Your progress is automatically saved as you complete the form. If you need to step away, 
+            we'll send you a link to continue where you left off.
+          </p>
           <UCRDOTInput />
         </div>
 
