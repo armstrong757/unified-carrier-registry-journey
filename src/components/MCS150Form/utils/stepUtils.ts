@@ -25,3 +25,16 @@ export const getNextStep = (currentStep: number, formData: any) => {
   }
   return currentStep + 1;
 };
+
+export const getPreviousStep = (currentStep: number, formData: any) => {
+  if (currentStep === 5) {
+    if (formData.reasonForFiling.outOfBusiness) return 1;
+    if (shouldSkipStep3(formData) && shouldSkipStep4(formData)) return 2;
+    if (shouldSkipStep4(formData)) return 3;
+    return 4;
+  }
+  if (currentStep === 4 && shouldSkipStep3(formData)) {
+    return 2;
+  }
+  return currentStep - 1;
+};

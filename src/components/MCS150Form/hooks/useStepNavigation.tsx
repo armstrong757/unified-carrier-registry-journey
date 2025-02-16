@@ -1,7 +1,7 @@
 
 import { useCallback } from "react";
 import { updateFilingData, createTransaction } from "@/utils/filingUtils";
-import { getNextStep } from "../utils/stepUtils";
+import { getNextStep, getPreviousStep } from "../utils/stepUtils";
 
 export const useStepNavigation = (
   currentStep: number,
@@ -52,10 +52,10 @@ export const useStepNavigation = (
     if (currentStep > 1) {
       try {
         if (filingId) {
-          const previousStep = currentStep - 1;
+          const previousStep = getPreviousStep(currentStep, formData);
           await updateFilingData(filingId, formData, previousStep);
         }
-        setCurrentStep(currentStep - 1);
+        setCurrentStep(getPreviousStep(currentStep, formData));
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (error) {
         console.error('Error updating step:', error);
