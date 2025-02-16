@@ -17,6 +17,8 @@ export type Database = {
           filing_type: Database["public"]["Enums"]["filing_type"]
           form_data: Json
           id: string
+          resume_token: string | null
+          resume_token_expires_at: string | null
           status: string
           updated_at: string | null
           usdot_number: string
@@ -28,6 +30,8 @@ export type Database = {
           filing_type: Database["public"]["Enums"]["filing_type"]
           form_data?: Json
           id?: string
+          resume_token?: string | null
+          resume_token_expires_at?: string | null
           status?: string
           updated_at?: string | null
           usdot_number: string
@@ -39,6 +43,8 @@ export type Database = {
           filing_type?: Database["public"]["Enums"]["filing_type"]
           form_data?: Json
           id?: string
+          resume_token?: string | null
+          resume_token_expires_at?: string | null
           status?: string
           updated_at?: string | null
           usdot_number?: string
@@ -180,7 +186,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_resume_token: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       filing_type: "ucr" | "mcs150"
