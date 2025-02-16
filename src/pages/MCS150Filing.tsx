@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { getFilingByResumeToken } from "@/utils/filingUtils";
 import { useToast } from "@/components/ui/use-toast";
+import { Filing, MCS150FormData } from "@/types/filing";
 
 const MCS150Filing = () => {
   const location = useLocation();
@@ -21,22 +22,22 @@ const MCS150Filing = () => {
         try {
           const filing = await getFilingByResumeToken(resumeToken);
           if (filing) {
+            const formData = filing.form_data as MCS150FormData;
+            
             sessionStorage.setItem('usdotData', JSON.stringify({
               usdotNumber: filing.usdot_number,
-              // Add other relevant data from the filing
-              legalName: filing.form_data.companyName || '',
-              telephone: filing.form_data.businessPhone || '',
-              physicalAddress: filing.form_data.principalAddress?.address || '',
+              legalName: formData.companyName || '',
+              telephone: formData.businessPhone || '',
+              physicalAddress: formData.principalAddress?.address || '',
             }));
             
             navigate("/mcs150", {
               state: {
                 usdotData: {
                   usdotNumber: filing.usdot_number,
-                  // Add other relevant data
-                  legalName: filing.form_data.companyName || '',
-                  telephone: filing.form_data.businessPhone || '',
-                  physicalAddress: filing.form_data.principalAddress?.address || '',
+                  legalName: formData.companyName || '',
+                  telephone: formData.businessPhone || '',
+                  physicalAddress: formData.principalAddress?.address || '',
                 },
                 resumedFiling: filing
               }

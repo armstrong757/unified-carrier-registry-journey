@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { getFilingByResumeToken } from "@/utils/filingUtils";
 import { useToast } from "@/components/ui/use-toast";
+import { Filing, UCRFormData } from "@/types/filing";
 
 const UCRFiling = () => {
   const location = useLocation();
@@ -21,19 +22,20 @@ const UCRFiling = () => {
         try {
           const filing = await getFilingByResumeToken(resumeToken);
           if (filing) {
+            const formData = filing.form_data as UCRFormData;
+            
             sessionStorage.setItem('usdotData', JSON.stringify({
               usdotNumber: filing.usdot_number,
-              // Add other relevant data
-              legalName: filing.form_data.representative || '',
-              telephone: filing.form_data.phone || '',
+              legalName: formData.representative || '',
+              telephone: formData.phone || '',
             }));
             
             navigate("/ucr", {
               state: {
                 usdotData: {
                   usdotNumber: filing.usdot_number,
-                  legalName: filing.form_data.representative || '',
-                  telephone: filing.form_data.phone || '',
+                  legalName: formData.representative || '',
+                  telephone: formData.phone || '',
                 },
                 resumedFiling: filing
               }

@@ -1,11 +1,29 @@
 
 export type FilingType = 'ucr' | 'mcs150';
 
+export interface MCS150FormData {
+  companyName?: string;
+  businessPhone?: string;
+  principalAddress?: {
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+  };
+  // Add other form fields as needed
+}
+
+export interface UCRFormData {
+  representative?: string;
+  phone?: string;
+  // Add other form fields as needed
+}
+
 export interface Filing {
   id: string;
   usdot_number: string;
   filing_type: FilingType;
-  form_data: any;
+  form_data: MCS150FormData | UCRFormData;
   status: 'draft' | 'completed';
   completed_at?: string;
   created_at: string;
