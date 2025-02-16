@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
@@ -131,6 +132,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
               <div className="flex items-center gap-2">
                 <Link
                   to="/mcs150"
+                  target="_blank"
                   state={{ usdotData: data }}
                   className="text-accent hover:text-accent/80 hover:underline"
                 >
