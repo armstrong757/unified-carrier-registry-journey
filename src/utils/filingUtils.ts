@@ -4,6 +4,12 @@ import { FilingType } from "@/types/filing";
 
 export const createFiling = async (usdotNumber: string, filingType: FilingType, initialFormData: any = {}) => {
   try {
+    // Generate a resume token for the filing
+    const { data: tokenData, error: tokenError } = await supabase
+      .rpc('generate_resume_token');
+    
+    if (tokenError) throw tokenError;
+
     const { data, error } = await supabase
       .from('filings')
       .insert([
@@ -11,7 +17,9 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
           usdot_number: usdotNumber,
           filing_type: filingType,
           form_data: initialFormData,
-          status: 'draft'
+          status: 'draft',
+          email: initialFormData.email, // Store email in dedicated column
+          resume_token: tokenData // Add resume token
         }
       ])
       .select()
@@ -31,6 +39,7 @@ export const updateFilingData = async (filingId: string, formData: any) => {
       .from('filings')
       .update({
         form_data: formData,
+        email: formData.email, // Update email in dedicated column
         updated_at: new Date().toISOString()
       })
       .eq('id', filingId)
@@ -41,6 +50,23 @@ export const updateFilingData = async (filingId: string, formData: any) => {
     return data;
   } catch (error) {
     console.error('Error updating filing:', error);
+    throw error;
+  }
+};
+
+export const getFilingByResumeToken = async (token: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('filings')
+      .select()
+      .eq('resume_token', token)
+      .gt('resume_token_expires_at', new Date().toISOString())
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error retrieving filing by resume token:', error);
     throw error;
   }
 };
