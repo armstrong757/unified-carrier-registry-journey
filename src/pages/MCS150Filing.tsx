@@ -14,20 +14,44 @@ const MCS150Filing = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // First check if we have DOT data passed directly (e.g., from UCR form)
+    // Check URL parameters first
+    const searchParams = new URLSearchParams(location.search);
+    const dotNumber = searchParams.get('dot');
+    const legalName = searchParams.get('name');
+    const phone = searchParams.get('phone');
+    const address = searchParams.get('address');
+
+    if (dotNumber) {
+      const usdotData = {
+        usdotNumber: dotNumber,
+        legalName: legalName ? decodeURIComponent(legalName) : '',
+        telephone: phone ? decodeURIComponent(phone) : '',
+        physicalAddress: address ? decodeURIComponent(address) : ''
+      };
+      
+      // Store the data in session storage for persistence
+      sessionStorage.setItem('usdotData', JSON.stringify(usdotData));
+      // Navigate directly to the form
+      navigate("/mcs150", {
+        state: { usdotData },
+        replace: true
+      });
+      return;
+    }
+
+    // Then check if we have DOT data passed directly
     if (location.state?.usdotData) {
       // Store the data in session storage for persistence
       sessionStorage.setItem('usdotData', JSON.stringify(location.state.usdotData));
       // Navigate directly to the form
       navigate("/mcs150", {
         state: { usdotData: location.state.usdotData },
-        replace: true // Use replace to prevent back button issues
+        replace: true
       });
       return;
     }
 
-    // Then check for resume token
-    const searchParams = new URLSearchParams(location.search);
+    // Finally check for resume token
     const resumeToken = searchParams.get('resume');
     if (resumeToken) {
       const resumeFiling = async () => {

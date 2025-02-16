@@ -34,6 +34,9 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
   const location = useLocation();
   const isUCRForm = location.pathname === "/ucr";
 
+  // Create URL with query parameters for the necessary data
+  const mcs150Url = `/mcs150?dot=${data.usdotNumber}&name=${encodeURIComponent(data.legalName)}&phone=${encodeURIComponent(data.telephone || '')}&address=${encodeURIComponent(data.physicalAddress || '')}`;
+
   return (
     <Card className="bg-white/80 animate-fadeIn will-change-transform">
       <CardContent className="p-6">
@@ -131,9 +134,8 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             <div className="border-t border-gray-200 mt-8 pt-4">
               <div className="flex items-center gap-2">
                 <Link
-                  to="/mcs150"
+                  to={mcs150Url}
                   target="_blank"
-                  state={{ usdotData: data }}
                   className="text-accent hover:text-accent/80 hover:underline"
                 >
                   Update MCS-150
