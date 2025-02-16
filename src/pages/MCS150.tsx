@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -177,7 +178,7 @@ const MCS150 = () => {
       expiryDate: "",
       cvv: "",
       cardName: "",
-      cardType: "credit",
+      cardType: "credit", // This is now properly nested under billing
       termsAccepted: false,
     },
   });
@@ -292,7 +293,7 @@ const MCS150 = () => {
     } else {
       try {
         if (filingId) {
-          await createTransaction(filingId, 149, formData.cardType);
+          await createTransaction(filingId, 149, formData.billing.cardType);
           toast({
             title: "Success",
             description: "Your MCS-150 form has been submitted successfully.",
