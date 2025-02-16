@@ -28,6 +28,7 @@ export interface Filing {
   completed_at?: string;
   created_at: string;
   updated_at: string;
+  abandoned_cart_email_sent: boolean;
 }
 
 export interface Transaction {

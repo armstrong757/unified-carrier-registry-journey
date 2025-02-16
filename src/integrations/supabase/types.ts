@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       filings: {
         Row: {
+          abandoned_cart_email_sent: boolean | null
           completed_at: string | null
           created_at: string | null
           email: string | null
@@ -24,6 +25,7 @@ export type Database = {
           usdot_number: string
         }
         Insert: {
+          abandoned_cart_email_sent?: boolean | null
           completed_at?: string | null
           created_at?: string | null
           email?: string | null
@@ -37,6 +39,7 @@ export type Database = {
           usdot_number: string
         }
         Update: {
+          abandoned_cart_email_sent?: boolean | null
           completed_at?: string | null
           created_at?: string | null
           email?: string | null
