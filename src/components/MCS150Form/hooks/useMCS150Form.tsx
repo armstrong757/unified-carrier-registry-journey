@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -128,16 +127,6 @@ export const useMCS150Form = () => {
             setFormData(resumedFiling.form_data);
             setCurrentStep(resumedFiling.last_step_completed || 1);
           } else {
-            // Ensure we have a valid USDOT number
-            if (!stateData.usdotNumber) {
-              toast({
-                title: "Error",
-                description: "Invalid USDOT number. Please start from the beginning.",
-                variant: "destructive",
-              });
-              navigate('/mcs-150-filing');
-              return;
-            }
             const filing = await createFiling(stateData.usdotNumber, 'mcs150', formData);
             if (filing) {
               setFilingId(filing.id);
@@ -147,12 +136,14 @@ export const useMCS150Form = () => {
           }
         } catch (error) {
           console.error('Error initializing filing:', error);
-          toast({
-            title: "Error",
-            description: "Failed to initialize filing. Please try again.",
-            variant: "destructive",
-          });
-          navigate('/mcs-150-filing');
+          if (!location.state?.usdotData) {
+            toast({
+              title: "Error",
+              description: "Failed to initialize filing. Please try again.",
+              variant: "destructive",
+            });
+            navigate('/mcs-150-filing');
+          }
         }
       };
       
@@ -160,50 +151,52 @@ export const useMCS150Form = () => {
       return;
     }
 
-    const storedData = sessionStorage.getItem('usdotData');
-    if (!storedData) {
-      toast({
-        title: "Error",
-        description: "No DOT information found. Please start from the MCS-150 Filing page.",
-        variant: "destructive",
-      });
-      navigate('/mcs-150-filing');
-      return;
-    }
-
-    try {
-      const parsedData = JSON.parse(storedData);
-      if (!parsedData.usdotNumber) {
-        throw new Error('Invalid USDOT data');
+    if (!location.state?.usdotData) {
+      const storedData = sessionStorage.getItem('usdotData');
+      if (!storedData) {
+        toast({
+          title: "Error",
+          description: "No DOT information found. Please start from the MCS-150 Filing page.",
+          variant: "destructive",
+        });
+        navigate('/mcs-150-filing');
+        return;
       }
-      setUsdotData(parsedData);
-      const initializeFiling = async () => {
-        try {
-          const filing = await createFiling(parsedData.usdotNumber, 'mcs150', formData);
-          if (filing) {
-            setFilingId(filing.id);
-          } else {
-            throw new Error('Failed to create filing');
-          }
-        } catch (error) {
-          console.error('Error creating filing:', error);
-          toast({
-            title: "Error",
-            description: "Failed to initialize filing. Please try again.",
-            variant: "destructive",
-          });
-          navigate('/mcs-150-filing');
+
+      try {
+        const parsedData = JSON.parse(storedData);
+        if (!parsedData.usdotNumber) {
+          throw new Error('Invalid USDOT data');
         }
-      };
-      initializeFiling();
-    } catch (error) {
-      console.error('Error parsing stored USDOT data:', error);
-      toast({
-        title: "Error",
-        description: "Invalid DOT information. Please try again.",
-        variant: "destructive",
-      });
-      navigate('/mcs-150-filing');
+        setUsdotData(parsedData);
+        const initializeFiling = async () => {
+          try {
+            const filing = await createFiling(parsedData.usdotNumber, 'mcs150', formData);
+            if (filing) {
+              setFilingId(filing.id);
+            } else {
+              throw new Error('Failed to create filing');
+            }
+          } catch (error) {
+            console.error('Error creating filing:', error);
+            toast({
+              title: "Error",
+              description: "Failed to initialize filing. Please try again.",
+              variant: "destructive",
+            });
+            navigate('/mcs-150-filing');
+          }
+        };
+        initializeFiling();
+      } catch (error) {
+        console.error('Error parsing stored USDOT data:', error);
+        toast({
+          title: "Error",
+          description: "Invalid DOT information. Please try again.",
+          variant: "destructive",
+        });
+        navigate('/mcs-150-filing');
+      }
     }
   }, [navigate, toast, location]);
 
