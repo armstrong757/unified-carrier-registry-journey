@@ -24,14 +24,24 @@ const MCS150 = () => {
 
   useEffect(() => {
     const stateData = location.state?.usdotData;
+    const resumedFiling = location.state?.resumedFiling;
+    
     if (stateData) {
       setUsdotData(stateData);
+      
       const initializeFiling = async () => {
         try {
-          const filing = await createFiling(stateData.usdotNumber, 'mcs150', formData);
-          setFilingId(filing.id);
+          if (resumedFiling) {
+            // If resuming, use the existing filing
+            setFilingId(resumedFiling.id);
+            setFormData(resumedFiling.form_data);
+          } else {
+            // Create new filing
+            const filing = await createFiling(stateData.usdotNumber, 'mcs150', formData);
+            setFilingId(filing.id);
+          }
         } catch (error) {
-          console.error('Error creating filing:', error);
+          console.error('Error initializing filing:', error);
           toast({
             title: "Error",
             description: "Failed to initialize filing. Please try again.",
@@ -39,6 +49,7 @@ const MCS150 = () => {
           });
         }
       };
+      
       initializeFiling();
       return;
     }

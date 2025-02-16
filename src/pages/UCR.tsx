@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import FormProgress from "@/components/UCRForm/FormProgress";
@@ -8,12 +7,13 @@ import StepThree from "@/components/UCRForm/StepThree";
 import StepFour from "@/components/UCRForm/StepFour";
 import USDOTSummary from "@/components/UCRForm/USDOTSummary";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { createFiling, updateFilingData, createTransaction } from "@/utils/filingUtils";
 
 const UCR = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
   const [usdotData, setUsdotData] = useState<any>(null);
@@ -57,6 +57,37 @@ const UCR = () => {
   });
 
   useEffect(() => {
+    const stateData = location.state?.usdotData;
+    const resumedFiling = location.state?.resumedFiling;
+    
+    if (stateData) {
+      setUsdotData(stateData);
+      
+      const initializeFiling = async () => {
+        try {
+          if (resumedFiling) {
+            // If resuming, use the existing filing
+            setFilingId(resumedFiling.id);
+            setFormData(resumedFiling.form_data);
+          } else {
+            // Create new filing
+            const filing = await createFiling(stateData.usdotNumber, 'ucr', formData);
+            setFilingId(filing.id);
+          }
+        } catch (error) {
+          console.error('Error initializing filing:', error);
+          toast({
+            title: "Error",
+            description: "Failed to initialize filing. Please try again.",
+            variant: "destructive",
+          });
+        }
+      };
+      
+      initializeFiling();
+      return;
+    }
+
     const storedData = sessionStorage.getItem('usdotData');
     if (!storedData) {
       toast({
@@ -87,7 +118,7 @@ const UCR = () => {
     };
 
     initializeFiling();
-  }, [navigate, toast]);
+  }, [navigate, toast, location]);
 
   const handleNext = async () => {
     if (currentStep < totalSteps) {

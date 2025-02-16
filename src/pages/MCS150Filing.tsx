@@ -2,8 +2,65 @@
 import { DOTNumberInput } from "@/components/MCS150Form/DOTNumberInput";
 import { TableOfContents } from "@/components/MCS150Form/TableOfContents";
 import { ContentSections } from "@/components/MCS150Form/ContentSections";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { getFilingByResumeToken } from "@/utils/filingUtils";
+import { useToast } from "@/components/ui/use-toast";
 
 const MCS150Filing = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const resumeToken = searchParams.get('resume');
+    
+    if (resumeToken) {
+      const resumeFiling = async () => {
+        try {
+          const filing = await getFilingByResumeToken(resumeToken);
+          if (filing) {
+            sessionStorage.setItem('usdotData', JSON.stringify({
+              usdotNumber: filing.usdot_number,
+              // Add other relevant data from the filing
+              legalName: filing.form_data.companyName || '',
+              telephone: filing.form_data.businessPhone || '',
+              physicalAddress: filing.form_data.principalAddress?.address || '',
+            }));
+            
+            navigate("/mcs150", {
+              state: {
+                usdotData: {
+                  usdotNumber: filing.usdot_number,
+                  // Add other relevant data
+                  legalName: filing.form_data.companyName || '',
+                  telephone: filing.form_data.businessPhone || '',
+                  physicalAddress: filing.form_data.principalAddress?.address || '',
+                },
+                resumedFiling: filing
+              }
+            });
+            
+            toast({
+              title: "Form Resumed",
+              description: "Your previous progress has been restored.",
+            });
+          }
+        } catch (error) {
+          console.error('Error resuming filing:', error);
+          toast({
+            title: "Error",
+            description: "This resume link is no longer valid. Please start a new filing.",
+            variant: "destructive",
+          });
+        }
+      };
+      
+      resumeFiling();
+    }
+  }, [location, navigate, toast]);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
