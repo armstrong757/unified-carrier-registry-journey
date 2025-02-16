@@ -8,8 +8,8 @@ import {
 
 const ProgressSavedIndicator = () => {
   return (
-    <div className="mt-4 bg-white/50 backdrop-blur-sm rounded-lg border p-4 flex items-center justify-center gap-2">
-      <span className="text-gray-600">Your Progress is Saved</span>
+    <div className="mt-4 bg-white/50 backdrop-blur-sm rounded-lg border p-4 flex items-start gap-2">
+      <span className="text-[14px] text-gray-600">Your Progress is Saved</span>
       <Tooltip>
         <TooltipTrigger asChild>
           <Info className="h-4 w-4 text-gray-500 cursor-help" />
