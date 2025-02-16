@@ -195,6 +195,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_active_draft_filing: {
+        Args: {
+          p_usdot: string
+        }
+        Returns: boolean
+      }
       generate_resume_token: {
         Args: Record<PropertyKey, never>
         Returns: string

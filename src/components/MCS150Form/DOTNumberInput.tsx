@@ -25,6 +25,30 @@ export const DOTNumberInput = () => {
     if (!dotNumber.trim()) return;
     setIsLoading(true);
     try {
+      // First check for existing draft filing
+      const { data: existingFiling } = await supabase
+        .from('filings')
+        .select('*')
+        .eq('usdot_number', dotNumber.trim())
+        .eq('status', 'draft')
+        .gt('resume_token_expires_at', new Date().toISOString())
+        .single();
+
+      if (existingFiling) {
+        toast({
+          title: "Existing Filing Found",
+          description: "You have an active filing in progress. Redirecting you to continue.",
+        });
+        sessionStorage.setItem('usdotData', JSON.stringify(existingFiling.form_data));
+        navigate("/mcs150", {
+          state: {
+            usdotData: existingFiling.form_data,
+            resumedFiling: existingFiling
+          }
+        });
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
         body: {
           dotNumber: dotNumber.trim()
@@ -87,3 +111,4 @@ export const DOTNumberInput = () => {
     </Card>
   );
 };
+
