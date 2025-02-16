@@ -9,6 +9,44 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      api_requests: {
+        Row: {
+          cache_hit: boolean | null
+          created_at: string | null
+          filing_id: string | null
+          id: string
+          request_source: string | null
+          request_type: string
+          usdot_number: string
+        }
+        Insert: {
+          cache_hit?: boolean | null
+          created_at?: string | null
+          filing_id?: string | null
+          id?: string
+          request_source?: string | null
+          request_type: string
+          usdot_number: string
+        }
+        Update: {
+          cache_hit?: boolean | null
+          created_at?: string | null
+          filing_id?: string | null
+          id?: string
+          request_source?: string | null
+          request_type?: string
+          usdot_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_requests_filing_id_fkey"
+            columns: ["filing_id"]
+            isOneToOne: false
+            referencedRelation: "filings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       filings: {
         Row: {
           abandoned_cart_email_sent: boolean | null
@@ -204,6 +242,18 @@ export type Database = {
       generate_resume_token: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_request_statistics: {
+        Args: {
+          start_time?: string
+          end_time?: string
+        }
+        Returns: {
+          total_requests: number
+          unique_dots: number
+          cache_hit_rate: number
+          avg_requests_per_dot: number
+        }[]
       }
     }
     Enums: {

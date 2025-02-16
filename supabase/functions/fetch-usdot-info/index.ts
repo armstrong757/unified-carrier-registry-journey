@@ -15,7 +15,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { dotNumber } = body;
+    const { dotNumber, requestSource = 'unknown' } = body;
     
     if (!dotNumber) {
       throw new Error('DOT number is required');
@@ -30,9 +30,20 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const cacheManager = new CacheManager(supabaseUrl, supabaseKey);
 
+    // Log the API request
+    await cacheManager.logApiRequest({
+      usdotNumber: dotNumber,
+      requestType: 'carrier_data',
+      requestSource,
+      cacheHit: false
+    });
+
     // First check the cache
     const cachedData = await cacheManager.getCachedData(dotNumber);
     if (cachedData) {
+      // Update the request record to indicate cache hit
+      await cacheManager.updateRequestCacheStatus(dotNumber, true);
+      
       console.log('DEBUG: Returning cached data for DOT:', dotNumber);
       return new Response(
         JSON.stringify(cachedData),
