@@ -148,13 +148,15 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
           <Label htmlFor="licenseFile">
             Upload Driver License <span className="text-red-500">*</span>
           </Label>
-          <Input
-            id="licenseFile"
-            type="file"
-            accept=".pdf,.jpg,.jpeg,.png"
-            onChange={handleFileUpload}
-            className="cursor-pointer w-full"
-          />
+          <div className="relative">
+            <Input
+              id="licenseFile"
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={handleFileUpload}
+              className="cursor-pointer w-full bg-gray-50 file:bg-gray-50 file:border-0 file:text-gray-600 file:cursor-pointer"
+            />
+          </div>
           <p className="text-sm text-gray-500">Upload a copy of your license (PDF, JPG, PNG)</p>
         </div>
 
@@ -162,7 +164,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
           <Label htmlFor="signature">
             Signature <span className="text-red-500">*</span>
           </Label>
-          <div className="w-full sm:w-1/2"> {/* Added container with responsive width */}
+          <div className="w-full sm:w-1/2">
             <SignaturePad
               onChange={(signatureData) => updateOperator("signature", signatureData)}
             />
