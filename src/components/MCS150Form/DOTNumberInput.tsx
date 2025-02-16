@@ -55,9 +55,25 @@ export const DOTNumberInput = () => {
         return;
       }
 
+      // First check sessionStorage for existing data
+      const cachedData = sessionStorage.getItem('usdotData');
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        if (parsedData.usdotNumber === dotNumber.trim()) {
+          console.log('Using sessionStorage data for DOT:', dotNumber);
+          navigate("/mcs150", {
+            state: {
+              usdotData: parsedData
+            }
+          });
+          return;
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
         body: {
-          dotNumber: dotNumber.trim()
+          dotNumber: dotNumber.trim(),
+          requestSource: 'mcs150_form'
         }
       });
       if (error) {

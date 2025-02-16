@@ -63,9 +63,25 @@ export const UCRDOTInput = () => {
         return;
       }
 
+      // First check sessionStorage for existing data
+      const cachedData = sessionStorage.getItem('usdotData');
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        if (parsedData.usdotNumber === dotNumber.trim()) {
+          console.log('Using sessionStorage data for DOT:', dotNumber);
+          navigate("/ucr", {
+            state: {
+              usdotData: parsedData
+            }
+          });
+          return;
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
         body: {
-          dotNumber: dotNumber.trim()
+          dotNumber: dotNumber.trim(),
+          requestSource: 'ucr_form'
         }
       });
       if (error) throw error;
