@@ -19,6 +19,27 @@ export interface UCRFormData {
   // Add other form fields as needed
 }
 
+export interface USDOTData {
+  usdotNumber: string;
+  legalName?: string;
+  dbaName?: string;
+  mailingAddress?: {
+    streetAddress?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+  };
+  phoneNumber?: string;
+  emailAddress?: string;
+  operatingStatus?: string;
+  outOfServiceDate?: string | null;
+  mcs150FormDate?: string | null;
+  entityType?: string;
+  carrierOperation?: string;
+  cargoCarried?: string[];
+}
+
 export interface Filing {
   id: string;
   usdot_number: string;
