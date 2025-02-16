@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import FormProgress from "@/components/UCRForm/FormProgress";
@@ -9,6 +8,7 @@ import StepFour from "@/components/UCRForm/StepFour";
 import USDOTSummary from "@/components/UCRForm/USDOTSummary";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { createFiling, updateFilingData, createTransaction } from "@/utils/filingUtils";
 
 const UCR = () => {
   const { toast } = useToast();
@@ -16,6 +16,7 @@ const UCR = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
   const [usdotData, setUsdotData] = useState<any>(null);
+  const [filingId, setFilingId] = useState<string | null>(null);
 
   useEffect(() => {
     const storedData = sessionStorage.getItem('usdotData');
@@ -28,7 +29,26 @@ const UCR = () => {
       navigate('/ucr-filing');
       return;
     }
-    setUsdotData(JSON.parse(storedData));
+
+    const parsedData = JSON.parse(storedData);
+    setUsdotData(parsedData);
+
+    // Create initial filing record
+    const initializeFiling = async () => {
+      try {
+        const filing = await createFiling(parsedData.usdotNumber, 'ucr', formData);
+        setFilingId(filing.id);
+      } catch (error) {
+        console.error('Error creating filing:', error);
+        toast({
+          title: "Error",
+          description: "Failed to initialize filing. Please try again.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    initializeFiling();
   }, [navigate, toast]);
 
   const [formData, setFormData] = useState({
@@ -67,17 +87,40 @@ const UCR = () => {
     termsAccepted: false,
   });
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      try {
+        if (filingId) {
+          await updateFilingData(filingId, formData);
+        }
+        setCurrentStep(currentStep + 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) {
+        console.error('Error updating filing:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save form data. Please try again.",
+          variant: "destructive",
+        });
+      }
     } else {
       // Handle form submission
-      toast({
-        title: "Registration Submitted",
-        description: "Your UCR registration has been submitted successfully.",
-      });
-      console.log("Form submitted:", formData);
+      try {
+        if (filingId) {
+          await createTransaction(filingId, 149, formData.billing.cardType);
+          toast({
+            title: "Success",
+            description: "Your UCR registration has been submitted successfully.",
+          });
+        }
+      } catch (error) {
+        console.error('Error processing payment:', error);
+        toast({
+          title: "Error",
+          description: "Failed to process payment. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 

@@ -9,6 +9,85 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      filings: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          filing_type: Database["public"]["Enums"]["filing_type"]
+          form_data: Json
+          id: string
+          status: string
+          updated_at: string | null
+          usdot_number: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          filing_type: Database["public"]["Enums"]["filing_type"]
+          form_data?: Json
+          id?: string
+          status?: string
+          updated_at?: string | null
+          usdot_number: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          filing_type?: Database["public"]["Enums"]["filing_type"]
+          form_data?: Json
+          id?: string
+          status?: string
+          updated_at?: string | null
+          usdot_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "filings_usdot_number_fkey"
+            columns: ["usdot_number"]
+            isOneToOne: false
+            referencedRelation: "usdot_info"
+            referencedColumns: ["usdot_number"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          filing_id: string
+          id: string
+          payment_method: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          filing_id: string
+          id?: string
+          payment_method?: string | null
+          status: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          filing_id?: string
+          id?: string
+          payment_method?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_filing_id_fkey"
+            columns: ["filing_id"]
+            isOneToOne: false
+            referencedRelation: "filings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usdot_info: {
         Row: {
           basics_data: Json | null
@@ -101,7 +180,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      filing_type: "ucr" | "mcs150"
     }
     CompositeTypes: {
       [_ in never]: never
