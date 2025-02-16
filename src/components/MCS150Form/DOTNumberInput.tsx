@@ -25,6 +25,21 @@ export const DOTNumberInput = () => {
     if (!dotNumber.trim()) return;
     setIsLoading(true);
     try {
+      // First check sessionStorage for existing data
+      const cachedData = sessionStorage.getItem('usdotData');
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        if (parsedData.usdotNumber === dotNumber.trim()) {
+          console.log('Using sessionStorage data for DOT:', dotNumber);
+          navigate("/mcs150", {
+            state: {
+              usdotData: parsedData
+            }
+          });
+          return;
+        }
+      }
+
       // Check for existing draft MCS-150 filing
       const { data: existingFiling, error: filingError } = await supabase
         .from('filings')
@@ -45,29 +60,16 @@ export const DOTNumberInput = () => {
           title: "Welcome Back!",
           description: "We saved your progress. You can continue where you left off.",
         });
-        sessionStorage.setItem('usdotData', JSON.stringify(existingFiling.form_data));
+        // Store the USDOT data in sessionStorage
+        const usdotData = existingFiling.form_data.usdotData || existingFiling.form_data;
+        sessionStorage.setItem('usdotData', JSON.stringify(usdotData));
         navigate("/mcs150", {
           state: {
-            usdotData: existingFiling.form_data,
+            usdotData: usdotData,
             resumedFiling: existingFiling
           }
         });
         return;
-      }
-
-      // First check sessionStorage for existing data
-      const cachedData = sessionStorage.getItem('usdotData');
-      if (cachedData) {
-        const parsedData = JSON.parse(cachedData);
-        if (parsedData.usdotNumber === dotNumber.trim()) {
-          console.log('Using sessionStorage data for DOT:', dotNumber);
-          navigate("/mcs150", {
-            state: {
-              usdotData: parsedData
-            }
-          });
-          return;
-        }
       }
 
       const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
