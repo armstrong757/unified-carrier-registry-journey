@@ -30,7 +30,18 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const cacheManager = new CacheManager(supabaseUrl, supabaseKey);
 
-    // Force fresh data fetch for now
+    // First check the cache
+    const cachedData = await cacheManager.getCachedData(dotNumber);
+    if (cachedData) {
+      console.log('DEBUG: Returning cached data for DOT:', dotNumber);
+      return new Response(
+        JSON.stringify(cachedData),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // If no cache hit, fetch fresh data
+    console.log('DEBUG: Fetching fresh data for DOT:', dotNumber);
     const carrierData = await fetchCarrierData(dotNumber, fmcsaApiKey);
     await cacheManager.updateCache(carrierData);
 
@@ -53,4 +64,3 @@ serve(async (req) => {
     );
   }
 });
-
