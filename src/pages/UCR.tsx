@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import FormProgress from "@/components/UCRForm/FormProgress";
@@ -17,39 +18,6 @@ const UCR = () => {
   const totalSteps = 4;
   const [usdotData, setUsdotData] = useState<any>(null);
   const [filingId, setFilingId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const storedData = sessionStorage.getItem('usdotData');
-    if (!storedData) {
-      toast({
-        title: "Error",
-        description: "No DOT information found. Please start from the UCR Filing page.",
-        variant: "destructive",
-      });
-      navigate('/ucr-filing');
-      return;
-    }
-
-    const parsedData = JSON.parse(storedData);
-    setUsdotData(parsedData);
-
-    // Create initial filing record
-    const initializeFiling = async () => {
-      try {
-        const filing = await createFiling(parsedData.usdotNumber, 'ucr', formData);
-        setFilingId(filing.id);
-      } catch (error) {
-        console.error('Error creating filing:', error);
-        toast({
-          title: "Error",
-          description: "Failed to initialize filing. Please try again.",
-          variant: "destructive",
-        });
-      }
-    };
-
-    initializeFiling();
-  }, [navigate, toast]);
 
   const [formData, setFormData] = useState({
     // Step 1 - Representative Information (Pre-filled from USDOT data)
@@ -84,8 +52,42 @@ const UCR = () => {
     expiryDate: "",
     cvv: "",
     cardName: usdotData?.legalName || "", // Pre-fill with company name
+    cardType: "credit", // Add this field
     termsAccepted: false,
   });
+
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('usdotData');
+    if (!storedData) {
+      toast({
+        title: "Error",
+        description: "No DOT information found. Please start from the UCR Filing page.",
+        variant: "destructive",
+      });
+      navigate('/ucr-filing');
+      return;
+    }
+
+    const parsedData = JSON.parse(storedData);
+    setUsdotData(parsedData);
+
+    // Create initial filing record
+    const initializeFiling = async () => {
+      try {
+        const filing = await createFiling(parsedData.usdotNumber, 'ucr', formData);
+        setFilingId(filing.id);
+      } catch (error) {
+        console.error('Error creating filing:', error);
+        toast({
+          title: "Error",
+          description: "Failed to initialize filing. Please try again.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    initializeFiling();
+  }, [navigate, toast]);
 
   const handleNext = async () => {
     if (currentStep < totalSteps) {
@@ -107,7 +109,7 @@ const UCR = () => {
       // Handle form submission
       try {
         if (filingId) {
-          await createTransaction(filingId, 149, formData.billing.cardType);
+          await createTransaction(filingId, 149, formData.cardType);
           toast({
             title: "Success",
             description: "Your UCR registration has been submitted successfully.",

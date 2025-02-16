@@ -177,6 +177,7 @@ const MCS150 = () => {
       expiryDate: "",
       cvv: "",
       cardName: "",
+      cardType: "credit",
       termsAccepted: false,
     },
   });
@@ -237,7 +238,7 @@ const MCS150 = () => {
         drivers: {
           ...prev.drivers,
           total: (usdotData.powerUnits || 0).toString(),
-          cdl: (usdotData.powerUnits || 0).toString(), // Default CDL drivers to power units
+          cdl: (usdotData.powerUnits || 0).toString(),
           interstate: "0",
           intrastate: "0",
         },
@@ -291,7 +292,7 @@ const MCS150 = () => {
     } else {
       try {
         if (filingId) {
-          await createTransaction(filingId, 149, formData.billing.cardType);
+          await createTransaction(filingId, 149, formData.cardType);
           toast({
             title: "Success",
             description: "Your MCS-150 form has been submitted successfully.",
