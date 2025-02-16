@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -30,19 +31,16 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const cacheManager = new CacheManager(supabaseUrl, supabaseKey);
 
-    // Log the API request
-    await cacheManager.logApiRequest({
-      usdotNumber: dotNumber,
-      requestType: 'carrier_data',
-      requestSource,
-      cacheHit: false
-    });
-
     // First check the cache
     const cachedData = await cacheManager.getCachedData(dotNumber);
     if (cachedData) {
-      // Update the request record to indicate cache hit
-      await cacheManager.updateRequestCacheStatus(dotNumber, true);
+      // Log the API request with cache hit
+      await cacheManager.logApiRequest({
+        usdotNumber: dotNumber,
+        requestType: 'carrier_data',
+        requestSource,
+        cacheHit: true
+      });
       
       console.log('DEBUG: Returning cached data for DOT:', dotNumber);
       return new Response(
@@ -54,6 +52,16 @@ serve(async (req) => {
     // If no cache hit, fetch fresh data
     console.log('DEBUG: Fetching fresh data for DOT:', dotNumber);
     const carrierData = await fetchCarrierData(dotNumber, fmcsaApiKey);
+    
+    // Log the API request before caching
+    await cacheManager.logApiRequest({
+      usdotNumber: dotNumber,
+      requestType: 'carrier_data',
+      requestSource,
+      cacheHit: false
+    });
+
+    // Update the cache with new data
     await cacheManager.updateCache(carrierData);
 
     return new Response(
