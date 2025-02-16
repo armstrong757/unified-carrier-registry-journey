@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
@@ -131,16 +130,8 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             <div className="border-t border-gray-200 mt-8 pt-4">
               <div className="flex items-center gap-2">
                 <Link
-                  to="/mcs-150"
-                  target="_blank"
-                  state={{ 
-                    usdotData: {
-                      usdotNumber: data.usdotNumber,
-                      legalName: data.legalName,
-                      telephone: data.telephone,
-                      physicalAddress: data.physicalAddress
-                    } 
-                  }}
+                  to="/mcs150"
+                  state={{ usdotData: data }}
                   className="text-accent hover:text-accent/80 hover:underline"
                 >
                   Update MCS-150

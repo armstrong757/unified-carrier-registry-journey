@@ -16,8 +16,12 @@ const MCS150Filing = () => {
   useEffect(() => {
     // First check if we have DOT data passed directly (e.g., from UCR form)
     if (location.state?.usdotData) {
+      // Store the data in session storage for persistence
+      sessionStorage.setItem('usdotData', JSON.stringify(location.state.usdotData));
+      // Navigate directly to the form
       navigate("/mcs150", {
-        state: { usdotData: location.state.usdotData }
+        state: { usdotData: location.state.usdotData },
+        replace: true // Use replace to prevent back button issues
       });
       return;
     }
@@ -46,7 +50,8 @@ const MCS150Filing = () => {
                   physicalAddress: formData.principalAddress?.address || ''
                 },
                 resumedFiling: filing
-              }
+              },
+              replace: true
             });
             toast({
               title: "Form Resumed",
