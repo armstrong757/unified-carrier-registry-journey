@@ -1,3 +1,4 @@
+
 import { DOTNumberInput } from "@/components/MCS150Form/DOTNumberInput";
 import { TableOfContents } from "@/components/MCS150Form/TableOfContents";
 import { ContentSections } from "@/components/MCS150Form/ContentSections";
@@ -6,13 +7,22 @@ import { useEffect } from "react";
 import { getFilingByResumeToken } from "@/utils/filingUtils";
 import { useToast } from "@/components/ui/use-toast";
 import { Filing, MCS150FormData } from "@/types/filing";
+
 const MCS150Filing = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   useEffect(() => {
+    // First check if we have DOT data passed directly (e.g., from UCR form)
+    if (location.state?.usdotData) {
+      navigate("/mcs150", {
+        state: { usdotData: location.state.usdotData }
+      });
+      return;
+    }
+
+    // Then check for resume token
     const searchParams = new URLSearchParams(location.search);
     const resumeToken = searchParams.get('resume');
     if (resumeToken) {
@@ -55,13 +65,16 @@ const MCS150Filing = () => {
       resumeFiling();
     }
   }, [location, navigate, toast]);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
-  return <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-[16px]">
+
+  return (
+    <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-[16px]">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8 mb-16">
           <h1 className="font-bold text-[#1A1F2C] mb-8 py-0 my-[30px] text-3xl">
@@ -74,6 +87,8 @@ const MCS150Filing = () => {
         <TableOfContents />
         <ContentSections onScrollToTop={scrollToTop} />
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default MCS150Filing;
