@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useBotProtection } from "@/hooks/use-bot-protection";
+import { USDOTData } from "@/types/filing";
 
 export const UCRDOTInput = () => {
   const [dotNumber, setDotNumber] = useState("");
@@ -68,16 +69,26 @@ export const UCRDOTInput = () => {
           title: "Welcome Back!",
           description: "We saved your progress. You can continue where you left off.",
         });
-        // Store the USDOT data in sessionStorage
-        const usdotData = existingFiling.form_data.usdotData || existingFiling.form_data;
-        sessionStorage.setItem('usdotData', JSON.stringify(usdotData));
-        navigate("/ucr", {
-          state: {
-            usdotData: usdotData,
-            resumedFiling: existingFiling
+        
+        // Safely extract USDOT data from form_data
+        let usdotData: USDOTData;
+        if (typeof existingFiling.form_data === 'object' && existingFiling.form_data !== null) {
+          // Check if usdotData exists in form_data
+          if ('usdotData' in existingFiling.form_data) {
+            usdotData = existingFiling.form_data.usdotData as USDOTData;
+          } else {
+            // If not, assume form_data itself contains the USDOT data
+            usdotData = existingFiling.form_data as USDOTData;
           }
-        });
-        return;
+          sessionStorage.setItem('usdotData', JSON.stringify(usdotData));
+          navigate("/ucr", {
+            state: {
+              usdotData,
+              resumedFiling: existingFiling
+            }
+          });
+          return;
+        }
       }
 
       const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
