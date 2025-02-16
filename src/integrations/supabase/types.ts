@@ -246,6 +246,27 @@ export type Database = {
         }
         Relationships: []
       }
+      api_request_monitoring: {
+        Row: {
+          cache_hit: boolean | null
+          filing_id: string | null
+          request_source: string | null
+          request_timestamp: string | null
+          request_type: string | null
+          requests_per_minute: number | null
+          response_time_ms: number | null
+          usdot_number: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_requests_filing_id_fkey"
+            columns: ["filing_id"]
+            isOneToOne: false
+            referencedRelation: "filings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       check_active_draft_filing: {
@@ -262,6 +283,9 @@ export type Database = {
         Returns: {
           usdot_number: string
           request_count: number
+          request_sources: string[]
+          first_request: string
+          last_request: string
         }[]
       }
       generate_resume_token: {
