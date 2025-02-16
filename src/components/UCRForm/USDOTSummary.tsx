@@ -131,9 +131,16 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             <div className="border-t border-gray-200 mt-8 pt-4">
               <div className="flex items-center gap-2">
                 <Link
-                  to="/mcs150"
+                  to="/mcs-150"
                   target="_blank"
-                  state={{ usdotData: data }}
+                  state={{ 
+                    usdotData: {
+                      usdotNumber: data.usdotNumber,
+                      legalName: data.legalName,
+                      telephone: data.telephone,
+                      physicalAddress: data.physicalAddress
+                    } 
+                  }}
                   className="text-accent hover:text-accent/80 hover:underline"
                 >
                   Update MCS-150
