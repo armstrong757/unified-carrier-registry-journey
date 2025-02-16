@@ -1,8 +1,7 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 interface USDOTData {
   usdotNumber: string;
@@ -33,9 +32,6 @@ interface USDOTSummaryProps {
 const USDOTSummary = ({ data }: USDOTSummaryProps) => {
   const location = useLocation();
   const isUCRForm = location.pathname === "/ucr";
-
-  // Create URL with query parameters for the necessary data
-  const mcs150Url = `/mcs150?dot=${data.usdotNumber}&name=${encodeURIComponent(data.legalName)}&phone=${encodeURIComponent(data.telephone || '')}&address=${encodeURIComponent(data.physicalAddress || '')}`;
 
   return (
     <Card className="bg-white/80 animate-fadeIn will-change-transform">
@@ -133,14 +129,13 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           {isUCRForm && (
             <div className="border-t border-gray-200 mt-8 pt-4">
               <div className="flex items-center gap-2">
-                <a
-                  href={mcs150Url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/mcs150"
+                  state={{ usdotData: data, from: 'ucr' }}
                   className="text-accent hover:text-accent/80 hover:underline"
                 >
                   Update MCS-150
-                </a>
+                </Link>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="h-4 w-4 text-gray-500 cursor-help" />
