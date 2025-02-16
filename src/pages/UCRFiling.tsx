@@ -1,4 +1,3 @@
-
 import { UCRDOTInput } from "@/components/UCRForm/UCRDOTInput";
 import { UCRTableOfContents } from "@/components/UCRForm/UCRTableOfContents";
 import { UCRContentSections } from "@/components/UCRForm/UCRContentSections";
@@ -7,43 +6,39 @@ import { useEffect } from "react";
 import { getFilingByResumeToken } from "@/utils/filingUtils";
 import { useToast } from "@/components/ui/use-toast";
 import { Filing, UCRFormData } from "@/types/filing";
-
 const UCRFiling = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const resumeToken = searchParams.get('resume');
-    
     if (resumeToken) {
       const resumeFiling = async () => {
         try {
           const filing = await getFilingByResumeToken(resumeToken);
           if (filing) {
             const formData = filing.form_data as UCRFormData;
-            
             sessionStorage.setItem('usdotData', JSON.stringify({
               usdotNumber: filing.usdot_number,
               legalName: formData.representative || '',
-              telephone: formData.phone || '',
+              telephone: formData.phone || ''
             }));
-            
             navigate("/ucr", {
               state: {
                 usdotData: {
                   usdotNumber: filing.usdot_number,
                   legalName: formData.representative || '',
-                  telephone: formData.phone || '',
+                  telephone: formData.phone || ''
                 },
                 resumedFiling: filing
               }
             });
-            
             toast({
               title: "Form Resumed",
-              description: "Your previous progress has been restored.",
+              description: "Your previous progress has been restored."
             });
           }
         } catch (error) {
@@ -51,39 +46,30 @@ const UCRFiling = () => {
           toast({
             title: "Error",
             description: "This resume link is no longer valid. Please start a new filing.",
-            variant: "destructive",
+            variant: "destructive"
           });
         }
       };
-      
       resumeFiling();
     }
   }, [location, navigate, toast]);
-
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
-
-  return (
-    <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-[16px]">
+  return <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-[16px]">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-8 mb-16">
           <h1 className="font-bold text-[#1A1F2C] mb-8 text-3xl my-[30px]">UCR Registration</h1>
-          <p className="text-gray-600 text-sm max-w-2xl mx-auto">
-            Your progress is automatically saved as you complete the form. If you need to step away, 
-            we'll send you a link to continue where you left off.
-          </p>
+          
           <UCRDOTInput />
         </div>
 
         <UCRTableOfContents />
         <UCRContentSections onScrollToTop={scrollToTop} />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default UCRFiling;
