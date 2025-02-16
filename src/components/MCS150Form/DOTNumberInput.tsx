@@ -26,14 +26,19 @@ export const DOTNumberInput = () => {
     setIsLoading(true);
     try {
       // Check for existing draft MCS-150 filing
-      const { data: existingFiling } = await supabase
+      const { data: existingFiling, error: filingError } = await supabase
         .from('filings')
         .select('*')
         .eq('usdot_number', dotNumber.trim())
         .eq('filing_type', 'mcs150')
         .eq('status', 'draft')
         .gt('resume_token_expires_at', new Date().toISOString())
-        .single();
+        .maybeSingle();
+
+      if (filingError) {
+        console.error('Error checking for existing filing:', filingError);
+        throw new Error('Failed to check for existing filing');
+      }
 
       if (existingFiling) {
         toast({

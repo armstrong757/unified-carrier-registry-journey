@@ -24,7 +24,7 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
         }
       ])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -46,7 +46,7 @@ export const updateFilingData = async (filingId: string, formData: any, currentS
       })
       .eq('id', filingId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -63,9 +63,12 @@ export const getFilingByResumeToken = async (token: string) => {
       .select()
       .eq('resume_token', token)
       .gt('resume_token_expires_at', new Date().toISOString())
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) {
+      throw new Error('No valid filing found for this resume token');
+    }
     return data;
   } catch (error) {
     console.error('Error retrieving filing by resume token:', error);
@@ -86,7 +89,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         }
       ])
       .select()
-      .single();
+      .maybeSingle();
 
     if (transactionError) throw transactionError;
 
