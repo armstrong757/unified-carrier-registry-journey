@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import FormProgress from "@/components/UCRForm/FormProgress";
@@ -68,9 +67,10 @@ const UCR = () => {
       const initializeFiling = async () => {
         try {
           if (resumedFiling) {
-            // If resuming, use the existing filing
+            // If resuming, use the existing filing and set current step
             setFilingId(resumedFiling.id);
             setFormData(resumedFiling.form_data);
+            setCurrentStep(resumedFiling.last_step_completed || 1);
           } else {
             // Create new filing
             const filing = await createFiling(stateData.usdotNumber, 'ucr', formData);
@@ -126,7 +126,7 @@ const UCR = () => {
     if (currentStep < totalSteps) {
       try {
         if (filingId) {
-          await updateFilingData(filingId, formData);
+          await updateFilingData(filingId, formData, currentStep + 1);
         }
         setCurrentStep(currentStep + 1);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -159,10 +159,17 @@ const UCR = () => {
     }
   };
 
-  const handleBack = () => {
+  const handleBack = async () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      try {
+        if (filingId) {
+          await updateFilingData(filingId, formData, currentStep - 1);
+        }
+        setCurrentStep(currentStep - 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) {
+        console.error('Error updating step:', error);
+      }
     }
   };
 

@@ -18,8 +18,9 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
           filing_type: filingType,
           form_data: initialFormData,
           status: 'draft',
-          email: initialFormData.email, // Store email in dedicated column
-          resume_token: tokenData // Add resume token
+          email: initialFormData.email,
+          resume_token: tokenData,
+          last_step_completed: 1
         }
       ])
       .select()
@@ -33,13 +34,14 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
   }
 };
 
-export const updateFilingData = async (filingId: string, formData: any) => {
+export const updateFilingData = async (filingId: string, formData: any, currentStep: number) => {
   try {
     const { data, error } = await supabase
       .from('filings')
       .update({
         form_data: formData,
-        email: formData.email, // Update email in dedicated column
+        email: formData.email,
+        last_step_completed: currentStep,
         updated_at: new Date().toISOString()
       })
       .eq('id', filingId)

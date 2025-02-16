@@ -18,6 +18,8 @@ export type Database = {
           filing_type: Database["public"]["Enums"]["filing_type"]
           form_data: Json
           id: string
+          last_step_completed: number | null
+          last_step_timestamp: string | null
           resume_token: string | null
           resume_token_expires_at: string | null
           status: string
@@ -32,6 +34,8 @@ export type Database = {
           filing_type: Database["public"]["Enums"]["filing_type"]
           form_data?: Json
           id?: string
+          last_step_completed?: number | null
+          last_step_timestamp?: string | null
           resume_token?: string | null
           resume_token_expires_at?: string | null
           status?: string
@@ -46,6 +50,8 @@ export type Database = {
           filing_type?: Database["public"]["Enums"]["filing_type"]
           form_data?: Json
           id?: string
+          last_step_completed?: number | null
+          last_step_timestamp?: string | null
           resume_token?: string | null
           resume_token_expires_at?: string | null
           status?: string
