@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
@@ -12,6 +13,7 @@ interface USDOTData {
   physicalAddress: string;
   telephone: string;
   powerUnits: number;
+  drivers: number;
   busCount: number;
   limoCount: number;
   minibusCount: number;
@@ -21,7 +23,8 @@ interface USDOTData {
   outOfService: boolean;
   outOfServiceDate: string | null;
   mcNumber: string;
-  mcs150LastUpdate: string;
+  mcs150FormDate: string | null;
+  mileageYear: string | null;
   basicsData: Record<string, any>;
 }
 
@@ -32,6 +35,11 @@ interface USDOTSummaryProps {
 const USDOTSummary = ({ data }: USDOTSummaryProps) => {
   const location = useLocation();
   const isUCRForm = location.pathname === "/ucr";
+
+  // Helper function to format large numbers with commas
+  const formatNumber = (num: number) => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
 
   return (
     <Card className="bg-white/80 animate-fadeIn will-change-transform">
@@ -72,6 +80,10 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           <div>
             <span className="font-medium">Power Units: </span>
             {typeof data.powerUnits === 'number' ? data.powerUnits : 'Not Available'}
+          </div>
+          <div>
+            <span className="font-medium">Drivers: </span>
+            {typeof data.drivers === 'number' ? data.drivers : 'Not Available'}
           </div>
           {data.busCount > 0 && (
             <div>
@@ -123,8 +135,16 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           )}
           <div>
             <span className="font-medium">MCS-150 Last Update: </span>
-            {data.mcs150LastUpdate || 'Not Available'}
+            {data.mcs150FormDate || 'Not Available'}
           </div>
+          {data.mileageYear && (
+            <div>
+              <span className="font-medium">Mileage (Year): </span>
+              {`${formatNumber(parseInt(data.mileageYear.split('(')[0].trim()))} (${
+                data.mileageYear.match(/\((\d{4})\)/)?.[1] || 'N/A'
+              })`}
+            </div>
+          )}
 
           {isUCRForm && (
             <div className="border-t border-gray-200 mt-8 pt-4">
