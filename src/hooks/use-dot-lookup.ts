@@ -46,6 +46,8 @@ function transformResponse(data: any): USDOTData {
     riskScore: data.risk_score || data.riskScore || 'Unknown',
     outOfServiceDate: data.out_of_service_date || data.outOfServiceDate || null,
     mcs150FormDate: data.mcs150_last_update || data.mcs150FormDate || null,
+    mcs150Year: Number(data.mcs150_year || data.mcs150Year) || 0,
+    mcs150Mileage: Number(data.mcs150_mileage || data.mcs150Mileage) || 0,
     carrierOperation: data.carrier_operation || data.carrierOperation || '',
     cargoCarried: Array.isArray(data.cargo_carried || data.cargoCarried) 
       ? data.cargo_carried || data.cargoCarried 
