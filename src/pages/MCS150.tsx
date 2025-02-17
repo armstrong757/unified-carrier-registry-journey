@@ -11,7 +11,7 @@ import USDOTSummary from "@/components/UCRForm/USDOTSummary";
 import ProgressSavedIndicator from "@/components/UCRForm/ProgressSavedIndicator";
 import { useMCS150Form } from "@/components/MCS150Form/hooks/useMCS150Form";
 import { useStepNavigation } from "@/components/MCS150Form/hooks/useStepNavigation";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 const MCS150 = () => {
@@ -27,6 +27,7 @@ const MCS150 = () => {
   } = useMCS150Form();
 
   const location = useLocation();
+  const navigate = useNavigate();
   const cameFromUCR = location.state?.from === 'ucr';
 
   const { handleNext, handleBack } = useStepNavigation(
@@ -37,6 +38,14 @@ const MCS150 = () => {
     formData,
     toast
   );
+
+  const handleBackToUCR = () => {
+    if (usdotData) {
+      navigate("/ucr", {
+        state: { usdotData }
+      });
+    }
+  };
 
   const renderStep = () => {
     switch (currentStep) {
@@ -65,13 +74,13 @@ const MCS150 = () => {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       {cameFromUCR && (
         <div className="max-w-7xl mx-auto mb-4">
-          <Link
-            to="/ucr"
+          <button
+            onClick={handleBackToUCR}
             className="inline-flex items-center text-sm text-accent hover:text-accent/80 hover:underline"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
             Return to UCR Form
-          </Link>
+          </button>
         </div>
       )}
       <div className="max-w-7xl mx-auto mcs-form-container mb-[250px]">
