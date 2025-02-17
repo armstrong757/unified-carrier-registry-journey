@@ -10,7 +10,11 @@ export const useMCS150Form = () => {
   const totalSteps = 6;
   
   const { formData, setFormData } = useFormState();
-  const { usdotData, filingId, isInitialized } = useFilingInitialization(formData);
+  const { usdotData, filingId, isInitialized } = useFilingInitialization({
+    formData,
+    setFormData,
+    setCurrentStep
+  });
 
   return {
     currentStep,

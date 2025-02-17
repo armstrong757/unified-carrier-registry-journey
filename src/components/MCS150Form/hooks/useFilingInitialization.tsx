@@ -4,7 +4,17 @@ import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createFiling } from "@/utils/filingUtils";
 
-export const useFilingInitialization = (formData: any) => {
+interface UseFilingInitializationProps {
+  formData: any;
+  setFormData: (data: any) => void;
+  setCurrentStep: (step: number) => void;
+}
+
+export const useFilingInitialization = ({
+  formData,
+  setFormData,
+  setCurrentStep
+}: UseFilingInitializationProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -108,7 +118,7 @@ export const useFilingInitialization = (formData: any) => {
       });
       navigate('/mcs-150-filing');
     }
-  }, [navigate, toast, location, isInitialized]);
+  }, [navigate, toast, location, isInitialized, formData, setFormData, setCurrentStep]);
 
   return { usdotData, filingId, isInitialized };
 };
