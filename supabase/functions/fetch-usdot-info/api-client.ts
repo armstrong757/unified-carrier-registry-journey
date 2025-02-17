@@ -7,13 +7,20 @@ export async function getCarrierOKProfile(dotNumber: string): Promise<USDOTRespo
     throw new Error('CarrierOK API key not configured');
   }
 
+  // Ensure dot number is properly formatted
+  const formattedDot = dotNumber.replace(/\D/g, '');
   const baseUrl = 'https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2';
-  const url = `${baseUrl}/profile-lite?dot=${encodeURIComponent(dotNumber)}`;
+  const url = `${baseUrl}/profile-lite?dot=${encodeURIComponent(formattedDot)}`;
 
   console.log('Making request to CarrierOK API:', {
     url,
-    dotNumber,
-    hasApiKey: !!apiKey
+    dotNumber: formattedDot,
+    hasApiKey: !!apiKey,
+    headers: {
+      'Accept': 'application/json',
+      'X-Api-Key': '[REDACTED]',
+      'Content-Type': 'application/json'
+    }
   });
 
   try {
@@ -30,13 +37,16 @@ export async function getCarrierOKProfile(dotNumber: string): Promise<USDOTRespo
     console.log('Raw API Response:', responseText);
 
     if (!response.ok) {
-      console.error('CarrierOK API error:', {
+      const errorDetails = {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
+        url: url.replace(apiKey, '[REDACTED]'),
+        method: 'GET',
         body: responseText
-      });
-      throw new Error(`CarrierOK API error: ${response.status} ${response.statusText}`);
+      };
+      console.error('CarrierOK API error details:', errorDetails);
+      throw new Error(`CarrierOK API error: ${response.status} ${response.statusText} - ${responseText}`);
     }
 
     let data;
@@ -56,7 +66,7 @@ export async function getCarrierOKProfile(dotNumber: string): Promise<USDOTRespo
     const item = data.items[0];
     
     return {
-      usdot_number: item.dot_number || dotNumber,
+      usdot_number: item.dot_number || formattedDot,
       legal_name: item.legal_name || '',
       dba_name: item.dba_name || '',
       operating_status: item.usdot_status || 'NOT AUTHORIZED',
