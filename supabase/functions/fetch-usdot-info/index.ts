@@ -61,7 +61,8 @@ serve(async (req) => {
       throw new Error('API key not configured');
     }
 
-    const apiUrl = `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${encodeURIComponent(cleanDotNumber)}`;
+    // Changed 'dot' to 'dot_number' in the URL parameter
+    const apiUrl = `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot_number=${encodeURIComponent(cleanDotNumber)}`;
     console.log('Making request to CarrierOK API...');
 
     const response = await fetch(apiUrl, {
