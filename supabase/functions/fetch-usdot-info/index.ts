@@ -48,6 +48,7 @@ serve(async (req) => {
     }
 
     const carrier = data.items[0]
+    console.log('Raw carrier data:', carrier); // Added to debug the MCS-150 date issue
 
     const transformedData = {
       usdot_number: carrier.dot_number,
@@ -63,10 +64,12 @@ serve(async (req) => {
       insurance_bond: carrier.insurance_bond_on_file,
       insurance_cargo: carrier.insurance_cargo_on_file,
       risk_score: carrier.risk_score,
-      mcs150_form_date: carrier.mcs150_form_date, // Using the correct field for the full date
+      mcs150_form_date: carrier.mcs150_form_date || carrier.mcs150_last_update || carrier.mcs150_date || null,
       mcs150_year: carrier.mcs150_year,
       mcs150_mileage: carrier.mcs150_mileage,
     }
+
+    console.log('Transformed data:', transformedData); // Added to verify the transformation
 
     return new Response(
       JSON.stringify(transformedData),
