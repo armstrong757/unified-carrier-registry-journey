@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
@@ -31,21 +30,9 @@ function transformResponse(data: any): USDOTData {
   console.log('Transforming API response:', data);
 
   // Format MCS-150 date properly
-  const formatMCS150Date = (dateStr: string) => {
-    if (!dateStr) return null;
-    
-    // Handle just year format (e.g. "2005")
-    if (/^\d{4}$/.test(dateStr)) {
-      return `06/28/${dateStr}`;  // Default to June 28th of the year
-    }
-    
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return dateStr; // Return as-is if invalid date
-    return date.toLocaleDateString('en-US', { 
-      month: '2-digit', 
-      day: '2-digit', 
-      year: 'numeric' 
-    });
+  const formatMCS150Date = (year: number | string | null) => {
+    if (!year) return null;
+    return `06/28/${year}`; // Using June 28th as per business requirements
   };
   
   // Handle both the API response format and the stored format
@@ -53,7 +40,7 @@ function transformResponse(data: any): USDOTData {
     usdotNumber: data.dot_number || data.usdot_number || data.usdotNumber || '',
     legalName: data.legal_name || data.legalName || 'Unknown',
     dbaName: data.dba_name || data.dbaName || '',
-    operatingStatus: data.operating_status === 'Active' ? 'NOT AUTHORIZED' : data.operating_status || 'NOT AUTHORIZED',
+    operatingStatus: 'NOT AUTHORIZED', // As per business requirement, this should always be NOT AUTHORIZED
     entityType: data.entity_type_desc || data.entity_type || data.entityType || 'CARRIER',
     physicalAddress: data.physical_address || data.physicalAddress || '',
     telephone: data.telephone_number || data.telephone || data.phone || '',
@@ -64,9 +51,9 @@ function transformResponse(data: any): USDOTData {
     insuranceCargo: Number(data.insurance_cargo_on_file || data.insurance_cargo || data.insuranceCargo) || 0,
     riskScore: data.risk_score || data.riskScore || 'Unknown',
     outOfServiceDate: data.out_of_service_date || data.outOfServiceDate || null,
-    mcs150FormDate: formatMCS150Date(data.mcs150_last_update) || null,
-    mcs150Year: Number(data.mcs150_last_update || data.mcs150_year || data.mcs150Year) || 0,
-    mcs150Mileage: Number(20000) || 0, // Hardcoded for testing
+    mcs150FormDate: formatMCS150Date(data.mcs150_year),
+    mcs150Year: Number(data.mcs150_year) || 0,
+    mcs150Mileage: Number(data.mcs150_mileage) || 0,
     carrierOperation: data.carrier_operation || data.carrierOperation || '',
     cargoCarried: Array.isArray(data.cargo_carried || data.cargoCarried) 
       ? data.cargo_carried || data.cargoCarried 
