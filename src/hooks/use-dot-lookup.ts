@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
@@ -107,9 +106,9 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
           if (existingFiling) {
             console.log('Found existing filing:', existingFiling);
-            let usdotData: USDOTData;
-            
             try {
+              let usdotData: USDOTData;
+              
               if (existingFiling.form_data && typeof existingFiling.form_data === 'object') {
                 if ('usdotData' in existingFiling.form_data) {
                   usdotData = transformResponse(existingFiling.form_data.usdotData);
@@ -129,43 +128,36 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
               return;
             } catch (error) {
               console.error('Error processing existing filing:', error);
-              // Continue with new API request if existing filing data is invalid
             }
           }
 
-          if (!pendingRequests[trimmedDOT]) {
-            console.log('Making new API request for DOT:', trimmedDOT);
-            pendingRequests[trimmedDOT] = supabase.functions
-              .invoke('fetch-usdot-info', {
-                body: { 
-                  dotNumber: trimmedDOT, 
-                  requestSource: `${filingType}_form`,
-                  testMode: true // Temporarily set to true for testing
-                }
-              })
-              .then(({ data, error }) => {
-                if (error) {
-                  console.error('Edge function error:', error);
-                  throw new Error(error.message || 'Failed to fetch DOT information');
-                }
-                if (!data) {
-                  throw new Error('No data received from DOT lookup');
-                }
-                console.log('Received API response:', data);
-                const transformedData = transformResponse(data);
-                if (!isUSDOTData(transformedData)) {
-                  throw new Error('Invalid response format from USDOT lookup');
-                }
-                responseCache[trimmedDOT] = { data: transformedData, timestamp: Date.now() };
-                return transformedData;
-              })
-              .finally(() => {
-                delete pendingRequests[trimmedDOT];
-              });
+          console.log('Making new API request for DOT:', trimmedDOT);
+          const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
+            body: { 
+              dotNumber: trimmedDOT, 
+              requestSource: `${filingType}_form`,
+              testMode: false // Now using live mode
+            }
+          });
+
+          if (error) {
+            console.error('Edge function error:', error);
+            throw new Error(error.message || 'Failed to fetch DOT information');
           }
 
-          const data = await pendingRequests[trimmedDOT];
-          resolve({ usdotData: data });
+          if (!data) {
+            throw new Error('No data received from DOT lookup');
+          }
+
+          console.log('Received API response:', data);
+          const transformedData = transformResponse(data);
+          
+          if (!isUSDOTData(transformedData)) {
+            throw new Error('Invalid response format from USDOT lookup');
+          }
+
+          responseCache[trimmedDOT] = { data: transformedData, timestamp: now };
+          resolve({ usdotData: transformedData });
 
         } catch (error) {
           console.error('Error in DOT lookup:', error);
