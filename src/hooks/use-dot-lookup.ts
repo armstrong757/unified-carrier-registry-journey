@@ -32,11 +32,11 @@ function transformResponse(data: any): USDOTData {
   
   // Handle both the API response format and the stored format
   const transformed: USDOTData = {
-    usdotNumber: data.dot_number || data.usdot_number || data.usdotNumber || '',
+    usdotNumber: data.usdot_number || data.dot_number || data.usdotNumber || '',
     legalName: data.legal_name || data.legalName || 'Unknown',
     dbaName: data.dba_name || data.dbaName || '',
     operatingStatus: 'NOT AUTHORIZED', // As per business requirement, this should always be NOT AUTHORIZED
-    entityType: data.entity_type_desc || data.entity_type || data.entityType || 'CARRIER',
+    entityType: data.entity_type || data.entity_type_desc || data.entityType || 'CARRIER',
     physicalAddress: data.physical_address || data.physicalAddress || '',
     telephone: data.telephone_number || data.telephone || data.phone || '',
     powerUnits: Number(data.total_power_units || data.power_units || data.powerUnits) || 0,
@@ -46,8 +46,8 @@ function transformResponse(data: any): USDOTData {
     insuranceCargo: Number(data.insurance_cargo_on_file || data.insurance_cargo || data.insuranceCargo) || 0,
     riskScore: data.risk_score || data.riskScore || 'Unknown',
     outOfServiceDate: data.out_of_service_date || data.outOfServiceDate || null,
-    mcs150FormDate: data.mcs150_last_update || data.mcs150_form_date || data.mcs150FormDate || null,
-    mcs150Year: Number(data.mcs150_year || data.mcs150_last_update) || 0,
+    mcs150FormDate: data.mcs150_form_date || data.mcs150_last_update || data.mcs150FormDate || null,
+    mcs150Year: Number(data.mcs150_year || data.mcs150_last_update?.split('-')[0]) || 0,
     mcs150Mileage: Number(data.mcs150_mileage || data.mcs150_miles || data.annual_miles) || 0,
     carrierOperation: data.carrier_operation || data.carrierOperation || '',
     cargoCarried: Array.isArray(data.cargo_carried || data.cargoCarried) 
@@ -137,9 +137,8 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           console.log('Making new API request for DOT:', trimmedDOT);
           const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
             body: { 
-              dotNumber: trimmedDOT, 
-              requestSource: `${filingType}_form`,
-              testMode: false // Now using live mode
+              dotNumber: trimmedDOT.toString(), // Ensure dotNumber is a string
+              requestSource: `${filingType}_form`
             }
           });
 
