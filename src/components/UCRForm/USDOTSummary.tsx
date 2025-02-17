@@ -45,8 +45,13 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
 
   // Format the mileage year string
   const getMileageYear = () => {
-    if (data.mcs150Mileage && data.mcs150Year) {
-      return `${formatNumber(data.mcs150Mileage)} (${data.mcs150Year})`;
+    // If we have mileage, show it with the year from mcs150FormDate
+    if (data.mcs150Mileage && data.mcs150FormDate) {
+      return `${formatNumber(data.mcs150Mileage)} (${data.mcs150FormDate})`;
+    }
+    // If we only have the year, show just that
+    if (data.mcs150FormDate) {
+      return `0 (${data.mcs150FormDate})`;
     }
     return null;
   };
@@ -147,12 +152,10 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             <span className="font-medium">MCS-150 Last Update: </span>
             {data.mcs150FormDate || 'Not Available'}
           </div>
-          {getMileageYear() && (
-            <div>
-              <span className="font-medium">Mileage (Year): </span>
-              {getMileageYear()}
-            </div>
-          )}
+          <div>
+            <span className="font-medium">Mileage (Year): </span>
+            {getMileageYear() || 'Not Available'}
+          </div>
 
           {isUCRForm && (
             <div className="border-t border-gray-200 mt-8 pt-4">
