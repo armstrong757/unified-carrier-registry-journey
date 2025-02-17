@@ -109,23 +109,28 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             console.log('Found existing filing:', existingFiling);
             let usdotData: USDOTData;
             
-            if (existingFiling.form_data && typeof existingFiling.form_data === 'object') {
-              if ('usdotData' in existingFiling.form_data) {
-                usdotData = transformResponse(existingFiling.form_data.usdotData);
+            try {
+              if (existingFiling.form_data && typeof existingFiling.form_data === 'object') {
+                if ('usdotData' in existingFiling.form_data) {
+                  usdotData = transformResponse(existingFiling.form_data.usdotData);
+                } else {
+                  usdotData = transformResponse(existingFiling.form_data);
+                }
               } else {
-                usdotData = transformResponse(existingFiling.form_data);
+                throw new Error('Invalid form data structure in filing');
               }
-            } else {
-              throw new Error('Invalid form data structure in filing');
-            }
 
-            if (!isUSDOTData(usdotData)) {
-              throw new Error('Invalid USDOT data format in filing');
-            }
+              if (!isUSDOTData(usdotData)) {
+                throw new Error('Invalid USDOT data format in filing');
+              }
 
-            responseCache[trimmedDOT] = { data: usdotData, timestamp: now };
-            resolve({ usdotData, resumedFiling: existingFiling });
-            return;
+              responseCache[trimmedDOT] = { data: usdotData, timestamp: now };
+              resolve({ usdotData, resumedFiling: existingFiling });
+              return;
+            } catch (error) {
+              console.error('Error processing existing filing:', error);
+              // Continue with new API request if existing filing data is invalid
+            }
           }
 
           if (!pendingRequests[trimmedDOT]) {
@@ -135,11 +140,17 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
                 body: { 
                   dotNumber: trimmedDOT, 
                   requestSource: `${filingType}_form`,
-                  testMode: false
+                  testMode: true // Temporarily set to true for testing
                 }
               })
               .then(({ data, error }) => {
-                if (error) throw error;
+                if (error) {
+                  console.error('Edge function error:', error);
+                  throw new Error(error.message || 'Failed to fetch DOT information');
+                }
+                if (!data) {
+                  throw new Error('No data received from DOT lookup');
+                }
                 console.log('Received API response:', data);
                 const transformedData = transformResponse(data);
                 if (!isUSDOTData(transformedData)) {
