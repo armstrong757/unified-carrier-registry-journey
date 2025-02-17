@@ -1,13 +1,10 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
-
-interface RequestData {
-  dotNumber: string;
-  requestSource?: string;
-}
-
-const CARRIER_OK_API_KEY = Deno.env.get('CARRIER_OK_API_KEY')
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { validateDOTNumber } from './validator.ts'
+import { getCarrierOKProfile } from './api-client.ts'
+import { getCachedResponse, cacheResponse } from './cache-manager.ts'
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -15,77 +12,98 @@ serve(async (req) => {
   }
 
   try {
-    const { dotNumber, requestSource } = await req.json() as RequestData
+    const { dotNumber, requestSource = 'unknown' } = await req.json()
 
     if (!dotNumber) {
       throw new Error('DOT number is required')
     }
 
-    console.log(`Making request to CarrierOK API for DOT number: ${dotNumber}`);
+    const cleanDotNumber = dotNumber.toString().trim()
+    
+    if (!validateDOTNumber(cleanDotNumber)) {
+      throw new Error('Invalid DOT number format')
+    }
 
-    const response = await fetch(
-      `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot_number=${dotNumber}`,
-      {
-        method: 'GET',
-        headers: {
-          'X-Api-Key': CARRIER_OK_API_KEY || '',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }
+    console.log(`Making request to CarrierOK API for DOT number: ${cleanDotNumber}`)
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('CarrierOK API Error Response:', errorData);
-      throw new Error(`CarrierOK API request failed: ${response.status} ${response.statusText} - ${errorData}`);
-    }
+    const startTime = Date.now()
 
-    const data = await response.json()
-    
-    if (!data.items || !data.items[0]) {
-      throw new Error('No data found for the provided DOT number')
-    }
+    // Check cache
+    const cachedData = await getCachedResponse(supabase, cleanDotNumber)
+    if (cachedData) {
+      console.log('Using cached USDOT data:', cachedData)
+      
+      await supabase.from('api_requests').insert({
+        usdot_number: cleanDotNumber,
+        request_type: 'carrier_profile',
+        request_source: requestSource,
+        cache_hit: true,
+        response_status: 200,
+        response_time_ms: Date.now() - startTime
+      })
 
-    const carrier = data.items[0]
-
-    const transformedData = {
-      usdot_number: carrier.dot_number,
-      legal_name: carrier.legal_name,
-      dba_name: carrier.dba_name || '',
-      operating_status: carrier.usdot_status,
-      entity_type: carrier.entity_type_desc,
-      physical_address: carrier.physical_address,
-      telephone: carrier.telephone_number,
-      power_units: carrier.total_power_units,
-      drivers: carrier.total_drivers,
-      insurance_bipd: carrier.insurance_bipd_on_file,
-      insurance_bond: carrier.insurance_bond_on_file,
-      insurance_cargo: carrier.insurance_cargo_on_file,
-      risk_score: carrier.risk_score,
-      mcs150_form_date: carrier.mcs150_last_update || carrier.mcs150_year, // Use mcs150_last_update as primary source
-      mcs150_year: carrier.mcs150_year,
-      mcs150_mileage: carrier.mcs150_mileage,
-    }
-
-    return new Response(
-      JSON.stringify(transformedData),
-      {
+      return new Response(JSON.stringify(cachedData), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
-      },
-    )
+      })
+    }
+
+    // Fetch from API
+    const apiResponse = await getCarrierOKProfile(cleanDotNumber)
+    console.log('Received API response:', apiResponse)
+
+    // Cache the response
+    await cacheResponse(supabase, cleanDotNumber, apiResponse)
+    
+    // Transform for client response
+    const clientResponse = {
+      usdot_number: apiResponse.items[0].dot_number,
+      legal_name: apiResponse.items[0].legal_name,
+      dba_name: apiResponse.items[0].dba_name || '',
+      operating_status: apiResponse.items[0].usdot_status,
+      entity_type: apiResponse.items[0].entity_type_desc,
+      physical_address: apiResponse.items[0].physical_address,
+      telephone: apiResponse.items[0].telephone_number?.toString(),
+      power_units: apiResponse.items[0].total_power_units,
+      drivers: apiResponse.items[0].total_drivers,
+      insurance_bipd: apiResponse.items[0].insurance_bipd_on_file,
+      insurance_bond: apiResponse.items[0].insurance_bond_on_file,
+      insurance_cargo: apiResponse.items[0].insurance_cargo_on_file,
+      risk_score: apiResponse.items[0].risk_score,
+      mcs150_form_date: apiResponse.items[0].mcs150_last_update,
+      mcs150_year: apiResponse.items[0].mcs150_year,
+      mcs150_mileage: apiResponse.items[0].mcs150_mileage
+    }
+
+    // Log the API request
+    await supabase.from('api_requests').insert({
+      usdot_number: cleanDotNumber,
+      request_type: 'carrier_profile',
+      request_source: requestSource,
+      cache_hit: false,
+      response_status: 200,
+      response_time_ms: Date.now() - startTime
+    })
+
+    return new Response(JSON.stringify(clientResponse), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    })
 
   } catch (error) {
-    console.error('Edge Function Error:', error.message);
+    console.error('Error in fetch-usdot-info:', error)
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        details: error instanceof Error ? error.stack : undefined
+      JSON.stringify({
+        error: error.message
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
+        status: 500,
       },
     )
   }
