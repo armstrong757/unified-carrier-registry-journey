@@ -1,79 +1,96 @@
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
-import { USDOTResponse } from './types.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { USDOTData } from './types.ts';
 
-export const getCachedResponse = async (supabase: any, dotNumber: string): Promise<USDOTResponse | null> => {
-  try {
-    const { data, error } = await supabase
+interface ApiRequestLog {
+  usdotNumber: string;
+  requestType: string;
+  requestSource: string;
+  cacheHit: boolean;
+  responseTime?: number;
+  filingId?: string;
+}
+
+export class CacheManager {
+  private supabase;
+  private cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours
+
+  constructor(supabaseUrl: string, supabaseKey: string) {
+    this.supabase = createClient(supabaseUrl, supabaseKey);
+  }
+
+  async getCachedData(dotNumber: string): Promise<USDOTData | null> {
+    const { data: existingData, error } = await this.supabase
       .from('usdot_info')
       .select('*')
-      .eq('usdot_number', dotNumber.toString())
+      .eq('usdot_number', dotNumber)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error('DEBUG: Cache fetch error:', error);
+      return null;
+    }
+
+    if (!existingData) return null;
+
+    const lastUpdate = new Date(existingData.updated_at || '');
+    const timeSinceUpdate = Date.now() - lastUpdate.getTime();
     
-    if (!data) return null;
-
-    // Transform database record back to API response format
-    return {
-      usdot_number: data.usdot_number,
-      legal_name: data.legal_name,
-      dba_name: data.dba_name,
-      operating_status: data.operating_status,
-      entity_type: data.entity_type,
-      physical_address: data.physical_address,
-      telephone_number: data.telephone,
-      total_power_units: data.power_units?.toString(),
-      total_drivers: data.drivers?.toString(),
-      mcs150_year: data.mileage_year,
-      mcs150_mileage: "0", // Default as we don't store this
-      entity_type_desc: data.entity_type,
-      basics_data: data.basics_data || {}
-    };
-  } catch (error) {
-    console.error('Error fetching cached response:', error);
-    return null;
+    return timeSinceUpdate > this.cacheExpiry ? null : existingData as USDOTData;
   }
-};
 
-export const cacheResponse = async (supabase: any, dotNumber: string, response: USDOTResponse) => {
-  try {
-    console.log('Caching response for DOT:', dotNumber, response);
-
-    const usdotRecord = {
-      usdot_number: dotNumber.toString(),
-      legal_name: response.legal_name,
-      dba_name: response.dba_name,
-      operating_status: response.operating_status || response.usdot_status,
-      entity_type: response.entity_type_desc,
-      physical_address: response.physical_address,
-      telephone: response.telephone_number?.toString(),
-      power_units: parseInt(response.total_power_units || '0'),
-      drivers: parseInt(response.total_drivers || '0'),
-      mcs150_last_update: null, // Set if available in response
-      basics_data: response.basics_data || {},
-      out_of_service: false, // Set if available in response
-      out_of_service_date: null, // Set if available in response
-      updated_at: new Date().toISOString()
-    };
-
-    console.log('Upserting USDOT record:', usdotRecord);
-
-    const { error } = await supabase
+  async updateCache(data: USDOTData): Promise<void> {
+    const { error } = await this.supabase
       .from('usdot_info')
-      .upsert(usdotRecord, {
-        onConflict: 'usdot_number',
-        returning: 'minimal'
+      .upsert({
+        usdot_number: data.usdotNumber,
+        operating_status: data.operatingStatus,
+        entity_type: data.entityType,
+        legal_name: data.legalName,
+        dba_name: data.dbaName,
+        physical_address: data.physicalAddress,
+        telephone: data.telephone,
+        power_units: data.powerUnits,
+        bus_count: data.busCount,
+        limo_count: data.limoCount,
+        minibus_count: data.minibusCount,
+        motorcoach_count: data.motorcoachCount,
+        van_count: data.vanCount,
+        complaint_count: data.complaintCount,
+        out_of_service: data.outOfService,
+        out_of_service_date: data.outOfServiceDate,
+        mc_number: data.mcNumber,
+        mcs150_last_update: data.mcs150LastUpdate,
+        basics_data: data.basicsData,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'usdot_number'
       });
 
     if (error) {
-      console.error('Error caching response:', error);
-      throw error;
+      console.error('DEBUG: Cache update error:', error);
     }
-
-    console.log('Successfully cached DOT information');
-  } catch (error) {
-    console.error('Error in cacheResponse:', error);
-    throw error;
   }
-};
+
+  async logApiRequest(request: ApiRequestLog): Promise<void> {
+    try {
+      const { error } = await this.supabase
+        .from('api_requests')
+        .insert([{
+          usdot_number: request.usdotNumber,
+          request_type: request.requestType,
+          request_source: request.requestSource,
+          cache_hit: request.cacheHit,
+          filing_id: request.filingId,
+          response_time_ms: request.responseTime,
+          request_timestamp: new Date().toISOString()
+        }]);
+
+      if (error) {
+        console.error('DEBUG: API request logging error:', error);
+      }
+    } catch (error) {
+      console.error('DEBUG: Failed to log API request:', error);
+    }
+  }
+}
