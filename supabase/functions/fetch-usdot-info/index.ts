@@ -21,6 +21,7 @@ serve(async (req: Request) => {
     const apiKey = Deno.env.get("CARRIER_OK_API_KEY");
 
     if (!apiKey && !testMode) {
+      console.error("CarrierOK API key not configured");
       throw new Error("CarrierOK API key not configured");
     }
 
@@ -51,24 +52,36 @@ serve(async (req: Request) => {
     }
 
     // Make the actual API call to CarrierOK
-    console.log(`Fetching real data for DOT ${dotNumber} from CarrierOK API`);
-    const response = await fetch(`${CARRIER_OK_BASE_URL}/profile-lite?dot=${dotNumber}`, {
+    console.log(`Fetching real data for DOT ${dotNumber} from CarrierOK API with key: ${apiKey?.substring(0, 4)}...`);
+    
+    // Build the API URL
+    const apiUrl = new URL(`${CARRIER_OK_BASE_URL}/profile-lite`);
+    apiUrl.searchParams.set('dot', dotNumber);
+    
+    console.log('Request URL:', apiUrl.toString());
+    
+    const response = await fetch(apiUrl, {
       method: "GET",
       headers: {
-        "X-Api-Key": apiKey,
-        "Content-Type": "application/json",
+        "X-Api-Key": apiKey!,
+        "Accept": "application/json",
       },
     });
 
+    const responseText = await response.text();
+    console.log(`CarrierOK API Response Status: ${response.status}`);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+    console.log('Response body:', responseText);
+
     if (!response.ok) {
-      console.error("CarrierOK API error:", await response.text());
-      throw new Error(`CarrierOK API error: ${response.status}`);
+      throw new Error(`CarrierOK API error: ${response.status}\nResponse: ${responseText}`);
     }
 
-    const carrierData = await response.json();
+    const carrierData = JSON.parse(responseText);
     
     if (!carrierData?.items?.[0]) {
-      throw new Error("No carrier data found");
+      console.log('No carrier data found in response:', carrierData);
+      throw new Error("No carrier data found for this DOT number");
     }
 
     const carrier = carrierData.items[0];
@@ -103,9 +116,10 @@ serve(async (req: Request) => {
 
   } catch (error) {
     console.error("Error in fetch-usdot-info:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch DOT information";
     return new Response(
       JSON.stringify({
-        error: error.message,
+        error: errorMessage,
         details: "Failed to fetch carrier data. Please verify your DOT number and try again."
       }),
       {
