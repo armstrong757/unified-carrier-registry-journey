@@ -21,7 +21,6 @@ serve(async (req) => {
       throw new Error('DOT number is required')
     }
 
-    // Log the actual request we're making
     console.log(`Making request to CarrierOK API for DOT number: ${dotNumber}`);
 
     const response = await fetch(
@@ -64,8 +63,8 @@ serve(async (req) => {
       insurance_bond: carrier.insurance_bond_on_file,
       insurance_cargo: carrier.insurance_cargo_on_file,
       risk_score: carrier.risk_score,
-      mcs150_form_date: carrier.mcs150_last_update,
-      mcs150_year: carrier.mcs150_year,
+      mcs150_form_date: carrier.mcs150_year, // Fixed: Using mcs150_year which contains the full date
+      mcs150_year: carrier.mcs150_year?.split('-')[0] || null, // Extract year from the date
       mcs150_mileage: carrier.mcs150_mileage,
     }
 
