@@ -102,7 +102,11 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             console.log('Making new API request for DOT:', trimmedDOT);
             pendingRequests[trimmedDOT] = supabase.functions
               .invoke('fetch-usdot-info', {
-                body: { dotNumber: trimmedDOT, requestSource: `${filingType}_form` }
+                body: { 
+                  dotNumber: trimmedDOT, 
+                  requestSource: `${filingType}_form`,
+                  testMode: true // Enable test mode for verification
+                }
               })
               .then(({ data, error }) => {
                 if (error) throw error;
