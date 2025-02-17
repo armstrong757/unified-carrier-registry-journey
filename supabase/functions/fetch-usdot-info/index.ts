@@ -54,9 +54,9 @@ serve(async (req: Request) => {
     // Make the actual API call to CarrierOK
     console.log(`Fetching real data for DOT ${dotNumber} from CarrierOK API with key: ${apiKey?.substring(0, 4)}...`);
     
-    // Build the API URL
+    // Build the API URL with correct parameter name
     const apiUrl = new URL(`${CARRIER_OK_BASE_URL}/profile-lite`);
-    apiUrl.searchParams.set('dot', dotNumber);
+    apiUrl.searchParams.set('dot_number', dotNumber); // Changed from 'dot' to 'dot_number'
     
     console.log('Request URL:', apiUrl.toString());
     
