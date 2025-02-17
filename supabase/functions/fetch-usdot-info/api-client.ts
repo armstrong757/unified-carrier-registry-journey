@@ -1,79 +1,59 @@
 
 import { USDOTResponse } from './types.ts';
 
-export async function getCarrierOKProfile(dotNumber: string): Promise<USDOTResponse> {
-  const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
-  if (!apiKey) {
-    throw new Error('CarrierOK API key not configured');
-  }
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
 
-  const baseUrl = 'https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2';
-  const url = `${baseUrl}/profile-lite?dot_number=${encodeURIComponent(dotNumber)}`;
+async function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-  console.log('Making request to CarrierOK API:', {
-    url: url.replace(apiKey, '[REDACTED]'),
-    dotNumber,
-    hasApiKey: !!apiKey
-  });
-
+async function fetchWithRetry(url: string, options: RequestInit, retries = MAX_RETRIES): Promise<Response> {
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'X-Api-Key': apiKey,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const responseText = await response.text();
-    console.log('Raw API Response:', responseText);
-
+    const response = await fetch(url, options);
     if (!response.ok) {
-      console.error('CarrierOK API error:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: url.replace(apiKey, '[REDACTED]'),
-        body: responseText
-      });
-      throw new Error(`CarrierOK API error: ${response.status} ${response.statusText}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      console.error('Failed to parse API response:', e);
-      throw new Error('Invalid JSON response from API');
-    }
-
-    if (!data.items || !data.items[0]) {
-      throw new Error('No data found for DOT number');
-    }
-
-    const item = data.items[0];
-    console.log('Parsed carrier data:', item);
-
-    const response: USDOTResponse = {
-      usdot_number: item.dot_number || dotNumber,
-      legal_name: item.legal_name || '',
-      dba_name: item.dba_name || '',
-      operating_status: item.usdot_status || 'NOT AUTHORIZED',
-      entity_type: item.entity_type_desc || '',
-      entity_type_desc: item.entity_type_desc || '',
-      physical_address: item.physical_address || '',
-      telephone_number: item.telephone_number?.toString() || '',
-      total_power_units: item.total_power_units?.toString() || '0',
-      total_drivers: item.total_drivers?.toString() || '0',
-      mcs150_year: item.mcs150_year?.toString() || '',
-      mcs150_mileage: item.mcs150_mileage?.toString() || '0',
-      basics_data: {}
-    };
-
-    console.log('Transformed response:', response);
     return response;
   } catch (error) {
-    console.error('Error in getCarrierOKProfile:', error);
+    if (retries > 0) {
+      console.log(`Retry attempt ${MAX_RETRIES - retries + 1} for CarrierOK API request`);
+      await sleep(RETRY_DELAY);
+      return fetchWithRetry(url, options, retries - 1);
+    }
     throw error;
+  }
+}
+
+export async function getCarrierOKProfile(dotNumber: string): Promise<{ items: USDOTResponse[] }> {
+  const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
+  if (!apiKey) {
+    throw new Error('CARRIER_OK_API_KEY is not set');
+  }
+
+  const url = `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${dotNumber}`;
+  
+  console.log(`Making request to CarrierOK API for DOT: ${dotNumber}`);
+  
+  try {
+    const response = await fetchWithRetry(url, {
+      method: 'GET',
+      headers: {
+        'X-Api-Key': apiKey,
+        'Accept': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    console.log('CarrierOK API Response:', data);
+
+    if (!data.items || !Array.isArray(data.items) || data.items.length === 0) {
+      throw new Error('No carrier data found');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching from CarrierOK API:', error);
+    throw new Error(`Failed to fetch carrier data: ${error.message}`);
   }
 }

@@ -44,7 +44,7 @@ serve(async (req) => {
       throw new Error('Invalid DOT number format')
     }
 
-    console.log(`Making request to CarrierOK API for DOT number: ${cleanDotNumber}`)
+    console.log(`Processing request for DOT number: ${cleanDotNumber}`)
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -53,51 +53,56 @@ serve(async (req) => {
 
     const startTime = Date.now()
 
-    // Check cache
-    const cachedData = await getCachedResponse(supabase, cleanDotNumber)
-    if (cachedData) {
-      console.log('Using cached USDOT data:', cachedData)
+    try {
+      // Check cache
+      const cachedData = await getCachedResponse(supabase, cleanDotNumber)
+      if (cachedData) {
+        console.log('Using cached USDOT data:', cachedData)
+        
+        await supabase.from('api_requests').insert({
+          usdot_number: cleanDotNumber,
+          request_type: 'carrier_profile',
+          request_source: requestSource,
+          cache_hit: true,
+          response_status: 200,
+          response_time_ms: Date.now() - startTime
+        })
+
+        return new Response(JSON.stringify({ items: [cachedData] }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        })
+      }
+
+      // Fetch from API
+      const apiResponse = await getCarrierOKProfile(cleanDotNumber)
+      console.log('Received API response:', apiResponse)
+
+      // Cache the response
+      await cacheResponse(supabase, cleanDotNumber, apiResponse)
       
+      // Log the API request
       await supabase.from('api_requests').insert({
         usdot_number: cleanDotNumber,
         request_type: 'carrier_profile',
         request_source: requestSource,
-        cache_hit: true,
+        cache_hit: false,
         response_status: 200,
         response_time_ms: Date.now() - startTime
       })
 
-      return new Response(JSON.stringify(cachedData), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      return new Response(JSON.stringify(apiResponse), {
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+          'Cache-Control': 'public, max-age=3600'
+        },
         status: 200,
       })
+    } catch (dbError) {
+      console.error('Database operation error:', dbError)
+      throw new Error('Database operation failed')
     }
-
-    // Fetch from API
-    const apiResponse = await getCarrierOKProfile(cleanDotNumber)
-    console.log('Received API response:', apiResponse)
-
-    // Cache the response
-    await cacheResponse(supabase, cleanDotNumber, apiResponse)
-    
-    // Log the API request
-    await supabase.from('api_requests').insert({
-      usdot_number: cleanDotNumber,
-      request_type: 'carrier_profile',
-      request_source: requestSource,
-      cache_hit: false,
-      response_status: 200,
-      response_time_ms: Date.now() - startTime
-    })
-
-    return new Response(JSON.stringify(apiResponse), {
-      headers: { 
-        ...corsHeaders,
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=3600'
-      },
-      status: 200,
-    })
 
   } catch (error) {
     console.error('Error in fetch-usdot-info:', error)
