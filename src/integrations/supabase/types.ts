@@ -13,33 +13,42 @@ export type Database = {
         Row: {
           cache_hit: boolean | null
           created_at: string | null
+          error_message: string | null
           filing_id: string | null
           id: string
           request_source: string | null
           request_timestamp: string | null
           request_type: string
+          request_url: string | null
+          response_status: number | null
           response_time_ms: number | null
           usdot_number: string
         }
         Insert: {
           cache_hit?: boolean | null
           created_at?: string | null
+          error_message?: string | null
           filing_id?: string | null
           id?: string
           request_source?: string | null
           request_timestamp?: string | null
           request_type: string
+          request_url?: string | null
+          response_status?: number | null
           response_time_ms?: number | null
           usdot_number: string
         }
         Update: {
           cache_hit?: boolean | null
           created_at?: string | null
+          error_message?: string | null
           filing_id?: string | null
           id?: string
           request_source?: string | null
           request_timestamp?: string | null
           request_type?: string
+          request_url?: string | null
+          response_status?: number | null
           response_time_ms?: number | null
           usdot_number?: string
         }
@@ -249,11 +258,13 @@ export type Database = {
       api_request_monitoring: {
         Row: {
           cache_hit: boolean | null
+          error_message: string | null
           filing_id: string | null
           request_source: string | null
           request_timestamp: string | null
           request_type: string | null
           requests_per_minute: number | null
+          response_status: number | null
           response_time_ms: number | null
           usdot_number: string | null
         }
