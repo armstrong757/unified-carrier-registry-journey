@@ -1,46 +1,31 @@
-
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
 import { useToast } from "@/components/ui/use-toast";
 
-// Keep track of in-flight requests to prevent duplicates
-// Make it global (outside the hook) so it's shared across all instances
 const pendingRequests: { [key: string]: Promise<USDOTData> } = {};
-
-// Cache successful responses
 const responseCache: { [key: string]: { data: USDOTData; timestamp: number } } = {};
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
-
-// Request debounce timeout
-const DEBOUNCE_TIMEOUT = 300; // 300ms
+const CACHE_DURATION = 5 * 60 * 1000;
+const DEBOUNCE_TIMEOUT = 300;
 let debounceTimer: NodeJS.Timeout;
 
-// Updated type guard to match the test data format
 function isUSDOTData(data: unknown): data is USDOTData {
   const d = data as any;
   return (
     typeof d === 'object' &&
     d !== null &&
     (
-      // Check for usdot_number (from test data) or usdotNumber (from existing format)
       (typeof d.usdot_number === 'string' || typeof d.usdotNumber === 'string') &&
-      // Check for legal_name or legalName
       (typeof d.legal_name === 'string' || typeof d.legalName === 'string')
     )
   );
 }
 
-// Transform API response to match USDOTData type
 function transformResponse(data: any): USDOTData {
-  console.log('Transforming API response:', data); // Debug log
-  
-  // Helper function to handle null/undefined values
+  console.log('Transforming API response:', data);
   const getValueOrDefault = (value: any, defaultValue: any) => {
     return value !== null && value !== undefined ? value : defaultValue;
   };
-
-  // Convert string numbers to actual numbers
   const toNumber = (value: any) => {
     if (typeof value === 'string') {
       const parsed = parseInt(value, 10);
@@ -48,7 +33,6 @@ function transformResponse(data: any): USDOTData {
     }
     return typeof value === 'number' ? value : 0;
   };
-
   return {
     usdotNumber: data.usdot_number || data.usdotNumber,
     legalName: data.legal_name || data.legalName,
@@ -91,18 +75,15 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
       return null;
     }
 
-    // Clear any existing debounce timer
     if (debounceTimer) {
       clearTimeout(debounceTimer);
     }
 
-    // Return a promise that resolves after the debounce period
     return new Promise((resolve) => {
       debounceTimer = setTimeout(async () => {
         setIsLoading(true);
         
         try {
-          // Check memory cache first
           const now = Date.now();
           const cachedResponse = responseCache[trimmedDOT];
           if (cachedResponse && (now - cachedResponse.timestamp) < CACHE_DURATION) {
@@ -111,7 +92,6 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             return;
           }
 
-          // Check for existing draft filing
           const { data: existingFiling, error: filingError } = await supabase
             .from('filings')
             .select('*')
@@ -136,14 +116,12 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
                 throw new Error('Invalid USDOT data format in filing');
               }
               
-              // Update cache
               responseCache[trimmedDOT] = { data: usdotData, timestamp: now };
               resolve({ usdotData, resumedFiling: existingFiling });
               return;
             }
           }
 
-          // Deduplicate API calls
           if (!pendingRequests[trimmedDOT]) {
             console.log('Making new API request for DOT:', trimmedDOT);
             pendingRequests[trimmedDOT] = supabase.functions
@@ -151,18 +129,17 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
                 body: { 
                   dotNumber: trimmedDOT, 
                   requestSource: `${filingType}_form`,
-                  testMode: true // Enable test mode for verification
+                  testMode: false
                 }
               })
               .then(({ data, error }) => {
                 if (error) throw error;
-                console.log('Received API response:', data); // Debug log
+                console.log('Received API response:', data);
                 const transformedData = transformResponse(data);
                 if (!isUSDOTData(transformedData)) {
-                  console.error('Invalid data format:', transformedData); // Debug log
+                  console.error('Invalid data format:', transformedData);
                   throw new Error('Invalid response format from USDOT lookup');
                 }
-                // Update cache
                 responseCache[trimmedDOT] = { data: transformedData, timestamp: Date.now() };
                 return transformedData;
               })
