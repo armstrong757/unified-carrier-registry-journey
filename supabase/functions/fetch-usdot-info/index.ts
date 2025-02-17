@@ -4,7 +4,6 @@ import { corsHeaders } from '../_shared/cors.ts'
 
 interface RequestData {
   dotNumber: string;
-  testMode?: boolean;
   requestSource?: string;
 }
 
@@ -16,13 +15,18 @@ serve(async (req) => {
   }
 
   try {
-    const { dotNumber, testMode, requestSource } = await req.json() as RequestData
+    const { dotNumber, requestSource } = await req.json() as RequestData
 
     if (!dotNumber) {
       throw new Error('DOT number is required')
     }
 
-    console.log(`Fetching DOT info for ${dotNumber} from ${requestSource || 'unknown source'}`)
+    // Log the actual request we're making
+    console.log(`Making request to CarrierOK API:`, {
+      url: `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${dotNumber}`,
+      apiKey: CARRIER_OK_API_KEY ? 'Present' : 'Missing',
+      dotNumber
+    });
 
     const response = await fetch(
       `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${dotNumber}`,
@@ -30,12 +34,24 @@ serve(async (req) => {
         method: 'GET',
         headers: {
           'X-Api-Key': CARRIER_OK_API_KEY || '',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
         },
       }
     )
 
+    // Log the response status and headers
+    console.log('CarrierOK API Response:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries())
+    });
+
     if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`)
+      // Get the error message from the response if possible
+      const errorData = await response.text();
+      console.error('CarrierOK API Error Response:', errorData);
+      throw new Error(`CarrierOK API request failed: ${response.status} ${response.statusText} - ${errorData}`);
     }
 
     const data = await response.json()
@@ -60,7 +76,7 @@ serve(async (req) => {
       insurance_bond: carrier.insurance_bond_on_file,
       insurance_cargo: carrier.insurance_cargo_on_file,
       risk_score: carrier.risk_score,
-      mcs150_form_date: carrier.mcs150_last_update, // This should now correctly pass the full date
+      mcs150_form_date: carrier.mcs150_last_update,
       mcs150_year: carrier.mcs150_year,
       mcs150_mileage: carrier.mcs150_mileage,
     }
@@ -74,9 +90,12 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error:', error.message)
+    console.error('Edge Function Error:', error.message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error instanceof Error ? error.stack : undefined
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
