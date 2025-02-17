@@ -21,21 +21,20 @@ export interface UCRFormData {
 
 export interface USDOTData {
   usdotNumber: string;
-  legalName?: string;
+  legalName: string;
   dbaName?: string;
-  mailingAddress?: {
-    streetAddress?: string;
-    city?: string;
-    state?: string;
-    zipCode?: string;
-    country?: string;
-  };
-  phoneNumber?: string;
-  emailAddress?: string;
   operatingStatus?: string;
+  entityType?: string;
+  physicalAddress?: string;
+  telephone?: string;
+  powerUnits?: number;
+  drivers?: number;
+  insuranceBIPD?: number;
+  insuranceBond?: number;
+  insuranceCargo?: number;
+  riskScore?: string;
   outOfServiceDate?: string | null;
   mcs150FormDate?: string | null;
-  entityType?: string;
   carrierOperation?: string;
   cargoCarried?: string[];
 }
