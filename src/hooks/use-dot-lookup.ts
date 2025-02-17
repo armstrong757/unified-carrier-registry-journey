@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
@@ -37,19 +38,21 @@ function transformResponse(data: any): USDOTData {
     operatingStatus: 'NOT AUTHORIZED', // As per business requirement, this should always be NOT AUTHORIZED
     entityType: data.entity_type_desc || data.entity_type || data.entityType || 'CARRIER',
     physicalAddress: data.physical_address || data.physicalAddress || '',
-    telephone: data.telephone_number || data.telephone || '',
-    powerUnits: Number(data.total_power_units || data.powerUnits) || 0,
+    telephone: data.telephone_number || data.telephone || data.phone || '',
+    powerUnits: Number(data.total_power_units || data.power_units || data.powerUnits) || 0,
     drivers: Number(data.total_drivers || data.drivers) || 0,
-    insuranceBIPD: Number(data.insurance_bipd_on_file || data.insuranceBIPD) || 0,
-    insuranceBond: Number(data.insurance_bond_on_file || data.insuranceBond) || 0,
-    insuranceCargo: Number(data.insurance_cargo_on_file || data.insuranceCargo) || 0,
+    insuranceBIPD: Number(data.insurance_bipd_on_file || data.insurance_bipd || data.insuranceBIPD) || 0,
+    insuranceBond: Number(data.insurance_bond_on_file || data.insurance_bond || data.insuranceBond) || 0,
+    insuranceCargo: Number(data.insurance_cargo_on_file || data.insurance_cargo || data.insuranceCargo) || 0,
     riskScore: data.risk_score || data.riskScore || 'Unknown',
-    outOfServiceDate: data.out_of_service_date || null,
-    mcs150FormDate: data.mcs150_form_date || null,
-    mcs150Year: Number(data.mcs150_year) || 0,
-    mcs150Mileage: Number(data.mcs150_miles) || 0,
-    carrierOperation: data.carrier_operation || '',
-    cargoCarried: Array.isArray(data.cargo_carried) ? data.cargo_carried : []
+    outOfServiceDate: data.out_of_service_date || data.outOfServiceDate || null,
+    mcs150FormDate: data.mcs150_last_update || data.mcs150_form_date || data.mcs150FormDate || null,
+    mcs150Year: Number(data.mcs150_year || data.mcs150_last_update) || 0,
+    mcs150Mileage: Number(data.mcs150_miles || data.mcs150_mileage || data.annual_miles) || 0,
+    carrierOperation: data.carrier_operation || data.carrierOperation || '',
+    cargoCarried: Array.isArray(data.cargo_carried || data.cargoCarried) 
+      ? data.cargo_carried || data.cargoCarried 
+      : []
   };
 
   console.log('Transformed USDOT data:', transformed);
