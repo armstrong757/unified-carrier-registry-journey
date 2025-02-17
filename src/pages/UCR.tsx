@@ -4,6 +4,7 @@ import USDOTSummary from "@/components/UCRForm/USDOTSummary";
 import ProgressSavedIndicator from "@/components/UCRForm/ProgressSavedIndicator";
 import { useUCRForm } from "@/components/UCRForm/hooks/useUCRForm";
 import { useStepNavigation } from "@/components/UCRForm/hooks/useStepNavigation";
+import { useToast } from "@/hooks/use-toast";
 
 const UCR = () => {
   const {
@@ -13,9 +14,10 @@ const UCR = () => {
     usdotData,
     filingId,
     formData,
-    setFormData,
-    toast
+    setFormData
   } = useUCRForm();
+
+  const { toast } = useToast();
 
   const { handleNext, handleBack } = useStepNavigation(
     currentStep,
@@ -23,7 +25,7 @@ const UCR = () => {
     totalSteps,
     filingId,
     formData,
-    toast
+    { toast }
   );
 
   if (!usdotData) {

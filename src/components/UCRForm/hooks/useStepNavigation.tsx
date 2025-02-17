@@ -1,6 +1,8 @@
 
 import { createTransaction, updateFilingData } from "@/utils/filingUtils";
-import { Toast } from "@/components/ui/use-toast";
+import { toast as toastFunction } from "@/hooks/use-toast";
+
+type ToastFunction = typeof toastFunction;
 
 export const useStepNavigation = (
   currentStep: number,
@@ -9,7 +11,7 @@ export const useStepNavigation = (
   filingId: string | null,
   formData: any,
   toast: {
-    toast: ({ title, description, variant }: Toast) => void;
+    toast: ToastFunction;
   }
 ) => {
   const handleNext = async () => {
