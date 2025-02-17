@@ -24,7 +24,8 @@ interface USDOTData {
   outOfServiceDate: string | null;
   mcNumber: string;
   mcs150FormDate: string | null;
-  mileageYear: string | null;
+  mcs150Year: number;
+  mcs150Mileage: number;
   basicsData: Record<string, any>;
 }
 
@@ -38,7 +39,16 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
 
   // Helper function to format large numbers with commas
   const formatNumber = (num: number) => {
+    if (!num) return '0';
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  // Format the mileage year string
+  const getMileageYear = () => {
+    if (data.mcs150Mileage && data.mcs150Year) {
+      return `${formatNumber(data.mcs150Mileage)} (${data.mcs150Year})`;
+    }
+    return null;
   };
 
   return (
@@ -137,12 +147,10 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             <span className="font-medium">MCS-150 Last Update: </span>
             {data.mcs150FormDate || 'Not Available'}
           </div>
-          {data.mileageYear && (
+          {getMileageYear() && (
             <div>
               <span className="font-medium">Mileage (Year): </span>
-              {`${formatNumber(parseInt(data.mileageYear.split('(')[0].trim()))} (${
-                data.mileageYear.match(/\((\d{4})\)/)?.[1] || 'N/A'
-              })`}
+              {getMileageYear()}
             </div>
           )}
 
