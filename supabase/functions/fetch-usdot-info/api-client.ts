@@ -1,71 +1,79 @@
 
-import { USDOTData, APIResponse } from './types.ts';
-import { validateDOTNumber } from './validator.ts';
+import { USDOTResponse } from './types.ts';
 
-export async function fetchCarrierData(dotNumber: string, apiKey: string): Promise<USDOTData> {
-  console.log('DEBUG: Starting carrier data fetch for DOT number:', dotNumber);
-  
-  const validDOTNumber = validateDOTNumber(dotNumber);
-  const baseUrl = 'https://mobile.fmcsa.dot.gov/qc/services/carriers';
-  const url = `${baseUrl}/${validDOTNumber}?webKey=${apiKey}`;
-  
+export async function getCarrierOKProfile(dotNumber: string): Promise<USDOTResponse> {
+  const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
+  if (!apiKey) {
+    throw new Error('CarrierOK API key not configured');
+  }
+
+  const baseUrl = 'https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2';
+  const url = `${baseUrl}/profile-lite?dot_number=${encodeURIComponent(dotNumber)}`;
+
+  console.log('Making request to CarrierOK API:', {
+    url: url.replace(apiKey, '[REDACTED]'),
+    dotNumber,
+    hasApiKey: !!apiKey
+  });
+
   try {
-    console.log('DEBUG: Fetching from URL:', url.replace(apiKey, '[REDACTED]'));
-    
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'X-Api-Key': apiKey,
+        'Content-Type': 'application/json'
       }
     });
-    
+
     const responseText = await response.text();
-    console.log('DEBUG: Raw response length:', responseText.length);
+    console.log('Raw API Response:', responseText);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
+      console.error('CarrierOK API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: url.replace(apiKey, '[REDACTED]'),
+        body: responseText
+      });
+      throw new Error(`CarrierOK API error: ${response.status} ${response.statusText}`);
     }
 
-    if (!responseText) {
-      throw new Error('Empty response from FMCSA API');
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Failed to parse API response:', e);
+      throw new Error('Invalid JSON response from API');
     }
 
-    const data = JSON.parse(responseText) as APIResponse;
-    const carrierData = data.content || data;
+    if (!data.items || !data.items[0]) {
+      throw new Error('No data found for DOT number');
+    }
 
-    return mapCarrierData(validDOTNumber, carrierData, data.basics);
+    const item = data.items[0];
+    console.log('Parsed carrier data:', item);
+
+    const response: USDOTResponse = {
+      usdot_number: item.dot_number || dotNumber,
+      legal_name: item.legal_name || '',
+      dba_name: item.dba_name || '',
+      operating_status: item.usdot_status || 'NOT AUTHORIZED',
+      entity_type: item.entity_type_desc || '',
+      entity_type_desc: item.entity_type_desc || '',
+      physical_address: item.physical_address || '',
+      telephone_number: item.telephone_number?.toString() || '',
+      total_power_units: item.total_power_units?.toString() || '0',
+      total_drivers: item.total_drivers?.toString() || '0',
+      mcs150_year: item.mcs150_year?.toString() || '',
+      mcs150_mileage: item.mcs150_mileage?.toString() || '0',
+      basics_data: {}
+    };
+
+    console.log('Transformed response:', response);
+    return response;
   } catch (error) {
-    console.error('DEBUG: Error in fetchCarrierData:', error);
+    console.error('Error in getCarrierOKProfile:', error);
     throw error;
   }
 }
-
-function mapCarrierData(dotNumber: string, carrierData: any, basicsData: Record<string, any> = {}): USDOTData {
-  return {
-    usdotNumber: dotNumber,
-    operatingStatus: carrierData.allowedToOperate === 'N' ? 'NOT AUTHORIZED' : 'AUTHORIZED',
-    entityType: carrierData.operatingStatus || 'UNKNOWN',
-    legalName: carrierData.legalName || 'NOT PROVIDED',
-    dbaName: carrierData.dbaName || '',
-    physicalAddress: [
-      carrierData.physicalAddress,
-      carrierData.physicalCity,
-      carrierData.physicalState,
-      carrierData.physicalZipcode
-    ].filter(Boolean).join(', ') || 'NOT PROVIDED',
-    telephone: carrierData.phoneNumber || 'NOT PROVIDED',
-    powerUnits: parseInt(carrierData.totalPowerUnits) || 0,
-    busCount: parseInt(carrierData.totalBuses) || 0,
-    limoCount: parseInt(carrierData.totalLimousines) || 0,
-    minibusCount: parseInt(carrierData.totalMiniBuses) || 0,
-    motorcoachCount: parseInt(carrierData.totalMotorCoaches) || 0,
-    vanCount: parseInt(carrierData.totalVans) || 0,
-    complaintCount: parseInt(carrierData.totalComplaints) || 0,
-    outOfService: carrierData.oosStatus === 'Y',
-    outOfServiceDate: carrierData.oosDate || null,
-    mcNumber: carrierData.mcNumber || '',
-    mcs150LastUpdate: carrierData.mcs150FormDate || null,
-    basicsData: basicsData || {},
-  };
-}
-
