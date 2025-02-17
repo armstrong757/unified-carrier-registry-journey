@@ -1,7 +1,11 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+function validateDOTNumber(dotNumber: string): boolean {
+  // DOT numbers are typically 5-7 digits
+  return /^\d{5,7}$/.test(dotNumber);
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -37,13 +41,18 @@ serve(async (req) => {
       throw new Error(`Invalid request body: ${e.message}`);
     }
 
-    const { dotNumber, requestSource = 'unknown' } = requestBody;
+    const { dotNumber } = requestBody;
 
     if (!dotNumber) {
       throw new Error('DOT number is required');
     }
 
     const cleanDotNumber = dotNumber.toString().trim();
+    
+    if (!validateDOTNumber(cleanDotNumber)) {
+      throw new Error('Invalid DOT number format. Must be 5-7 digits.');
+    }
+
     console.log('Processing DOT number:', cleanDotNumber);
 
     // Fetch carrier data from CarrierOK API
@@ -52,26 +61,40 @@ serve(async (req) => {
       throw new Error('API key not configured');
     }
 
-    const apiUrl = `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${cleanDotNumber}`;
-    console.log('Making request to:', apiUrl);
+    const apiUrl = `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${encodeURIComponent(cleanDotNumber)}`;
+    console.log('Making request to CarrierOK API...');
 
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'X-Api-Key': apiKey,
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
     });
 
+    const responseText = await response.text();
+    console.log('CarrierOK API raw response:', responseText);
+
     if (!response.ok) {
-      throw new Error(`CarrierOK API error: ${response.status} ${response.statusText}`);
+      throw new Error(`CarrierOK API error: ${response.status} ${response.statusText}\nResponse: ${responseText}`);
     }
 
-    const data = await response.json();
-    console.log('CarrierOK API Response:', data);
+    let data;
+    try {
+      data = JSON.parse(responseText);
+      console.log('CarrierOK API parsed response:', data);
+    } catch (e) {
+      console.error('Error parsing API response:', e);
+      throw new Error('Invalid response from CarrierOK API');
+    }
 
     if (!data.items || !Array.isArray(data.items)) {
       throw new Error('Invalid API response format');
+    }
+
+    if (data.items.length === 0) {
+      throw new Error(`No carrier found with DOT number ${cleanDotNumber}`);
     }
 
     return new Response(JSON.stringify(data), {
