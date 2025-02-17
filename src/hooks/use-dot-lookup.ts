@@ -4,7 +4,12 @@ import { USDOTData } from "@/types/filing";
 import { useToast } from "@/components/ui/use-toast";
 
 // Keep track of in-flight requests to prevent duplicates
+// Make it global (outside the hook) so it's shared across all instances
 const pendingRequests: { [key: string]: Promise<USDOTData> } = {};
+
+// Also cache successful responses globally
+const responseCache: { [key: string]: { data: USDOTData; timestamp: number } } = {};
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Type guard
 function isUSDOTData(data: unknown): data is USDOTData {
@@ -38,12 +43,22 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
     setIsLoading(true);
     
     try {
-      // Check sessionStorage first
+      // Check memory cache first (fastest)
+      const now = Date.now();
+      const cachedResponse = responseCache[trimmedDOT];
+      if (cachedResponse && (now - cachedResponse.timestamp) < CACHE_DURATION) {
+        console.log('Using memory cache for DOT:', trimmedDOT);
+        return { usdotData: cachedResponse.data };
+      }
+
+      // Check sessionStorage next (second fastest)
       const cachedData = sessionStorage.getItem('usdotData');
       if (cachedData) {
         const parsedData = JSON.parse(cachedData);
         if (isUSDOTData(parsedData) && parsedData.usdotNumber === trimmedDOT) {
           console.log('Using sessionStorage data for DOT:', trimmedDOT);
+          // Update memory cache
+          responseCache[trimmedDOT] = { data: parsedData, timestamp: now };
           return { usdotData: parsedData };
         }
       }
@@ -73,13 +88,16 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             throw new Error('Invalid USDOT data format in filing');
           }
           
+          // Update both caches
           sessionStorage.setItem('usdotData', JSON.stringify(usdotData));
+          responseCache[trimmedDOT] = { data: usdotData, timestamp: now };
           return { usdotData, resumedFiling: existingFiling };
         }
       }
 
-      // Deduplicate API calls
+      // Deduplicate API calls across all form types
       if (!pendingRequests[trimmedDOT]) {
+        console.log('Making new API request for DOT:', trimmedDOT);
         pendingRequests[trimmedDOT] = supabase.functions
           .invoke('fetch-usdot-info', {
             body: { dotNumber: trimmedDOT, requestSource: `${filingType}_form` }
@@ -89,16 +107,20 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             if (!isUSDOTData(data)) {
               throw new Error('Invalid response format from USDOT lookup');
             }
+            // Update both caches with the new data
+            responseCache[trimmedDOT] = { data, timestamp: Date.now() };
+            sessionStorage.setItem('usdotData', JSON.stringify(data));
             return data;
           })
           .finally(() => {
             // Clean up pending request
             delete pendingRequests[trimmedDOT];
           });
+      } else {
+        console.log('Using pending request for DOT:', trimmedDOT);
       }
 
       const data = await pendingRequests[trimmedDOT];
-      sessionStorage.setItem('usdotData', JSON.stringify(data));
       return { usdotData: data };
 
     } catch (error) {
