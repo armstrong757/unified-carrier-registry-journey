@@ -22,27 +22,30 @@ Deno.serve(async (req) => {
     console.log('Received request data:', requestData);
 
     const { dotNumber, requestSource = 'unknown' } = requestData;
-    const startTime = Date.now()
-
+    
     if (!dotNumber) {
       throw new Error('DOT number is required');
     }
 
+    // Ensure dotNumber is a string and trim any whitespace
+    const cleanDotNumber = dotNumber.toString().trim();
+    console.log('Cleaned DOT number:', cleanDotNumber);
+
     // Validate input
-    if (!validateDOTNumber(dotNumber)) {
+    if (!validateDOTNumber(cleanDotNumber)) {
       throw new Error('Invalid DOT number format');
     }
 
-    console.log(`Processing request for DOT ${dotNumber} from source: ${requestSource}`);
+    const startTime = Date.now();
+    console.log(`Processing request for DOT ${cleanDotNumber} from source: ${requestSource}`);
 
     // Check cache first
-    const cachedData = await getCachedResponse(supabase, dotNumber);
+    const cachedData = await getCachedResponse(supabase, cleanDotNumber);
     if (cachedData) {
-      console.log('Cache hit for DOT:', dotNumber);
+      console.log('Cache hit for DOT:', cleanDotNumber);
       
-      // Log the cached request
       await supabase.from('api_requests').insert({
-        usdot_number: dotNumber.toString(),
+        usdot_number: cleanDotNumber,
         request_type: 'carrier_profile',
         request_source: requestSource,
         cache_hit: true,
@@ -56,21 +59,21 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log('Cache miss, fetching from CarrierOK API for DOT:', dotNumber);
+    console.log('Cache miss, fetching from CarrierOK API for DOT:', cleanDotNumber);
     
     // Fetch from API
-    const response = await getCarrierOKProfile(dotNumber);
+    const response = await getCarrierOKProfile(cleanDotNumber);
     
     if (!response) {
       throw new Error('No data received from CarrierOK API');
     }
 
     // Cache the response
-    await cacheResponse(supabase, dotNumber, response);
+    await cacheResponse(supabase, cleanDotNumber, response);
 
     // Log the API request
     await supabase.from('api_requests').insert({
-      usdot_number: dotNumber.toString(),
+      usdot_number: cleanDotNumber,
       request_type: 'carrier_profile',
       request_source: requestSource,
       cache_hit: false,

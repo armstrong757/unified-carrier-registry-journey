@@ -30,7 +30,7 @@ export async function getCarrierOKProfile(dotNumber: string): Promise<USDOTRespo
     console.log('Raw API Response:', responseText);
 
     if (!response.ok) {
-      console.error('CarrierOK API error details:', {
+      console.error('CarrierOK API error:', {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
@@ -50,14 +50,12 @@ export async function getCarrierOKProfile(dotNumber: string): Promise<USDOTRespo
     console.log('Parsed API response:', data);
 
     if (!data.items || !data.items[0]) {
-      console.error('No data found in response:', data);
       throw new Error('No data found for DOT number');
     }
 
     const item = data.items[0];
     
-    // Transform the response to match our expected format
-    const transformedResponse: USDOTResponse = {
+    return {
       usdot_number: item.dot_number || dotNumber,
       legal_name: item.legal_name || '',
       dba_name: item.dba_name || '',
@@ -72,10 +70,6 @@ export async function getCarrierOKProfile(dotNumber: string): Promise<USDOTRespo
       mcs150_mileage: item.mcs150_mileage?.toString() || '0',
       basics_data: {}
     };
-
-    console.log('Transformed response:', transformedResponse);
-    return transformedResponse;
-
   } catch (error) {
     console.error('Error in getCarrierOKProfile:', error);
     throw error;
