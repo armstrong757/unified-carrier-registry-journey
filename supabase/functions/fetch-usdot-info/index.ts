@@ -22,14 +22,10 @@ serve(async (req) => {
     }
 
     // Log the actual request we're making
-    console.log(`Making request to CarrierOK API:`, {
-      url: `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${dotNumber}`,
-      apiKey: CARRIER_OK_API_KEY ? 'Present' : 'Missing',
-      dotNumber
-    });
+    console.log(`Making request to CarrierOK API for DOT number: ${dotNumber}`);
 
     const response = await fetch(
-      `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${dotNumber}`,
+      `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot_number=${dotNumber}`,
       {
         method: 'GET',
         headers: {
@@ -40,15 +36,7 @@ serve(async (req) => {
       }
     )
 
-    // Log the response status and headers
-    console.log('CarrierOK API Response:', {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries())
-    });
-
     if (!response.ok) {
-      // Get the error message from the response if possible
       const errorData = await response.text();
       console.error('CarrierOK API Error Response:', errorData);
       throw new Error(`CarrierOK API request failed: ${response.status} ${response.statusText} - ${errorData}`);
