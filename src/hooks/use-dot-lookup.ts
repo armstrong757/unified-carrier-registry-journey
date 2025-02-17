@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
@@ -34,7 +35,7 @@ function transformResponse(data: any): USDOTData {
     usdotNumber: data.usdot_number || data.dot_number || data.usdotNumber || '',
     legalName: data.legal_name || data.legalName || 'Unknown',
     dbaName: data.dba_name || data.dbaName || '',
-    operatingStatus: 'NOT AUTHORIZED', // As per business requirement, this should always be NOT AUTHORIZED
+    operatingStatus: data.operating_status || 'NOT AUTHORIZED',
     entityType: data.entity_type || data.entity_type_desc || data.entityType || 'CARRIER',
     physicalAddress: data.physical_address || data.physicalAddress || '',
     telephone: data.telephone_number || data.telephone || data.phone || '',
@@ -91,6 +92,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           if (cachedResponse && (now - cachedResponse.timestamp) < CACHE_DURATION) {
             console.log('Using cached USDOT data:', cachedResponse.data);
             resolve({ usdotData: cachedResponse.data });
+            setIsLoading(false);
             return;
           }
 
@@ -127,6 +129,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
               responseCache[trimmedDOT] = { data: usdotData, timestamp: now };
               resolve({ usdotData, resumedFiling: existingFiling });
+              setIsLoading(false);
               return;
             } catch (error) {
               console.error('Error processing existing filing:', error);
@@ -136,8 +139,11 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           console.log('Making new API request for DOT:', trimmedDOT);
           const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
             body: { 
-              dotNumber: trimmedDOT.toString(), // Ensure dotNumber is a string
+              dotNumber: trimmedDOT,
               requestSource: `${filingType}_form`
+            },
+            headers: {
+              'Content-Type': 'application/json'
             }
           });
 
@@ -146,12 +152,12 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             throw new Error(error.message || 'Failed to fetch DOT information');
           }
 
-          if (!data) {
+          if (!data || !data.items || !data.items[0]) {
             throw new Error('No data received from DOT lookup');
           }
 
           console.log('Received API response:', data);
-          const transformedData = transformResponse(data);
+          const transformedData = transformResponse(data.items[0]);
           
           if (!isUSDOTData(transformedData)) {
             throw new Error('Invalid response format from USDOT lookup');
