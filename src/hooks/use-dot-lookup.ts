@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
@@ -10,50 +11,50 @@ const DEBOUNCE_TIMEOUT = 300;
 let debounceTimer: NodeJS.Timeout;
 
 function isUSDOTData(data: unknown): data is USDOTData {
+  if (!data || typeof data !== 'object') return false;
+  
   const d = data as any;
-  return (
-    typeof d === 'object' &&
-    d !== null &&
-    (
-      (typeof d.usdot_number === 'string' || typeof d.usdotNumber === 'string') &&
-      (typeof d.legal_name === 'string' || typeof d.legalName === 'string')
-    )
+  const hasRequiredFields = (
+    (typeof d.usdot_number === 'string' || typeof d.usdotNumber === 'string') &&
+    (typeof d.legal_name === 'string' || typeof d.legalName === 'string')
   );
+  
+  if (!hasRequiredFields) {
+    console.error('Missing required fields in USDOT data:', data);
+    return false;
+  }
+  
+  return true;
 }
 
 function transformResponse(data: any): USDOTData {
   console.log('Transforming API response:', data);
-  const getValueOrDefault = (value: any, defaultValue: any) => {
-    return value !== null && value !== undefined ? value : defaultValue;
-  };
-  const toNumber = (value: any) => {
-    if (typeof value === 'string') {
-      const parsed = parseInt(value, 10);
-      return isNaN(parsed) ? 0 : parsed;
-    }
-    return typeof value === 'number' ? value : 0;
-  };
-  return {
-    usdotNumber: data.usdot_number || data.usdotNumber,
-    legalName: data.legal_name || data.legalName,
-    dbaName: getValueOrDefault(data.dba_name || data.dbaName, ''),
-    operatingStatus: getValueOrDefault(data.operating_status || data.operatingStatus, 'ACTIVE'),
-    entityType: getValueOrDefault(data.entity_type || data.entityType, 'CARRIER'),
-    physicalAddress: getValueOrDefault(data.physical_address || data.physicalAddress, ''),
-    telephone: getValueOrDefault(data.telephone || data.phone, ''),
-    powerUnits: toNumber(data.power_units || data.powerUnits),
-    drivers: toNumber(data.drivers || data.total_drivers),
-    insuranceBIPD: toNumber(data.insurance_bipd || data.insuranceBIPD),
-    insuranceBond: toNumber(data.insurance_bond || data.insuranceBond),
-    insuranceCargo: toNumber(data.insurance_cargo || data.insuranceCargo),
-    riskScore: getValueOrDefault(data.risk_score || data.riskScore, 'Unknown'),
+  
+  // Handle both the API response format and the stored format
+  const transformed: USDOTData = {
+    usdotNumber: data.usdot_number || data.usdotNumber || '',
+    legalName: data.legal_name || data.legalName || 'Unknown',
+    dbaName: data.dba_name || data.dbaName || '',
+    operatingStatus: data.operating_status || data.operatingStatus || 'ACTIVE',
+    entityType: data.entity_type || data.entityType || 'CARRIER',
+    physicalAddress: data.physical_address || data.physicalAddress || '',
+    telephone: data.telephone || data.phone || '',
+    powerUnits: Number(data.power_units || data.powerUnits) || 0,
+    drivers: Number(data.drivers || data.total_drivers) || 0,
+    insuranceBIPD: Number(data.insurance_bipd || data.insuranceBIPD) || 0,
+    insuranceBond: Number(data.insurance_bond || data.insuranceBond) || 0,
+    insuranceCargo: Number(data.insurance_cargo || data.insuranceCargo) || 0,
+    riskScore: data.risk_score || data.riskScore || 'Unknown',
     outOfServiceDate: data.out_of_service_date || data.outOfServiceDate || null,
     mcs150FormDate: data.mcs150_last_update || data.mcs150FormDate || null,
-    carrierOperation: getValueOrDefault(data.carrier_operation || data.carrierOperation, ''),
+    carrierOperation: data.carrier_operation || data.carrierOperation || '',
     cargoCarried: Array.isArray(data.cargo_carried || data.cargoCarried) 
       ? data.cargo_carried || data.cargoCarried 
       : []
   };
+
+  console.log('Transformed USDOT data:', transformed);
+  return transformed;
 }
 
 export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
@@ -87,11 +88,12 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           const now = Date.now();
           const cachedResponse = responseCache[trimmedDOT];
           if (cachedResponse && (now - cachedResponse.timestamp) < CACHE_DURATION) {
-            console.log('Using memory cache for DOT:', trimmedDOT);
+            console.log('Using cached USDOT data:', cachedResponse.data);
             resolve({ usdotData: cachedResponse.data });
             return;
           }
 
+          // Check for existing draft filing
           const { data: existingFiling, error: filingError } = await supabase
             .from('filings')
             .select('*')
@@ -104,22 +106,26 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           if (filingError) throw filingError;
 
           if (existingFiling) {
+            console.log('Found existing filing:', existingFiling);
             let usdotData: USDOTData;
-            if (typeof existingFiling.form_data === 'object' && existingFiling.form_data !== null) {
-              const formData = existingFiling.form_data;
-              
-              if ('usdotData' in formData && isUSDOTData(formData.usdotData)) {
-                usdotData = formData.usdotData;
-              } else if (isUSDOTData(formData)) {
-                usdotData = formData;
+            
+            if (existingFiling.form_data && typeof existingFiling.form_data === 'object') {
+              if ('usdotData' in existingFiling.form_data) {
+                usdotData = transformResponse(existingFiling.form_data.usdotData);
               } else {
-                throw new Error('Invalid USDOT data format in filing');
+                usdotData = transformResponse(existingFiling.form_data);
               }
-              
-              responseCache[trimmedDOT] = { data: usdotData, timestamp: now };
-              resolve({ usdotData, resumedFiling: existingFiling });
-              return;
+            } else {
+              throw new Error('Invalid form data structure in filing');
             }
+
+            if (!isUSDOTData(usdotData)) {
+              throw new Error('Invalid USDOT data format in filing');
+            }
+
+            responseCache[trimmedDOT] = { data: usdotData, timestamp: now };
+            resolve({ usdotData, resumedFiling: existingFiling });
+            return;
           }
 
           if (!pendingRequests[trimmedDOT]) {
@@ -137,7 +143,6 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
                 console.log('Received API response:', data);
                 const transformedData = transformResponse(data);
                 if (!isUSDOTData(transformedData)) {
-                  console.error('Invalid data format:', transformedData);
                   throw new Error('Invalid response format from USDOT lookup');
                 }
                 responseCache[trimmedDOT] = { data: transformedData, timestamp: Date.now() };
