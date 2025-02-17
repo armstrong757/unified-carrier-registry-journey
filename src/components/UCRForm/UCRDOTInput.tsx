@@ -1,149 +1,33 @@
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useBotProtection } from "@/hooks/use-bot-protection";
-import { USDOTData } from "@/types/filing";
-import { useMemo } from "react";
-
-// Type guard to check if an unknown value is a USDOTData
-function isUSDOTData(data: unknown): data is USDOTData {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    'usdotNumber' in data &&
-    typeof (data as USDOTData).usdotNumber === 'string'
-  );
-}
+import { useDOTLookup } from "@/hooks/use-dot-lookup";
 
 export const UCRDOTInput = () => {
   const [dotNumber, setDotNumber] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { honeypot, setHoneypot, checkBotAttempt } = useBotProtection();
+  const { lookupDOT, isLoading } = useDOTLookup('ucr');
 
-  // Memoize the validation function
-  const isValidDOT = useMemo(() => {
-    return dotNumber.trim().length > 0;
-  }, [dotNumber]);
-
-  // Use useCallback to prevent recreation of function on each render
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (checkBotAttempt()) {
-      return;
-    }
+    if (checkBotAttempt()) return;
 
-    if (!isValidDOT) {
-      toast({
-        title: "Error",
-        description: "Please enter a DOT number",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const trimmedDOT = dotNumber.trim();
-
-      // First check sessionStorage for existing data
-      const cachedData = sessionStorage.getItem('usdotData');
-      if (cachedData) {
-        const parsedData = JSON.parse(cachedData);
-        if (isUSDOTData(parsedData) && parsedData.usdotNumber === trimmedDOT) {
-          console.log('Using sessionStorage data for DOT:', trimmedDOT);
-          navigate("/ucr", {
-            state: {
-              usdotData: parsedData
-            }
-          });
-          return;
-        }
-      }
-
-      // Check for existing draft UCR filing
-      const { data: existingFiling, error: filingError } = await supabase
-        .from('filings')
-        .select('*')
-        .eq('usdot_number', trimmedDOT)
-        .eq('filing_type', 'ucr')
-        .eq('status', 'draft')
-        .gt('resume_token_expires_at', new Date().toISOString())
-        .maybeSingle();
-
-      if (filingError) {
-        console.error('Error checking for existing filing:', filingError);
-        throw new Error('Failed to check for existing filing');
-      }
-
-      if (existingFiling) {
-        toast({
-          title: "Welcome Back!",
-          description: "We saved your progress. You can continue where you left off.",
-        });
-        
-        // Safely extract USDOT data from form_data
-        let usdotData: USDOTData;
-        if (typeof existingFiling.form_data === 'object' && existingFiling.form_data !== null) {
-          const formData = existingFiling.form_data;
-          
-          if ('usdotData' in formData && isUSDOTData(formData.usdotData)) {
-            usdotData = formData.usdotData;
-          } else if (isUSDOTData(formData)) {
-            usdotData = formData;
-          } else {
-            throw new Error('Invalid USDOT data format in filing');
-          }
-          
-          sessionStorage.setItem('usdotData', JSON.stringify(usdotData));
-          navigate("/ucr", {
-            state: {
-              usdotData,
-              resumedFiling: existingFiling
-            }
-          });
-          return;
-        }
-      }
-
-      // Only make API call if we don't have cached data or existing filing
-      const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
-        body: {
-          dotNumber: trimmedDOT,
-          requestSource: 'ucr_form'
-        }
-      });
-      
-      if (error) throw error;
-      
-      if (!isUSDOTData(data)) {
-        throw new Error('Invalid response format from USDOT lookup');
-      }
-      
-      sessionStorage.setItem('usdotData', JSON.stringify(data));
+    const result = await lookupDOT(dotNumber);
+    if (result) {
       navigate("/ucr", {
         state: {
-          usdotData: data
+          usdotData: result.usdotData,
+          resumedFiling: result.resumedFiling
         }
       });
-    } catch (error) {
-      console.error('Error fetching USDOT info:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch DOT information. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
     }
-  }, [dotNumber, navigate, toast, checkBotAttempt, isValidDOT]);
+  };
 
   return (
     <Card className="max-w-md mx-auto p-8 bg-white shadow-lg border-0">
@@ -171,7 +55,7 @@ export const UCRDOTInput = () => {
           <Button 
             type="submit" 
             className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8" 
-            disabled={isLoading || !isValidDOT}
+            disabled={isLoading || !dotNumber.trim()}
           >
             {isLoading ? "LOADING..." : "GET STARTED"}
           </Button>
