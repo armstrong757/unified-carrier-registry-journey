@@ -36,6 +36,7 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
 
 export const updateFilingData = async (filingId: string, formData: any, currentStep: number) => {
   try {
+    // Don't update status, only update form data and step
     const { data, error } = await supabase
       .from('filings')
       .update({
@@ -45,6 +46,7 @@ export const updateFilingData = async (filingId: string, formData: any, currentS
         updated_at: new Date().toISOString()
       })
       .eq('id', filingId)
+      .eq('status', 'draft') // Only update if it's still in draft
       .select()
       .maybeSingle();
 
@@ -62,6 +64,7 @@ export const getFilingByResumeToken = async (token: string) => {
       .from('filings')
       .select()
       .eq('resume_token', token)
+      .eq('status', 'draft') // Only get draft filings
       .gt('resume_token_expires_at', new Date().toISOString())
       .maybeSingle();
 
@@ -78,6 +81,18 @@ export const getFilingByResumeToken = async (token: string) => {
 
 export const createTransaction = async (filingId: string, amount: number, paymentMethod: string) => {
   try {
+    // First check if the filing is still in draft
+    const { data: filing, error: filingCheckError } = await supabase
+      .from('filings')
+      .select('status')
+      .eq('id', filingId)
+      .maybeSingle();
+
+    if (filingCheckError) throw filingCheckError;
+    if (!filing || filing.status !== 'draft') {
+      throw new Error('Filing is not in draft status');
+    }
+
     const { data: transactionData, error: transactionError } = await supabase
       .from('transactions')
       .insert([
@@ -93,13 +108,15 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
     if (transactionError) throw transactionError;
 
+    // Only mark as completed if transaction is created successfully
     const { error: filingError } = await supabase
       .from('filings')
       .update({
         status: 'completed',
         completed_at: new Date().toISOString()
       })
-      .eq('id', filingId);
+      .eq('id', filingId)
+      .eq('status', 'draft'); // Only update if still in draft
 
     if (filingError) throw filingError;
 
