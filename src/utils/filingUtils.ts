@@ -4,25 +4,33 @@ import { FilingType, USDOTData } from "@/types/filing";
 
 export const createFiling = async (usdotNumber: string, filingType: FilingType, initialFormData: any = {}) => {
   try {
-    // First, ensure USDOT info exists in the database
-    if (initialFormData.usdotData) {
+    // First check if USDOT info already exists
+    const { data: existingUsdot, error: checkError } = await supabase
+      .from('usdot_info')
+      .select('usdot_number')
+      .eq('usdot_number', usdotNumber)
+      .maybeSingle();
+
+    if (checkError) throw checkError;
+
+    // If USDOT doesn't exist, create it with minimal info
+    if (!existingUsdot) {
       const usdotData = initialFormData.usdotData as USDOTData;
       const { error: usdotError } = await supabase
         .from('usdot_info')
-        .upsert({
+        .insert([{
           usdot_number: usdotNumber,
-          legal_name: usdotData.legalName,
-          dba_name: usdotData.dbaName,
-          operating_status: usdotData.operatingStatus,
-          entity_type: usdotData.entityType,
-          physical_address: usdotData.physicalAddress,
-          telephone: usdotData.telephone,
-          power_units: usdotData.powerUnits,
-          drivers: usdotData.drivers,
+          legal_name: usdotData?.legalName || 'Unknown',
+          dba_name: usdotData?.dbaName,
+          operating_status: usdotData?.operatingStatus,
+          entity_type: usdotData?.entityType,
+          physical_address: usdotData?.physicalAddress,
+          telephone: usdotData?.telephone,
+          power_units: usdotData?.powerUnits,
+          drivers: usdotData?.drivers,
+          created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'usdot_number'
-        });
+        }]);
 
       if (usdotError) throw usdotError;
     }
