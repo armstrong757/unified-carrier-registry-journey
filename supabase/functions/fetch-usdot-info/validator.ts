@@ -1,11 +1,15 @@
 
-export function validateDOTNumber(dotNumber: string): string {
-  const cleanDOTNumber = dotNumber.replace(/^(USDOT)?/i, '').replace(/\s+/g, '');
+export function validateDOTNumber(dotNumber: string | number): boolean {
+  // Convert to string if number
+  const dot = dotNumber.toString();
   
-  if (!/^\d{7}$/.test(cleanDOTNumber)) {
-    throw new Error('Invalid DOT number format. Must be exactly 7 digits.');
+  // DOT numbers should be numeric and between 4-7 digits
+  const dotRegex = /^\d{4,7}$/;
+  
+  if (!dotRegex.test(dot)) {
+    console.error('Invalid DOT number format:', dot);
+    return false;
   }
   
-  return cleanDOTNumber;
+  return true;
 }
-

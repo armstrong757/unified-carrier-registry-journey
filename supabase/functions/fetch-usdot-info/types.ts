@@ -14,5 +14,5 @@ export interface USDOTResponse {
   mcs150_year?: string;
   mcs150_mileage?: string;
   basics_data?: Record<string, any>;
-  [key: string]: any; // Allow for additional fields from the API
+  [key: string]: any;
 }
