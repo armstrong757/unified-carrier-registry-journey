@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
@@ -29,12 +28,6 @@ function isUSDOTData(data: unknown): data is USDOTData {
 
 function transformResponse(data: any): USDOTData {
   console.log('Transforming API response:', data);
-
-  // Format MCS-150 date properly
-  const formatMCS150Date = (year: number | string | null) => {
-    if (!year) return null;
-    return `06/28/${year}`; // Using June 28th as per business requirements
-  };
   
   // Handle both the API response format and the stored format
   const transformed: USDOTData = {
@@ -52,9 +45,9 @@ function transformResponse(data: any): USDOTData {
     insuranceCargo: Number(data.insurance_cargo_on_file || data.insurance_cargo || data.insuranceCargo) || 0,
     riskScore: data.risk_score || data.riskScore || 'Unknown',
     outOfServiceDate: data.out_of_service_date || data.outOfServiceDate || null,
-    mcs150FormDate: formatMCS150Date(data.mcs150_last_update || data.mcs150_year),
+    mcs150FormDate: data.mcs150_form_date || data.mcs150FormDate || null, // Use the full date from API
     mcs150Year: Number(data.mcs150_last_update || data.mcs150_year) || 0,
-    mcs150Mileage: Number(data.mcs150_miles || data.mcs150_mileage) || 0,
+    mcs150Mileage: Number(data.mcs150_miles || data.mileage || data.annual_miles || 1000) || 0, // Added more fallback fields and default to 1000
     carrierOperation: data.carrier_operation || data.carrierOperation || '',
     cargoCarried: Array.isArray(data.cargo_carried || data.cargoCarried) 
       ? data.cargo_carried || data.cargoCarried 
