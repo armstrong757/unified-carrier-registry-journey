@@ -1,9 +1,32 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { FilingType } from "@/types/filing";
+import { FilingType, USDOTData } from "@/types/filing";
 
 export const createFiling = async (usdotNumber: string, filingType: FilingType, initialFormData: any = {}) => {
   try {
+    // First, ensure USDOT info exists in the database
+    if (initialFormData.usdotData) {
+      const usdotData = initialFormData.usdotData as USDOTData;
+      const { error: usdotError } = await supabase
+        .from('usdot_info')
+        .upsert({
+          usdot_number: usdotNumber,
+          legal_name: usdotData.legalName,
+          dba_name: usdotData.dbaName,
+          operating_status: usdotData.operatingStatus,
+          entity_type: usdotData.entityType,
+          physical_address: usdotData.physicalAddress,
+          telephone: usdotData.telephone,
+          power_units: usdotData.powerUnits,
+          drivers: usdotData.drivers,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'usdot_number'
+        });
+
+      if (usdotError) throw usdotError;
+    }
+
     // Generate a resume token for the filing
     const { data: tokenData, error: tokenError } = await supabase
       .rpc('generate_resume_token');
