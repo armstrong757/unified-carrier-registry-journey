@@ -7,42 +7,48 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface CarrierResponse {
-  items: Array<{
-    dot_number: string;
-    legal_name: string;
-    dba_name?: string;
-    usdot_status: string;
-    entity_type_desc: string;
-    total_power_units: string;
-    total_drivers: string;
-    physical_address: string;
-    telephone_number: string;
-    company_contact_primary?: string;
-    insurance_bipd_on_file: string;
-    insurance_bond_on_file: string;
-    insurance_cargo_on_file: string;
-    risk_score: string;
-  }>;
+// Rate limiting configuration
+const RATE_LIMIT_MINUTES = 5;
+const RATE_LIMIT_THRESHOLD = 10;
+
+// Test data for verifying functionality
+const TEST_DOT_DATA = {
+  usdot_number: "12345",
+  legal_name: "TEST CARRIER LLC",
+  dba_name: "TEST DBA",
+  operating_status: "ACTIVE",
+  entity_type: "CARRIER",
+  physical_address: "123 TEST ST, TEST CITY, ST 12345",
+  telephone: "1234567890",
+  power_units: 5,
+  drivers: 10,
+  insurance_bipd: 750000,
+  insurance_bond: 75000,
+  insurance_cargo: 100000,
+  risk_score: "Low",
+  updated_at: new Date().toISOString()
+};
+
+async function checkRateLimit(supabase: any, dotNumber: string): Promise<boolean> {
+  const { data: abuseData } = await supabase.rpc('check_api_abuse', {
+    p_minutes: RATE_LIMIT_MINUTES,
+    p_threshold: RATE_LIMIT_THRESHOLD
+  });
+  
+  return abuseData?.some((item: any) => item.usdot_number === dotNumber) || false;
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const body = await req.json();
-    const { dotNumber, requestSource = 'unknown' } = body;
+    const { dotNumber, requestSource = 'unknown', testMode = false } = body;
     
     if (!dotNumber) {
       throw new Error('DOT number is required');
-    }
-
-    const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
-    if (!apiKey) {
-      throw new Error('CarrierOK API key not configured');
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -50,6 +56,12 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const startTime = performance.now();
+
+    // Check rate limit before proceeding
+    const isRateLimited = await checkRateLimit(supabase, dotNumber);
+    if (isRateLimited) {
+      throw new Error('Rate limit exceeded. Please try again later.');
+    }
 
     // First check cache
     const { data: cachedData, error: cacheError } = await supabase
@@ -68,8 +80,7 @@ serve(async (req) => {
     // If we have valid cached data less than 24 hours old
     if (cachedData && cachedData.updated_at) {
       const cacheAge = Date.now() - new Date(cachedData.updated_at).getTime();
-      if (cacheAge < 24 * 60 * 60 * 1000) { // 24 hours in milliseconds
-        // Log the API request with cache hit
+      if (cacheAge < 24 * 60 * 60 * 1000) {
         await supabase.from('api_requests').insert({
           usdot_number: dotNumber,
           request_type: 'carrier_data',
@@ -86,7 +97,32 @@ serve(async (req) => {
       }
     }
 
-    // If no cache hit, fetch from CarrierOK API
+    // If in test mode, return test data
+    if (testMode) {
+      console.log('Test mode: Returning test data for DOT:', dotNumber);
+      const testResponse = { ...TEST_DOT_DATA, usdot_number: dotNumber };
+      
+      await supabase.from('api_requests').insert({
+        usdot_number: dotNumber,
+        request_type: 'carrier_data',
+        request_source: `${requestSource}_test`,
+        cache_hit: false,
+        response_time_ms: responseTime,
+        response_status: 200
+      });
+
+      return new Response(
+        JSON.stringify(testResponse),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check if CarrierOK API key is configured
+    const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
+    if (!apiKey) {
+      throw new Error('CarrierOK API key not configured. Using test mode for verification.');
+    }
+
     console.log('Fetching from CarrierOK API for DOT:', dotNumber);
     const apiUrl = `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${dotNumber}`;
     
@@ -102,7 +138,7 @@ serve(async (req) => {
       throw new Error(`CarrierOK API error: ${response.status} ${response.statusText}`);
     }
 
-    const carrierData: CarrierResponse = await response.json();
+    const carrierData = await response.json();
     
     if (!carrierData.items?.[0]) {
       throw new Error('No carrier data found');
