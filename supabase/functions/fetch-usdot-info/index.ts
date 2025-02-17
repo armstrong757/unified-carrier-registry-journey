@@ -2,9 +2,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { validateDOTNumber } from './validator.ts'
-import { getCarrierOKProfile } from './api-client.ts'
-import { getCachedResponse, cacheResponse } from './cache-manager.ts'
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -26,96 +23,77 @@ serve(async (req) => {
 
     let requestBody;
     try {
-      requestBody = await req.json();
+      const text = await req.text();
+      console.log('Raw request body:', text);
+      
+      if (!text) {
+        throw new Error('Empty request body');
+      }
+      
+      requestBody = JSON.parse(text);
+      console.log('Parsed request body:', requestBody);
     } catch (e) {
       console.error('Error parsing request body:', e);
-      throw new Error('Invalid request body');
+      throw new Error(`Invalid request body: ${e.message}`);
     }
 
     const { dotNumber, requestSource = 'unknown' } = requestBody;
 
     if (!dotNumber) {
-      throw new Error('DOT number is required')
+      throw new Error('DOT number is required');
     }
 
-    const cleanDotNumber = dotNumber.toString().trim()
-    
-    if (!validateDOTNumber(cleanDotNumber)) {
-      throw new Error('Invalid DOT number format')
+    const cleanDotNumber = dotNumber.toString().trim();
+    console.log('Processing DOT number:', cleanDotNumber);
+
+    // Fetch carrier data from CarrierOK API
+    const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
+    if (!apiKey) {
+      throw new Error('API key not configured');
     }
 
-    console.log(`Processing request for DOT number: ${cleanDotNumber}`)
+    const apiUrl = `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${cleanDotNumber}`;
+    console.log('Making request to:', apiUrl);
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'X-Api-Key': apiKey,
+        'Accept': 'application/json',
+      },
+    });
 
-    const startTime = Date.now()
-
-    try {
-      // Check cache
-      const cachedData = await getCachedResponse(supabase, cleanDotNumber)
-      if (cachedData) {
-        console.log('Using cached USDOT data:', cachedData)
-        
-        await supabase.from('api_requests').insert({
-          usdot_number: cleanDotNumber,
-          request_type: 'carrier_profile',
-          request_source: requestSource,
-          cache_hit: true,
-          response_status: 200,
-          response_time_ms: Date.now() - startTime
-        })
-
-        return new Response(JSON.stringify({ items: [cachedData] }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        })
-      }
-
-      // Fetch from API
-      const apiResponse = await getCarrierOKProfile(cleanDotNumber)
-      console.log('Received API response:', apiResponse)
-
-      // Cache the response
-      await cacheResponse(supabase, cleanDotNumber, apiResponse)
-      
-      // Log the API request
-      await supabase.from('api_requests').insert({
-        usdot_number: cleanDotNumber,
-        request_type: 'carrier_profile',
-        request_source: requestSource,
-        cache_hit: false,
-        response_status: 200,
-        response_time_ms: Date.now() - startTime
-      })
-
-      return new Response(JSON.stringify(apiResponse), {
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-          'Cache-Control': 'public, max-age=3600'
-        },
-        status: 200,
-      })
-    } catch (dbError) {
-      console.error('Database operation error:', dbError)
-      throw new Error('Database operation failed')
+    if (!response.ok) {
+      throw new Error(`CarrierOK API error: ${response.status} ${response.statusText}`);
     }
+
+    const data = await response.json();
+    console.log('CarrierOK API Response:', data);
+
+    if (!data.items || !Array.isArray(data.items)) {
+      throw new Error('Invalid API response format');
+    }
+
+    return new Response(JSON.stringify(data), {
+      headers: { 
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+      status: 200,
+    });
 
   } catch (error) {
-    console.error('Error in fetch-usdot-info:', error)
+    console.error('Error in fetch-usdot-info:', error);
     
     const errorResponse = {
       error: error.message || 'An unexpected error occurred',
       timestamp: new Date().toISOString(),
-      details: error.stack
+      details: error.stack,
     };
 
     return new Response(JSON.stringify(errorResponse), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: error.status || 500,
-    })
+    });
   }
-})
+});
