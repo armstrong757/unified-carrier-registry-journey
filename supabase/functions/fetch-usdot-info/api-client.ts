@@ -8,40 +8,57 @@ export async function getCarrierOKProfile(dotNumber: string): Promise<USDOTRespo
   }
 
   const baseUrl = 'https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2';
-  const url = `${baseUrl}/profile-lite?dot=${dotNumber}`;
+  const url = `${baseUrl}/profile-lite?dot=${encodeURIComponent(dotNumber)}`;
 
-  console.log('Fetching from CarrierOK API:', url);
+  console.log('Making request to CarrierOK API:', {
+    url,
+    dotNumber,
+    hasApiKey: !!apiKey
+  });
 
   try {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'X-Api-Key': apiKey
+        'X-Api-Key': apiKey,
+        'Content-Type': 'application/json'
       }
     });
 
+    const responseText = await response.text();
+    console.log('Raw API Response:', responseText);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('CarrierOK API error:', {
+      console.error('CarrierOK API error details:', {
         status: response.status,
         statusText: response.statusText,
-        body: errorText
+        headers: Object.fromEntries(response.headers.entries()),
+        body: responseText
       });
       throw new Error(`CarrierOK API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    console.log('CarrierOK API response:', data);
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Failed to parse API response:', e);
+      throw new Error('Invalid JSON response from API');
+    }
+
+    console.log('Parsed API response:', data);
 
     if (!data.items || !data.items[0]) {
+      console.error('No data found in response:', data);
       throw new Error('No data found for DOT number');
     }
 
     const item = data.items[0];
     
-    return {
-      usdot_number: item.dot_number || '',
+    // Transform the response to match our expected format
+    const transformedResponse: USDOTResponse = {
+      usdot_number: item.dot_number || dotNumber,
       legal_name: item.legal_name || '',
       dba_name: item.dba_name || '',
       operating_status: item.usdot_status || 'NOT AUTHORIZED',
@@ -55,8 +72,12 @@ export async function getCarrierOKProfile(dotNumber: string): Promise<USDOTRespo
       mcs150_mileage: item.mcs150_mileage?.toString() || '0',
       basics_data: {}
     };
+
+    console.log('Transformed response:', transformedResponse);
+    return transformedResponse;
+
   } catch (error) {
-    console.error('Error fetching from CarrierOK API:', error);
+    console.error('Error in getCarrierOKProfile:', error);
     throw error;
   }
 }

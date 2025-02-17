@@ -18,20 +18,27 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { dotNumber, requestSource = 'unknown' } = await req.json()
+    const requestData = await req.json();
+    console.log('Received request data:', requestData);
+
+    const { dotNumber, requestSource = 'unknown' } = requestData;
     const startTime = Date.now()
+
+    if (!dotNumber) {
+      throw new Error('DOT number is required');
+    }
 
     // Validate input
     if (!validateDOTNumber(dotNumber)) {
-      throw new Error('Invalid DOT number format')
+      throw new Error('Invalid DOT number format');
     }
 
-    console.log(`Processing request for DOT ${dotNumber} from source: ${requestSource}`)
+    console.log(`Processing request for DOT ${dotNumber} from source: ${requestSource}`);
 
     // Check cache first
-    const cachedData = await getCachedResponse(supabase, dotNumber)
+    const cachedData = await getCachedResponse(supabase, dotNumber);
     if (cachedData) {
-      console.log('Cache hit for DOT:', dotNumber)
+      console.log('Cache hit for DOT:', dotNumber);
       
       // Log the cached request
       await supabase.from('api_requests').insert({
@@ -41,25 +48,25 @@ Deno.serve(async (req) => {
         cache_hit: true,
         response_status: 200,
         response_time_ms: Date.now() - startTime
-      })
+      });
 
       return new Response(JSON.stringify(cachedData), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
-      })
+      });
     }
 
-    console.log('Cache miss, fetching from CarrierOK API for DOT:', dotNumber)
+    console.log('Cache miss, fetching from CarrierOK API for DOT:', dotNumber);
     
     // Fetch from API
-    const response: USDOTResponse = await getCarrierOKProfile(dotNumber)
+    const response = await getCarrierOKProfile(dotNumber);
     
     if (!response) {
-      throw new Error('No data received from CarrierOK API')
+      throw new Error('No data received from CarrierOK API');
     }
 
     // Cache the response
-    await cacheResponse(supabase, dotNumber, response)
+    await cacheResponse(supabase, dotNumber, response);
 
     // Log the API request
     await supabase.from('api_requests').insert({
@@ -69,23 +76,23 @@ Deno.serve(async (req) => {
       cache_hit: false,
       response_status: 200,
       response_time_ms: Date.now() - startTime
-    })
+    });
 
     return new Response(JSON.stringify(response), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
-    })
+    });
 
   } catch (error) {
-    console.error('Error in fetch-usdot-info:', error)
+    console.error('Error in fetch-usdot-info:', error);
 
     // Log the failed request
     try {
-      const { dotNumber, requestSource = 'unknown' } = await req.json()
+      const { dotNumber, requestSource = 'unknown' } = await req.json();
       const supabase = createClient(
         Deno.env.get('SUPABASE_URL') ?? '',
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-      )
+      );
 
       await supabase.from('api_requests').insert({
         usdot_number: dotNumber?.toString() || 'unknown',
@@ -94,14 +101,14 @@ Deno.serve(async (req) => {
         cache_hit: false,
         response_status: 500,
         error_message: error.message
-      })
+      });
     } catch (logError) {
-      console.error('Error logging failed request:', logError)
+      console.error('Error logging failed request:', logError);
     }
 
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
-    })
+    });
   }
 })
