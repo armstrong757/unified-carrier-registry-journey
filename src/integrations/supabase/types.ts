@@ -304,6 +304,14 @@ export type Database = {
           avg_requests_per_dot: number
         }[]
       }
+      validate_filing_step: {
+        Args: {
+          p_current_step: number
+          p_new_step: number
+          p_filing_type: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       filing_type: "ucr" | "mcs150"

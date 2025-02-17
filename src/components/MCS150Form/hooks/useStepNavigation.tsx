@@ -14,17 +14,33 @@ export const useStepNavigation = (
   const handleNext = useCallback(async () => {
     if (currentStep < totalSteps) {
       try {
-        if (filingId) {
-          const nextStep = getNextStep(currentStep, formData);
-          await updateFilingData(filingId, formData, nextStep);
+        const nextStep = getNextStep(currentStep, formData);
+        if (nextStep === currentStep) {
+          // If step didn't change, show a message to user
+          toast({
+            title: "Action Required",
+            description: "Please complete all required fields before proceeding.",
+            variant: "destructive",
+          });
+          return;
         }
-        setCurrentStep(getNextStep(currentStep, formData));
+
+        if (filingId) {
+          const updatedFiling = await updateFilingData(filingId, formData, nextStep);
+          if (!updatedFiling) {
+            throw new Error('Failed to update filing data');
+          }
+        }
+
+        setCurrentStep(nextStep);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (error) {
         console.error('Error updating filing:', error);
         toast({
           title: "Error",
-          description: "Failed to save form data. Please try again.",
+          description: error instanceof Error 
+            ? error.message 
+            : "Failed to save form data. Please try again.",
           variant: "destructive",
         });
       }
@@ -51,17 +67,29 @@ export const useStepNavigation = (
   const handleBack = useCallback(async () => {
     if (currentStep > 1) {
       try {
+        const previousStep = getPreviousStep(currentStep, formData);
+        
         if (filingId) {
-          const previousStep = getPreviousStep(currentStep, formData);
-          await updateFilingData(filingId, formData, previousStep);
+          const updatedFiling = await updateFilingData(filingId, formData, previousStep);
+          if (!updatedFiling) {
+            throw new Error('Failed to update filing data');
+          }
         }
-        setCurrentStep(getPreviousStep(currentStep, formData));
+
+        setCurrentStep(previousStep);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (error) {
         console.error('Error updating step:', error);
+        toast({
+          title: "Error",
+          description: error instanceof Error 
+            ? error.message 
+            : "Failed to save form data. Please try again.",
+          variant: "destructive",
+        });
       }
     }
-  }, [currentStep, filingId, formData, setCurrentStep]);
+  }, [currentStep, filingId, formData, setCurrentStep, toast]);
 
   return { handleNext, handleBack };
 };
