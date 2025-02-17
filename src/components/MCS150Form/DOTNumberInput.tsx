@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,22 +26,30 @@ export const DOTNumberInput = () => {
   const { toast } = useToast();
   const { honeypot, setHoneypot, checkBotAttempt } = useBotProtection();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Memoize the validation function
+  const isValidDOT = useMemo(() => {
+    return dotNumber.trim().length > 0;
+  }, [dotNumber]);
+
+  // Use useCallback to prevent recreation of function on each render
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (checkBotAttempt()) {
       return;
     }
 
-    if (!dotNumber.trim()) return;
+    if (!isValidDOT) return;
     setIsLoading(true);
     try {
+      const trimmedDOT = dotNumber.trim();
+
       // First check sessionStorage for existing data
       const cachedData = sessionStorage.getItem('usdotData');
       if (cachedData) {
         const parsedData = JSON.parse(cachedData);
-        if (isUSDOTData(parsedData) && parsedData.usdotNumber === dotNumber.trim()) {
-          console.log('Using sessionStorage data for DOT:', dotNumber);
+        if (isUSDOTData(parsedData) && parsedData.usdotNumber === trimmedDOT) {
+          console.log('Using sessionStorage data for DOT:', trimmedDOT);
           navigate("/mcs150", {
             state: {
               usdotData: parsedData
@@ -55,7 +63,7 @@ export const DOTNumberInput = () => {
       const { data: existingFiling, error: filingError } = await supabase
         .from('filings')
         .select('*')
-        .eq('usdot_number', dotNumber.trim())
+        .eq('usdot_number', trimmedDOT)
         .eq('filing_type', 'mcs150')
         .eq('status', 'draft')
         .gt('resume_token_expires_at', new Date().toISOString())
@@ -77,11 +85,9 @@ export const DOTNumberInput = () => {
         if (typeof existingFiling.form_data === 'object' && existingFiling.form_data !== null) {
           const formData = existingFiling.form_data;
           
-          // Check if usdotData exists in form_data
           if ('usdotData' in formData && isUSDOTData(formData.usdotData)) {
             usdotData = formData.usdotData;
           } else if (isUSDOTData(formData)) {
-            // If not, check if form_data itself is USDOTData
             usdotData = formData;
           } else {
             throw new Error('Invalid USDOT data format in filing');
@@ -98,9 +104,10 @@ export const DOTNumberInput = () => {
         }
       }
 
+      // Only make API call if we don't have cached data or existing filing
       const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
         body: {
-          dotNumber: dotNumber.trim(),
+          dotNumber: trimmedDOT,
           requestSource: 'mcs150_form'
         }
       });
@@ -135,7 +142,7 @@ export const DOTNumberInput = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [dotNumber, navigate, toast, checkBotAttempt, isValidDOT]);
 
   return (
     <Card className="max-w-md mx-auto p-8 bg-white shadow-lg border-0">
@@ -160,7 +167,11 @@ export const DOTNumberInput = () => {
           style={{ display: 'none' }}
         />
         <div className="flex justify-center">
-          <Button type="submit" className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8" disabled={isLoading}>
+          <Button 
+            type="submit" 
+            className="bg-[#517fa4] hover:bg-[#517fa4]/90 text-white py-6 text-lg px-8" 
+            disabled={isLoading || !isValidDOT}
+          >
             {isLoading ? "Loading..." : "GET STARTED"}
           </Button>
         </div>
