@@ -16,14 +16,38 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 const DEBOUNCE_TIMEOUT = 300; // 300ms
 let debounceTimer: NodeJS.Timeout;
 
-// Type guard
+// Updated type guard to match the test data format
 function isUSDOTData(data: unknown): data is USDOTData {
+  const d = data as any;
   return (
-    typeof data === 'object' &&
-    data !== null &&
-    'usdotNumber' in data &&
-    typeof (data as USDOTData).usdotNumber === 'string'
+    typeof d === 'object' &&
+    d !== null &&
+    (
+      // Check for usdot_number (from test data) or usdotNumber (from existing format)
+      (typeof d.usdot_number === 'string' || typeof d.usdotNumber === 'string') &&
+      // Check for legal_name or legalName
+      (typeof d.legal_name === 'string' || typeof d.legalName === 'string')
+    )
   );
+}
+
+// Transform API response to match USDOTData type
+function transformResponse(data: any): USDOTData {
+  return {
+    usdotNumber: data.usdot_number || data.usdotNumber,
+    legalName: data.legal_name || data.legalName,
+    dbaName: data.dba_name || data.dbaName || '',
+    operatingStatus: data.operating_status || data.operatingStatus || 'ACTIVE',
+    entityType: data.entity_type || data.entityType || 'CARRIER',
+    physicalAddress: data.physical_address || data.physicalAddress || '',
+    telephone: data.telephone || '',
+    powerUnits: Number(data.power_units || data.powerUnits || 0),
+    drivers: Number(data.drivers || 0),
+    insuranceBIPD: Number(data.insurance_bipd || data.insuranceBIPD || 0),
+    insuranceBond: Number(data.insurance_bond || data.insuranceBond || 0),
+    insuranceCargo: Number(data.insurance_cargo || data.insuranceCargo || 0),
+    riskScore: data.risk_score || data.riskScore || 'Unknown'
+  };
 }
 
 export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
@@ -110,12 +134,15 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
               })
               .then(({ data, error }) => {
                 if (error) throw error;
-                if (!isUSDOTData(data)) {
+                console.log('Received API response:', data); // Debug log
+                const transformedData = transformResponse(data);
+                if (!isUSDOTData(transformedData)) {
+                  console.error('Invalid data format:', transformedData); // Debug log
                   throw new Error('Invalid response format from USDOT lookup');
                 }
                 // Update cache
-                responseCache[trimmedDOT] = { data, timestamp: Date.now() };
-                return data;
+                responseCache[trimmedDOT] = { data: transformedData, timestamp: Date.now() };
+                return transformedData;
               })
               .finally(() => {
                 delete pendingRequests[trimmedDOT];
