@@ -69,9 +69,9 @@ serve(async (req) => {
       insurance_bond: carrier.insurance_bond_on_file,
       insurance_cargo: carrier.insurance_cargo_on_file,
       risk_score: carrier.risk_score,
-      mcs150_last_update: carrier.mcs150_year,
+      mcs150_form_date: carrier.mcs150_last_update, // Changed to use full date field
       mcs150_year: carrier.mcs150_year,
-      mcs150_mileage: carrier.mcs150_mileage, // Make sure we map this field correctly
+      mcs150_mileage: carrier.mcs150_mileage,
     }
 
     return new Response(
