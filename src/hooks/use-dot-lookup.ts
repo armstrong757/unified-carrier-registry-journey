@@ -29,13 +29,25 @@ function isUSDOTData(data: unknown): data is USDOTData {
 
 function transformResponse(data: any): USDOTData {
   console.log('Transforming API response:', data);
+
+  // Format MCS-150 date properly
+  const formatMCS150Date = (dateStr: string) => {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr; // Return as-is if invalid date
+    return date.toLocaleDateString('en-US', { 
+      month: '2-digit', 
+      day: '2-digit', 
+      year: 'numeric' 
+    });
+  };
   
   // Handle both the API response format and the stored format
   const transformed: USDOTData = {
     usdotNumber: data.dot_number || data.usdot_number || data.usdotNumber || '',
     legalName: data.legal_name || data.legalName || 'Unknown',
     dbaName: data.dba_name || data.dbaName || '',
-    operatingStatus: data.usdot_status || data.operating_status || data.operatingStatus || 'ACTIVE',
+    operatingStatus: data.authority_status || data.operating_status || data.operatingStatus || 'NOT AUTHORIZED',
     entityType: data.entity_type_desc || data.entity_type || data.entityType || 'CARRIER',
     physicalAddress: data.physical_address || data.physicalAddress || '',
     telephone: data.telephone_number || data.telephone || data.phone || '',
@@ -46,7 +58,7 @@ function transformResponse(data: any): USDOTData {
     insuranceCargo: Number(data.insurance_cargo_on_file || data.insurance_cargo || data.insuranceCargo) || 0,
     riskScore: data.risk_score || data.riskScore || 'Unknown',
     outOfServiceDate: data.out_of_service_date || data.outOfServiceDate || null,
-    mcs150FormDate: data.mcs150_year?.toString() || data.mcs150FormDate || null,
+    mcs150FormDate: formatMCS150Date(data.mcs150_form_date) || data.mcs150FormDate || null,
     mcs150Year: Number(data.mcs150_year || data.mcs150Year) || 0,
     mcs150Mileage: Number(data.mcs150_mileage || data.mcs150Mileage) || 0,
     carrierOperation: data.carrier_operation || data.carrierOperation || '',
