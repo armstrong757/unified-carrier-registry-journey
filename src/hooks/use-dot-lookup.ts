@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
@@ -51,9 +52,9 @@ function transformResponse(data: any): USDOTData {
     insuranceCargo: Number(data.insurance_cargo_on_file || data.insurance_cargo || data.insuranceCargo) || 0,
     riskScore: data.risk_score || data.riskScore || 'Unknown',
     outOfServiceDate: data.out_of_service_date || data.outOfServiceDate || null,
-    mcs150FormDate: formatMCS150Date(data.mcs150_year),
-    mcs150Year: Number(data.mcs150_year) || 0,
-    mcs150Mileage: Number(data.mcs150_mileage) || 0,
+    mcs150FormDate: formatMCS150Date(data.mcs150_last_update || data.mcs150_year),
+    mcs150Year: Number(data.mcs150_last_update || data.mcs150_year) || 0,
+    mcs150Mileage: Number(data.mcs150_mileage || data.totalMileage) || 20000, // Default mileage as per discussion
     carrierOperation: data.carrier_operation || data.carrierOperation || '',
     cargoCarried: Array.isArray(data.cargo_carried || data.cargoCarried) 
       ? data.cargo_carried || data.cargoCarried 
