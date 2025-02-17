@@ -33,20 +33,42 @@ function isUSDOTData(data: unknown): data is USDOTData {
 
 // Transform API response to match USDOTData type
 function transformResponse(data: any): USDOTData {
+  console.log('Transforming API response:', data); // Debug log
+  
+  // Helper function to handle null/undefined values
+  const getValueOrDefault = (value: any, defaultValue: any) => {
+    return value !== null && value !== undefined ? value : defaultValue;
+  };
+
+  // Convert string numbers to actual numbers
+  const toNumber = (value: any) => {
+    if (typeof value === 'string') {
+      const parsed = parseInt(value, 10);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+    return typeof value === 'number' ? value : 0;
+  };
+
   return {
     usdotNumber: data.usdot_number || data.usdotNumber,
     legalName: data.legal_name || data.legalName,
-    dbaName: data.dba_name || data.dbaName || '',
-    operatingStatus: data.operating_status || data.operatingStatus || 'ACTIVE',
-    entityType: data.entity_type || data.entityType || 'CARRIER',
-    physicalAddress: data.physical_address || data.physicalAddress || '',
-    telephone: data.telephone || '',
-    powerUnits: Number(data.power_units || data.powerUnits || 0),
-    drivers: Number(data.drivers || 0),
-    insuranceBIPD: Number(data.insurance_bipd || data.insuranceBIPD || 0),
-    insuranceBond: Number(data.insurance_bond || data.insuranceBond || 0),
-    insuranceCargo: Number(data.insurance_cargo || data.insuranceCargo || 0),
-    riskScore: data.risk_score || data.riskScore || 'Unknown'
+    dbaName: getValueOrDefault(data.dba_name || data.dbaName, ''),
+    operatingStatus: getValueOrDefault(data.operating_status || data.operatingStatus, 'ACTIVE'),
+    entityType: getValueOrDefault(data.entity_type || data.entityType, 'CARRIER'),
+    physicalAddress: getValueOrDefault(data.physical_address || data.physicalAddress, ''),
+    telephone: getValueOrDefault(data.telephone || data.phone, ''),
+    powerUnits: toNumber(data.power_units || data.powerUnits),
+    drivers: toNumber(data.drivers || data.total_drivers),
+    insuranceBIPD: toNumber(data.insurance_bipd || data.insuranceBIPD),
+    insuranceBond: toNumber(data.insurance_bond || data.insuranceBond),
+    insuranceCargo: toNumber(data.insurance_cargo || data.insuranceCargo),
+    riskScore: getValueOrDefault(data.risk_score || data.riskScore, 'Unknown'),
+    outOfServiceDate: data.out_of_service_date || data.outOfServiceDate || null,
+    mcs150FormDate: data.mcs150_last_update || data.mcs150FormDate || null,
+    carrierOperation: getValueOrDefault(data.carrier_operation || data.carrierOperation, ''),
+    cargoCarried: Array.isArray(data.cargo_carried || data.cargoCarried) 
+      ? data.cargo_carried || data.cargoCarried 
+      : []
   };
 }
 
