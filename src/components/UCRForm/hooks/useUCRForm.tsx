@@ -26,10 +26,11 @@ export const useUCRForm = () => {
       leasingCompany: false,
     },
     straightTrucks: 0,
+    powerUnits: 0,
     passengerVehicles: 0,
     needsVehicleChanges: "no",
-    addVehicles: "",
-    excludeVehicles: "",
+    addVehicles: 0,
+    excludeVehicles: 0,
     cardNumber: "",
     expiryDate: "",
     cvv: "",
@@ -52,8 +53,15 @@ export const useUCRForm = () => {
             setFormData(resumedFiling.form_data);
             setCurrentStep(resumedFiling.last_step_completed || 1);
           } else {
-            const filing = await createFiling(stateData.usdotNumber, 'ucr', formData);
+            // Initialize form data with powerUnits from USDOT data
+            const initialFormData = {
+              ...formData,
+              powerUnits: stateData.powerUnits || 0,
+              straightTrucks: stateData.powerUnits || 0
+            };
+            const filing = await createFiling(stateData.usdotNumber, 'ucr', initialFormData);
             setFilingId(filing.id);
+            setFormData(initialFormData);
           }
         } catch (error) {
           console.error('Error initializing filing:', error);
@@ -85,8 +93,15 @@ export const useUCRForm = () => {
 
     const initializeFiling = async () => {
       try {
-        const filing = await createFiling(parsedData.usdotNumber, 'ucr', formData);
+        // Initialize form data with powerUnits from stored USDOT data
+        const initialFormData = {
+          ...formData,
+          powerUnits: parsedData.powerUnits || 0,
+          straightTrucks: parsedData.powerUnits || 0
+        };
+        const filing = await createFiling(parsedData.usdotNumber, 'ucr', initialFormData);
         setFilingId(filing.id);
+        setFormData(initialFormData);
       } catch (error) {
         console.error('Error creating filing:', error);
         toast({
