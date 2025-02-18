@@ -118,7 +118,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           )}
           <div>
             <span className="font-medium">MCS-150 Last Update: </span>
-            {data.mcs150Date || 'Not Available'}
+            {data.mcs150Date ? data.mcs150Date : 'Not Available'}
           </div>
           <div>
             <span className="font-medium">Mileage (Year): </span>
