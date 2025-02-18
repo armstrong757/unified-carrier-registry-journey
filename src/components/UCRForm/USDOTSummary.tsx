@@ -21,14 +21,15 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
 
   // Format the mileage year string
   const getMileageYear = () => {
-    // If we have mileage and a year, show both
-    if (data.mcs150Mileage && data.mcs150Year) {
-      return `${formatNumber(data.mcs150Mileage)} (${data.mcs150Year})`;
+    // If we have mileage, show it
+    if (data.mcs150Mileage) {
+      return `${formatNumber(data.mcs150Mileage)} (${data.mcs150Year || 'N/A'})`;
     }
-    // If we only have the year, show just that
+    // If we only have the year, show 0 mileage with the year
     if (data.mcs150Year) {
       return `0 (${data.mcs150Year})`;
     }
+    // If we have neither, return null to show Not Available
     return null;
   };
 
