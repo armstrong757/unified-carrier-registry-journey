@@ -31,13 +31,25 @@ export const useStepNavigation = (
         });
       }
     } else {
+      // Only attempt transaction if we have payment info
+      if (!formData.cardNumber || !formData.expiryDate || !formData.cvv || !formData.cardName) {
+        toast.toast({
+          title: "Missing Payment Information",
+          description: "Please fill out all payment fields before submitting.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       try {
         if (filingId) {
-          await createTransaction(filingId, 149, formData.cardType);
-          toast.toast({
-            title: "Success",
-            description: "Your UCR registration has been submitted successfully.",
-          });
+          const transaction = await createTransaction(filingId, 149, formData.cardType);
+          if (transaction) {
+            toast.toast({
+              title: "Success",
+              description: "Your UCR registration has been submitted successfully.",
+            });
+          }
         }
       } catch (error) {
         console.error('Error processing payment:', error);
