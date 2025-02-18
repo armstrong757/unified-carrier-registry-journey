@@ -29,17 +29,25 @@ export interface USDOTData {
   telephone?: string;
   powerUnits?: number;
   drivers?: number;
-  insuranceBIPD?: number;
-  insuranceBond?: number;
-  insuranceCargo?: number;
-  riskScore?: string;
+  busCount?: number;
+  limoCount?: number;
+  minibusCount?: number;
+  motorcoachCount?: number;
+  vanCount?: number;
+  complaintCount?: number;
+  outOfService?: boolean;
   outOfServiceDate?: string | null;
+  mcNumber?: string;
   mcs150FormDate?: string | null;
   mcs150Date?: string | null;
   mcs150Year?: number;
   mcs150Mileage?: number;
   carrierOperation?: string;
   cargoCarried?: string[];
+  insuranceBIPD?: number;
+  insuranceBond?: number;
+  insuranceCargo?: number;
+  riskScore?: string;
 }
 
 export interface Filing {
