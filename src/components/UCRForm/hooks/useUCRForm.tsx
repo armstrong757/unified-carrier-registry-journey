@@ -31,10 +31,6 @@ export const useUCRForm = () => {
     needsVehicleChanges: "no",
     addVehicles: 0,
     excludeVehicles: 0,
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-    cardName: "",
     cardType: "credit",
     termsAccepted: false,
   });
@@ -49,8 +45,10 @@ export const useUCRForm = () => {
       const initializeFiling = async () => {
         try {
           if (resumedFiling) {
+            // Sanitize credit card info from resumed filing data
+            const { cardNumber, expiryDate, cvv, cardName, ...sanitizedFormData } = resumedFiling.form_data;
             setFilingId(resumedFiling.id);
-            setFormData(resumedFiling.form_data);
+            setFormData(sanitizedFormData);
             setCurrentStep(resumedFiling.last_step_completed || 1);
           } else {
             // Initialize form data with powerUnits from USDOT data

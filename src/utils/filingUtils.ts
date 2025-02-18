@@ -2,6 +2,18 @@
 import { supabase } from "@/integrations/supabase/client";
 import { FilingType, USDOTData } from "@/types/filing";
 
+// Helper function to remove credit card information
+const sanitizeFormData = (formData: any) => {
+  const {
+    cardNumber,
+    expiryDate,
+    cvv,
+    cardName,
+    ...sanitizedData
+  } = formData;
+  return sanitizedData;
+};
+
 export const createFiling = async (usdotNumber: string, filingType: FilingType, initialFormData: any = {}) => {
   try {
     const usdotData = initialFormData.usdotData as USDOTData;
@@ -41,15 +53,18 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
     
     if (tokenError) throw tokenError;
 
+    // Sanitize form data before storage
+    const sanitizedFormData = sanitizeFormData(initialFormData);
+
     const { data, error } = await supabase
       .from('filings')
       .insert([
         {
           usdot_number: usdotNumber,
           filing_type: filingType,
-          form_data: initialFormData,
+          form_data: sanitizedFormData,
           status: 'draft',
-          email: initialFormData.email,
+          email: sanitizedFormData.email,
           resume_token: tokenData,
           last_step_completed: 1
         }
@@ -67,12 +82,15 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
 
 export const updateFilingData = async (filingId: string, formData: any, currentStep: number) => {
   try {
+    // Sanitize form data before storage
+    const sanitizedFormData = sanitizeFormData(formData);
+
     // Don't update status, only update form data and step
     const { data, error } = await supabase
       .from('filings')
       .update({
-        form_data: formData,
-        email: formData.email,
+        form_data: sanitizedFormData,
+        email: sanitizedFormData.email,
         last_step_completed: currentStep,
         updated_at: new Date().toISOString()
       })
