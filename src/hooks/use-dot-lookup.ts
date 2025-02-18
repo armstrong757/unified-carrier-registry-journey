@@ -25,8 +25,8 @@ function transformResponse(data: any): USDOTData {
     insuranceCargo: Number(data.insurance_cargo_on_file) || 0,
     riskScore: data.risk_score || 'Unknown',
     outOfServiceDate: data.out_of_service_date || null,
-    mcs150FormDate: data.mcs150_date || null,
-    mcs150Date: data.mcs150_date || null,
+    mcs150FormDate: data.mcs150_form_date || null,
+    mcs150Date: data.mcs150_form_date || null,  // Use mcs150_form_date instead of mcs150_date
     mcs150Year: Number(data.mcs150_year) || 0,
     mcs150Mileage: Number(data.mcs150_mileage) || 0,
     carrierOperation: data.carrier_operation || '',
