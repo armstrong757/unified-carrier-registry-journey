@@ -302,6 +302,110 @@ export type Database = {
         }
         Relationships: []
       }
+      mcs150_airtable_records: {
+        Row: {
+          created_at: string | null
+          ein: string | null
+          filing_id: string
+          filing_type: string
+          id: string
+          license_url: string | null
+          mc_number: string | null
+          mcs_business_email: string | null
+          mcs_business_phone: string | null
+          mcs_cargo_classifications: Json | null
+          mcs_company_operations: Json | null
+          mcs_drivers: Json | null
+          mcs_hazmat_details: Json | null
+          mcs_mailing_address: Json | null
+          mcs_operations_classifications: Json | null
+          mcs_operator_info: Json | null
+          mcs_owner_name: string | null
+          mcs_principal_address: Json | null
+          mcs_reason_biennial_update: boolean | null
+          mcs_reason_out_of_business: boolean | null
+          mcs_reason_reactivate: boolean | null
+          mcs_reason_reapplication: boolean | null
+          mcs_vehicles: Json | null
+          payment_amount: number | null
+          payment_method: string | null
+          payment_status: string | null
+          signature_url: string | null
+          transaction_id: string | null
+          usdot_number: string
+        }
+        Insert: {
+          created_at?: string | null
+          ein?: string | null
+          filing_id: string
+          filing_type: string
+          id?: string
+          license_url?: string | null
+          mc_number?: string | null
+          mcs_business_email?: string | null
+          mcs_business_phone?: string | null
+          mcs_cargo_classifications?: Json | null
+          mcs_company_operations?: Json | null
+          mcs_drivers?: Json | null
+          mcs_hazmat_details?: Json | null
+          mcs_mailing_address?: Json | null
+          mcs_operations_classifications?: Json | null
+          mcs_operator_info?: Json | null
+          mcs_owner_name?: string | null
+          mcs_principal_address?: Json | null
+          mcs_reason_biennial_update?: boolean | null
+          mcs_reason_out_of_business?: boolean | null
+          mcs_reason_reactivate?: boolean | null
+          mcs_reason_reapplication?: boolean | null
+          mcs_vehicles?: Json | null
+          payment_amount?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          signature_url?: string | null
+          transaction_id?: string | null
+          usdot_number: string
+        }
+        Update: {
+          created_at?: string | null
+          ein?: string | null
+          filing_id?: string
+          filing_type?: string
+          id?: string
+          license_url?: string | null
+          mc_number?: string | null
+          mcs_business_email?: string | null
+          mcs_business_phone?: string | null
+          mcs_cargo_classifications?: Json | null
+          mcs_company_operations?: Json | null
+          mcs_drivers?: Json | null
+          mcs_hazmat_details?: Json | null
+          mcs_mailing_address?: Json | null
+          mcs_operations_classifications?: Json | null
+          mcs_operator_info?: Json | null
+          mcs_owner_name?: string | null
+          mcs_principal_address?: Json | null
+          mcs_reason_biennial_update?: boolean | null
+          mcs_reason_out_of_business?: boolean | null
+          mcs_reason_reactivate?: boolean | null
+          mcs_reason_reapplication?: boolean | null
+          mcs_vehicles?: Json | null
+          payment_amount?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          signature_url?: string | null
+          transaction_id?: string | null
+          usdot_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mcs150_airtable_records_filing_id_fkey"
+            columns: ["filing_id"]
+            isOneToOne: false
+            referencedRelation: "filings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transactions: {
         Row: {
           amount: number
@@ -333,6 +437,107 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "transactions_filing_id_fkey"
+            columns: ["filing_id"]
+            isOneToOne: false
+            referencedRelation: "filings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ucr_airtable_records: {
+        Row: {
+          company_name: string | null
+          created_at: string | null
+          email: string | null
+          filing_id: string
+          filing_type: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          payment_amount: number | null
+          payment_method: string | null
+          payment_status: string | null
+          phone: string | null
+          physical_address: string | null
+          registration_year: string | null
+          total_vehicles: number | null
+          transaction_id: string | null
+          ucr_add_vehicles: number | null
+          ucr_broker: boolean | null
+          ucr_exclude_vehicles: number | null
+          ucr_freight_forwarder: boolean | null
+          ucr_leasing_company: boolean | null
+          ucr_motor_carrier: boolean | null
+          ucr_motor_private: boolean | null
+          ucr_passenger_vehicles: number | null
+          ucr_power_units: number | null
+          ucr_straight_trucks: number | null
+          ucr_total_fee: number | null
+          usdot_number: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          filing_id: string
+          filing_type: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          payment_amount?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          phone?: string | null
+          physical_address?: string | null
+          registration_year?: string | null
+          total_vehicles?: number | null
+          transaction_id?: string | null
+          ucr_add_vehicles?: number | null
+          ucr_broker?: boolean | null
+          ucr_exclude_vehicles?: number | null
+          ucr_freight_forwarder?: boolean | null
+          ucr_leasing_company?: boolean | null
+          ucr_motor_carrier?: boolean | null
+          ucr_motor_private?: boolean | null
+          ucr_passenger_vehicles?: number | null
+          ucr_power_units?: number | null
+          ucr_straight_trucks?: number | null
+          ucr_total_fee?: number | null
+          usdot_number: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          filing_id?: string
+          filing_type?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          payment_amount?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          phone?: string | null
+          physical_address?: string | null
+          registration_year?: string | null
+          total_vehicles?: number | null
+          transaction_id?: string | null
+          ucr_add_vehicles?: number | null
+          ucr_broker?: boolean | null
+          ucr_exclude_vehicles?: number | null
+          ucr_freight_forwarder?: boolean | null
+          ucr_leasing_company?: boolean | null
+          ucr_motor_carrier?: boolean | null
+          ucr_motor_private?: boolean | null
+          ucr_passenger_vehicles?: number | null
+          ucr_power_units?: number | null
+          ucr_straight_trucks?: number | null
+          ucr_total_fee?: number | null
+          usdot_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ucr_airtable_records_filing_id_fkey"
             columns: ["filing_id"]
             isOneToOne: false
             referencedRelation: "filings"
