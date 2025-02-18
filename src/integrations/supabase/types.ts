@@ -263,104 +263,87 @@ export type Database = {
       }
       ucr_airtable_records: {
         Row: {
+          classification_broker: boolean | null
+          classification_freight_forwarder: boolean | null
+          classification_leasing_company: boolean | null
+          classification_motor_carrier: boolean | null
+          classification_motor_private: boolean | null
           company_name: string | null
           created_at: string | null
           email: string | null
-          filing_id: string
           filing_type: string
-          first_name: string | null
+          full_name: string | null
           id: string
-          last_name: string | null
           payment_amount: number | null
           payment_method: string | null
           payment_status: string | null
           phone: string | null
           physical_address: string | null
           registration_year: string | null
-          total_vehicles: number | null
           transaction_id: string | null
-          ucr_add_vehicles: number | null
-          ucr_broker: boolean | null
-          ucr_exclude_vehicles: number | null
-          ucr_freight_forwarder: boolean | null
-          ucr_leasing_company: boolean | null
-          ucr_motor_carrier: boolean | null
-          ucr_motor_private: boolean | null
-          ucr_passenger_vehicles: number | null
-          ucr_power_units: number | null
-          ucr_straight_trucks: number | null
-          ucr_total_fee: number | null
           usdot_number: string
+          vehicles_add_vehicles: number | null
+          vehicles_exclude_vehicles: number | null
+          vehicles_passenger_vehicles: number | null
+          vehicles_power_units: number | null
+          vehicles_straight_trucks: number | null
+          vehicles_total: number | null
         }
         Insert: {
+          classification_broker?: boolean | null
+          classification_freight_forwarder?: boolean | null
+          classification_leasing_company?: boolean | null
+          classification_motor_carrier?: boolean | null
+          classification_motor_private?: boolean | null
           company_name?: string | null
           created_at?: string | null
           email?: string | null
-          filing_id: string
           filing_type: string
-          first_name?: string | null
+          full_name?: string | null
           id?: string
-          last_name?: string | null
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
           phone?: string | null
           physical_address?: string | null
           registration_year?: string | null
-          total_vehicles?: number | null
           transaction_id?: string | null
-          ucr_add_vehicles?: number | null
-          ucr_broker?: boolean | null
-          ucr_exclude_vehicles?: number | null
-          ucr_freight_forwarder?: boolean | null
-          ucr_leasing_company?: boolean | null
-          ucr_motor_carrier?: boolean | null
-          ucr_motor_private?: boolean | null
-          ucr_passenger_vehicles?: number | null
-          ucr_power_units?: number | null
-          ucr_straight_trucks?: number | null
-          ucr_total_fee?: number | null
           usdot_number: string
+          vehicles_add_vehicles?: number | null
+          vehicles_exclude_vehicles?: number | null
+          vehicles_passenger_vehicles?: number | null
+          vehicles_power_units?: number | null
+          vehicles_straight_trucks?: number | null
+          vehicles_total?: number | null
         }
         Update: {
+          classification_broker?: boolean | null
+          classification_freight_forwarder?: boolean | null
+          classification_leasing_company?: boolean | null
+          classification_motor_carrier?: boolean | null
+          classification_motor_private?: boolean | null
           company_name?: string | null
           created_at?: string | null
           email?: string | null
-          filing_id?: string
           filing_type?: string
-          first_name?: string | null
+          full_name?: string | null
           id?: string
-          last_name?: string | null
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
           phone?: string | null
           physical_address?: string | null
           registration_year?: string | null
-          total_vehicles?: number | null
           transaction_id?: string | null
-          ucr_add_vehicles?: number | null
-          ucr_broker?: boolean | null
-          ucr_exclude_vehicles?: number | null
-          ucr_freight_forwarder?: boolean | null
-          ucr_leasing_company?: boolean | null
-          ucr_motor_carrier?: boolean | null
-          ucr_motor_private?: boolean | null
-          ucr_passenger_vehicles?: number | null
-          ucr_power_units?: number | null
-          ucr_straight_trucks?: number | null
-          ucr_total_fee?: number | null
           usdot_number?: string
+          vehicles_add_vehicles?: number | null
+          vehicles_exclude_vehicles?: number | null
+          vehicles_passenger_vehicles?: number | null
+          vehicles_power_units?: number | null
+          vehicles_straight_trucks?: number | null
+          vehicles_total?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "ucr_airtable_records_filing_id_fkey"
-            columns: ["filing_id"]
-            isOneToOne: false
-            referencedRelation: "filings"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       usdot_info: {
         Row: {

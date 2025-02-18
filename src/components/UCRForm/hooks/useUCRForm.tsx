@@ -14,7 +14,7 @@ export const useUCRForm = () => {
 
   const [formData, setFormData] = useState({
     registrationYear: new Date().getFullYear() + 1,
-    representative: "",
+    representative: "", // Changed from first/last name to full name
     email: "",
     phone: "",
     authorization: false,

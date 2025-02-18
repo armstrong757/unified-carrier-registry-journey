@@ -32,23 +32,22 @@ export const testUCRFilingCompletion = async (filingId: string) => {
 
     if (transactionError) throw transactionError;
 
-    // The populate_airtable_record trigger will automatically create the record
     // Verify the UCR record was created with correct vehicle data
     const { data: record, error: recordError } = await supabase
       .from('ucr_airtable_records')
       .select(`
-        filing_id,
-        total_vehicles,
-        ucr_straight_trucks,
-        ucr_power_units,
-        ucr_passenger_vehicles,
-        ucr_add_vehicles,
-        ucr_exclude_vehicles,
+        id,
+        vehicles_total,
+        vehicles_straight_trucks,
+        vehicles_power_units,
+        vehicles_passenger_vehicles,
+        vehicles_add_vehicles,
+        vehicles_exclude_vehicles,
         payment_status,
         payment_method,
         payment_amount
       `)
-      .eq('filing_id', filingId)
+      .eq('id', filingId)
       .single();
 
     if (recordError) throw recordError;
