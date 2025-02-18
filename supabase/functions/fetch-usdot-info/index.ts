@@ -3,8 +3,10 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 
 function validateDOTNumber(dotNumber: string): boolean {
+  // Clean the DOT number by removing any non-digit characters
+  const cleanDotNumber = dotNumber.replace(/\D/g, '');
   // DOT numbers are typically 5-7 digits
-  return /^\d{5,7}$/.test(dotNumber);
+  return /^\d{5,7}$/.test(cleanDotNumber);
 }
 
 serve(async (req) => {
