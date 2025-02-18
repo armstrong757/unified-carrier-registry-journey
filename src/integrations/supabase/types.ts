@@ -9,6 +9,93 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      airtable_records: {
+        Row: {
+          company_name: string | null
+          created_at: string | null
+          ein: string | null
+          email: string | null
+          filing_id: string
+          filing_type: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          license_url: string | null
+          mc_number: string | null
+          payment_amount: number | null
+          payment_method: string | null
+          payment_status: string | null
+          phone: string | null
+          physical_address: string | null
+          registration_year: string | null
+          signature_url: string | null
+          total_vehicles: number | null
+          transaction_id: string | null
+          usdot_number: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string | null
+          ein?: string | null
+          email?: string | null
+          filing_id: string
+          filing_type: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          license_url?: string | null
+          mc_number?: string | null
+          payment_amount?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          phone?: string | null
+          physical_address?: string | null
+          registration_year?: string | null
+          signature_url?: string | null
+          total_vehicles?: number | null
+          transaction_id?: string | null
+          usdot_number: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string | null
+          ein?: string | null
+          email?: string | null
+          filing_id?: string
+          filing_type?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          license_url?: string | null
+          mc_number?: string | null
+          payment_amount?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          phone?: string | null
+          physical_address?: string | null
+          registration_year?: string | null
+          signature_url?: string | null
+          total_vehicles?: number | null
+          transaction_id?: string | null
+          usdot_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "airtable_records_filing_id_fkey"
+            columns: ["filing_id"]
+            isOneToOne: true
+            referencedRelation: "filings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "airtable_records_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_requests: {
         Row: {
           cache_hit: boolean | null
