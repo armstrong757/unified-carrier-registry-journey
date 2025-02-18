@@ -4,28 +4,20 @@ import { FilingType, USDOTData } from "@/types/filing";
 
 export const createFiling = async (usdotNumber: string, filingType: FilingType, initialFormData: any = {}) => {
   try {
-    // First check if USDOT info already exists
-    const { data: existingUsdot, error: checkError } = await supabase
-      .from('usdot_info')
-      .select('*')
-      .eq('usdot_number', usdotNumber)
-      .maybeSingle();
-
-    if (checkError) throw checkError;
-
-    // If USDOT doesn't exist or needs updating, merge API data with existing data
     const usdotData = initialFormData.usdotData as USDOTData;
+    
+    // Prepare USDOT info record
     const usdotRecord = {
       usdot_number: usdotNumber,
-      legal_name: usdotData?.legalName || existingUsdot?.legal_name || 'Unknown',
-      dba_name: usdotData?.dbaName || existingUsdot?.dba_name,
-      operating_status: usdotData?.operatingStatus || existingUsdot?.operating_status,
-      entity_type: usdotData?.entityType || existingUsdot?.entity_type,
-      physical_address: usdotData?.physicalAddress || existingUsdot?.physical_address,
-      telephone: usdotData?.telephone || existingUsdot?.telephone,
-      power_units: usdotData?.powerUnits || existingUsdot?.power_units || 0,
-      drivers: usdotData?.drivers || existingUsdot?.drivers || 0,
-      mcs150_last_update: usdotData?.mcs150FormDate || existingUsdot?.mcs150_last_update,
+      legal_name: usdotData?.legalName || 'Unknown',
+      dba_name: usdotData?.dbaName,
+      operating_status: usdotData?.operatingStatus,
+      entity_type: usdotData?.entityType,
+      physical_address: usdotData?.physicalAddress,
+      telephone: usdotData?.telephone,
+      power_units: usdotData?.powerUnits || 0,
+      drivers: usdotData?.drivers || 0,
+      mcs150_last_update: usdotData?.mcs150FormDate,
       bus_count: 0,
       limo_count: 0,
       minibus_count: 0,
@@ -34,7 +26,7 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
       updated_at: new Date().toISOString()
     };
 
-    // Use upsert to either create or update the record
+    // Use upsert to either create or update the USDOT info record
     const { error: usdotError } = await supabase
       .from('usdot_info')
       .upsert(usdotRecord, {
