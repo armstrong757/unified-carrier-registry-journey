@@ -30,7 +30,15 @@ function transformResponse(data: any): USDOTData {
     mcs150Year: Number(data.mcs150_year) || 0,
     mcs150Mileage: Number(data.mcs150_mileage) || 0,
     carrierOperation: data.carrier_operation || '',
-    cargoCarried: []
+    cargoCarried: [],
+    busCount: 0,
+    limoCount: 0,
+    minibusCount: 0,
+    motorcoachCount: 0,
+    vanCount: 0,
+    complaintCount: 0,
+    outOfService: false,
+    mcNumber: data.docket || ''
   };
 
   console.log('Transformed USDOT data:', transformed);
