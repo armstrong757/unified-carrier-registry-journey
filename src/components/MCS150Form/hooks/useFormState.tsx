@@ -3,7 +3,7 @@ import { useState } from "react";
 
 export const useFormState = () => {
   const [formData, setFormData] = useState({
-    reasonForFiling: "biennialUpdate", // Single field instead of multiple booleans
+    reasonForFiling: "biennialUpdate",
     hasChanges: "no",
     changesToMake: {
       companyInfo: false,
@@ -45,9 +45,9 @@ export const useFormState = () => {
     businessPhone: "",
     businessEmail: "",
     companyName: "",
-    einSsn: "",
+    companyEinSsn: "", // Added company EIN/SSN field
     
-    // Operating Information
+    // Operations Information (renamed from operating)
     companyOperations: {
       interstateCarrier: false,
       intrastatehazmatCarrier: false,
@@ -145,12 +145,12 @@ export const useFormState = () => {
     
     // Operator Information
     operator: {
-      firstName: "",
-      lastName: "",
+      firstName: "", // Added first name
+      lastName: "", // Added last name
       title: "",
-      email: "",
-      phone: "",
-      einSsn: "",
+      email: "", // Added email
+      phone: "", // Added phone
+      einSsn: "", // Renamed to einSsn for operator
       milesDriven: "",
       licenseFile: null,
       signature: "",

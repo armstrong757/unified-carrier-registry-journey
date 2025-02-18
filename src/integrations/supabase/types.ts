@@ -122,6 +122,7 @@ export type Database = {
       mcs150_airtable_records: {
         Row: {
           changes_to_make: Json | null
+          company_ein_ssn: string | null
           company_email: string | null
           company_info_changes: Json | null
           company_mailing_address: Json | null
@@ -129,7 +130,6 @@ export type Database = {
           company_phone: string | null
           company_principal_address: Json | null
           created_at: string | null
-          ein: string | null
           filing_id: string
           filing_type: string
           has_changes: boolean | null
@@ -137,14 +137,19 @@ export type Database = {
           license_url: string | null
           mc_number: string | null
           mcs_operator_info: Json | null
-          operating_cargo_classifications: Json | null
-          operating_classifications: Json | null
-          operating_company_operations: Json | null
-          operating_drivers: Json | null
-          operating_hazmat_details: Json | null
           operating_info_changes: Json | null
-          operating_vehicles: Json | null
+          operations_cargo_classifications: Json | null
+          operations_classifications: Json | null
+          operations_company_operations: Json | null
+          operations_drivers: Json | null
+          operations_hazmat_details: Json | null
+          operations_vehicles: Json | null
+          operator_ein_ssn: string | null
+          operator_email: string | null
+          operator_first_name: string | null
+          operator_last_name: string | null
           operator_miles_driven: number | null
+          operator_phone: string | null
           operator_title: string | null
           payment_amount: number | null
           payment_method: string | null
@@ -156,6 +161,7 @@ export type Database = {
         }
         Insert: {
           changes_to_make?: Json | null
+          company_ein_ssn?: string | null
           company_email?: string | null
           company_info_changes?: Json | null
           company_mailing_address?: Json | null
@@ -163,7 +169,6 @@ export type Database = {
           company_phone?: string | null
           company_principal_address?: Json | null
           created_at?: string | null
-          ein?: string | null
           filing_id: string
           filing_type: string
           has_changes?: boolean | null
@@ -171,14 +176,19 @@ export type Database = {
           license_url?: string | null
           mc_number?: string | null
           mcs_operator_info?: Json | null
-          operating_cargo_classifications?: Json | null
-          operating_classifications?: Json | null
-          operating_company_operations?: Json | null
-          operating_drivers?: Json | null
-          operating_hazmat_details?: Json | null
           operating_info_changes?: Json | null
-          operating_vehicles?: Json | null
+          operations_cargo_classifications?: Json | null
+          operations_classifications?: Json | null
+          operations_company_operations?: Json | null
+          operations_drivers?: Json | null
+          operations_hazmat_details?: Json | null
+          operations_vehicles?: Json | null
+          operator_ein_ssn?: string | null
+          operator_email?: string | null
+          operator_first_name?: string | null
+          operator_last_name?: string | null
           operator_miles_driven?: number | null
+          operator_phone?: string | null
           operator_title?: string | null
           payment_amount?: number | null
           payment_method?: string | null
@@ -190,6 +200,7 @@ export type Database = {
         }
         Update: {
           changes_to_make?: Json | null
+          company_ein_ssn?: string | null
           company_email?: string | null
           company_info_changes?: Json | null
           company_mailing_address?: Json | null
@@ -197,7 +208,6 @@ export type Database = {
           company_phone?: string | null
           company_principal_address?: Json | null
           created_at?: string | null
-          ein?: string | null
           filing_id?: string
           filing_type?: string
           has_changes?: boolean | null
@@ -205,14 +215,19 @@ export type Database = {
           license_url?: string | null
           mc_number?: string | null
           mcs_operator_info?: Json | null
-          operating_cargo_classifications?: Json | null
-          operating_classifications?: Json | null
-          operating_company_operations?: Json | null
-          operating_drivers?: Json | null
-          operating_hazmat_details?: Json | null
           operating_info_changes?: Json | null
-          operating_vehicles?: Json | null
+          operations_cargo_classifications?: Json | null
+          operations_classifications?: Json | null
+          operations_company_operations?: Json | null
+          operations_drivers?: Json | null
+          operations_hazmat_details?: Json | null
+          operations_vehicles?: Json | null
+          operator_ein_ssn?: string | null
+          operator_email?: string | null
+          operator_first_name?: string | null
+          operator_last_name?: string | null
           operator_miles_driven?: number | null
+          operator_phone?: string | null
           operator_title?: string | null
           payment_amount?: number | null
           payment_method?: string | null
