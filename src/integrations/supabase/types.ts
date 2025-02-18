@@ -111,15 +111,7 @@ export type Database = {
           updated_at?: string | null
           usdot_number?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "filings_usdot_number_fkey"
-            columns: ["usdot_number"]
-            isOneToOne: false
-            referencedRelation: "usdot_info"
-            referencedColumns: ["usdot_number"]
-          },
-        ]
+        Relationships: []
       }
       transactions: {
         Row: {
@@ -158,90 +150,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      usdot_info: {
-        Row: {
-          basics_data: Json | null
-          bus_count: number | null
-          complaint_count: number | null
-          created_at: string | null
-          dba_name: string | null
-          drivers: number | null
-          ein: string | null
-          entity_type: string | null
-          id: string
-          legal_name: string | null
-          limo_count: number | null
-          mc_number: string | null
-          mcs150_last_update: string | null
-          mileage_year: string | null
-          minibus_count: number | null
-          motorcoach_count: number | null
-          operating_status: string | null
-          out_of_service: boolean | null
-          out_of_service_date: string | null
-          physical_address: string | null
-          power_units: number | null
-          telephone: string | null
-          updated_at: string | null
-          usdot_number: string
-          van_count: number | null
-        }
-        Insert: {
-          basics_data?: Json | null
-          bus_count?: number | null
-          complaint_count?: number | null
-          created_at?: string | null
-          dba_name?: string | null
-          drivers?: number | null
-          ein?: string | null
-          entity_type?: string | null
-          id?: string
-          legal_name?: string | null
-          limo_count?: number | null
-          mc_number?: string | null
-          mcs150_last_update?: string | null
-          mileage_year?: string | null
-          minibus_count?: number | null
-          motorcoach_count?: number | null
-          operating_status?: string | null
-          out_of_service?: boolean | null
-          out_of_service_date?: string | null
-          physical_address?: string | null
-          power_units?: number | null
-          telephone?: string | null
-          updated_at?: string | null
-          usdot_number: string
-          van_count?: number | null
-        }
-        Update: {
-          basics_data?: Json | null
-          bus_count?: number | null
-          complaint_count?: number | null
-          created_at?: string | null
-          dba_name?: string | null
-          drivers?: number | null
-          ein?: string | null
-          entity_type?: string | null
-          id?: string
-          legal_name?: string | null
-          limo_count?: number | null
-          mc_number?: string | null
-          mcs150_last_update?: string | null
-          mileage_year?: string | null
-          minibus_count?: number | null
-          motorcoach_count?: number | null
-          operating_status?: string | null
-          out_of_service?: boolean | null
-          out_of_service_date?: string | null
-          physical_address?: string | null
-          power_units?: number | null
-          telephone?: string | null
-          updated_at?: string | null
-          usdot_number?: string
-          van_count?: number | null
-        }
-        Relationships: []
       }
     }
     Views: {
