@@ -1,15 +1,28 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-export const testAirtableRecordPopulation = async (filingId: string) => {
+export const testUCRFilingCompletion = async (filingId: string) => {
   try {
-    // First create a test transaction
+    // First update the filing status to completed
+    const { data: filing, error: filingError } = await supabase
+      .from('filings')
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString()
+      })
+      .eq('id', filingId)
+      .select()
+      .single();
+
+    if (filingError) throw filingError;
+
+    // Create a test transaction without payment processing
     const { data: transaction, error: transactionError } = await supabase
       .from('transactions')
       .insert([
         {
           filing_id: filingId,
-          amount: 100,
+          amount: 149, // Standard UCR fee
           status: 'completed',
           payment_method: 'test'
         }
@@ -29,17 +42,29 @@ export const testAirtableRecordPopulation = async (filingId: string) => {
         ucr_power_units,
         ucr_passenger_vehicles,
         ucr_add_vehicles,
-        ucr_exclude_vehicles
+        ucr_exclude_vehicles,
+        payment_status,
+        payment_method,
+        payment_amount
       `)
       .eq('filing_id', filingId)
       .single();
 
     if (recordError) throw recordError;
 
-    console.log('Airtable Record Created:', record);
+    console.log('Test Filing Completed:', {
+      filing,
+      transaction,
+      airtableRecord: record
+    });
+    
     return record;
   } catch (error) {
-    console.error('Error testing Airtable record population:', error);
+    console.error('Error testing filing completion:', error);
     throw error;
   }
 };
+
+// Example usage in browser console:
+// import { testUCRFilingCompletion } from '@/utils/testUtils';
+// testUCRFilingCompletion('your-filing-id').then(console.log).catch(console.error);
