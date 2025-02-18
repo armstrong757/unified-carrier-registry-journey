@@ -24,16 +24,26 @@ export const getNextStep = (currentStep: number, formData: any) => {
 
   // Handle skipping steps based on form data
   if (currentStep === 2) {
-    if (shouldSkipStep3(formData) && shouldSkipStep4(formData)) return 5;
-    if (shouldSkipStep3(formData)) return 4;
+    // If both steps should be skipped, go to step 5
+    if (shouldSkipStep3(formData) && shouldSkipStep4(formData)) {
+      return 5;
+    }
+    // If only step 3 should be skipped, go to step 4
+    if (shouldSkipStep3(formData)) {
+      return 3; // Return 3 to maintain sequential progression
+    }
     return 3;
   }
 
-  if (currentStep === 3 && shouldSkipStep4(formData)) {
-    return 5;
+  if (currentStep === 3) {
+    if (shouldSkipStep4(formData)) {
+      return 5;
+    }
+    return 4;
   }
 
-  return Math.min(currentStep + 1, 6); // Never exceed maximum step
+  // For all other cases, move to the next step
+  return Math.min(currentStep + 1, 6);
 };
 
 export const getPreviousStep = (currentStep: number, formData: any) => {
@@ -51,7 +61,7 @@ export const getPreviousStep = (currentStep: number, formData: any) => {
   return Math.max(currentStep - 1, 1); // Never go below step 1
 };
 
-// New helper function to validate step completion
+// Helper function to validate step completion
 const isStepComplete = (step: number, formData: any): boolean => {
   switch (step) {
     case 1:
