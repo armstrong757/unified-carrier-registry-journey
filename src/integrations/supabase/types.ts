@@ -22,6 +22,25 @@ export type Database = {
           last_name: string | null
           license_url: string | null
           mc_number: string | null
+          mcs_business_email: string | null
+          mcs_business_phone: string | null
+          mcs_cargo_classifications: Json | null
+          mcs_company_info_changes: Json | null
+          mcs_company_operations: Json | null
+          mcs_drivers: Json | null
+          mcs_has_changes: string | null
+          mcs_hazmat_details: Json | null
+          mcs_mailing_address: Json | null
+          mcs_operating_info_changes: Json | null
+          mcs_operations_classifications: Json | null
+          mcs_operator_info: Json | null
+          mcs_owner_name: string | null
+          mcs_principal_address: Json | null
+          mcs_reason_biennial_update: boolean | null
+          mcs_reason_out_of_business: boolean | null
+          mcs_reason_reactivate: boolean | null
+          mcs_reason_reapplication: boolean | null
+          mcs_vehicles: Json | null
           payment_amount: number | null
           payment_method: string | null
           payment_status: string | null
@@ -31,6 +50,19 @@ export type Database = {
           signature_url: string | null
           total_vehicles: number | null
           transaction_id: string | null
+          ucr_add_vehicles: number | null
+          ucr_broker: boolean | null
+          ucr_exclude_vehicles: number | null
+          ucr_freight_forwarder: boolean | null
+          ucr_leasing_company: boolean | null
+          ucr_motor_carrier: boolean | null
+          ucr_motor_private: boolean | null
+          ucr_needs_vehicle_changes: string | null
+          ucr_passenger_vehicles: number | null
+          ucr_power_units: number | null
+          ucr_registration_year: string | null
+          ucr_straight_trucks: number | null
+          ucr_total_fee: number | null
           usdot_number: string
         }
         Insert: {
@@ -45,6 +77,25 @@ export type Database = {
           last_name?: string | null
           license_url?: string | null
           mc_number?: string | null
+          mcs_business_email?: string | null
+          mcs_business_phone?: string | null
+          mcs_cargo_classifications?: Json | null
+          mcs_company_info_changes?: Json | null
+          mcs_company_operations?: Json | null
+          mcs_drivers?: Json | null
+          mcs_has_changes?: string | null
+          mcs_hazmat_details?: Json | null
+          mcs_mailing_address?: Json | null
+          mcs_operating_info_changes?: Json | null
+          mcs_operations_classifications?: Json | null
+          mcs_operator_info?: Json | null
+          mcs_owner_name?: string | null
+          mcs_principal_address?: Json | null
+          mcs_reason_biennial_update?: boolean | null
+          mcs_reason_out_of_business?: boolean | null
+          mcs_reason_reactivate?: boolean | null
+          mcs_reason_reapplication?: boolean | null
+          mcs_vehicles?: Json | null
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
@@ -54,6 +105,19 @@ export type Database = {
           signature_url?: string | null
           total_vehicles?: number | null
           transaction_id?: string | null
+          ucr_add_vehicles?: number | null
+          ucr_broker?: boolean | null
+          ucr_exclude_vehicles?: number | null
+          ucr_freight_forwarder?: boolean | null
+          ucr_leasing_company?: boolean | null
+          ucr_motor_carrier?: boolean | null
+          ucr_motor_private?: boolean | null
+          ucr_needs_vehicle_changes?: string | null
+          ucr_passenger_vehicles?: number | null
+          ucr_power_units?: number | null
+          ucr_registration_year?: string | null
+          ucr_straight_trucks?: number | null
+          ucr_total_fee?: number | null
           usdot_number: string
         }
         Update: {
@@ -68,6 +132,25 @@ export type Database = {
           last_name?: string | null
           license_url?: string | null
           mc_number?: string | null
+          mcs_business_email?: string | null
+          mcs_business_phone?: string | null
+          mcs_cargo_classifications?: Json | null
+          mcs_company_info_changes?: Json | null
+          mcs_company_operations?: Json | null
+          mcs_drivers?: Json | null
+          mcs_has_changes?: string | null
+          mcs_hazmat_details?: Json | null
+          mcs_mailing_address?: Json | null
+          mcs_operating_info_changes?: Json | null
+          mcs_operations_classifications?: Json | null
+          mcs_operator_info?: Json | null
+          mcs_owner_name?: string | null
+          mcs_principal_address?: Json | null
+          mcs_reason_biennial_update?: boolean | null
+          mcs_reason_out_of_business?: boolean | null
+          mcs_reason_reactivate?: boolean | null
+          mcs_reason_reapplication?: boolean | null
+          mcs_vehicles?: Json | null
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
@@ -77,6 +160,19 @@ export type Database = {
           signature_url?: string | null
           total_vehicles?: number | null
           transaction_id?: string | null
+          ucr_add_vehicles?: number | null
+          ucr_broker?: boolean | null
+          ucr_exclude_vehicles?: number | null
+          ucr_freight_forwarder?: boolean | null
+          ucr_leasing_company?: boolean | null
+          ucr_motor_carrier?: boolean | null
+          ucr_motor_private?: boolean | null
+          ucr_needs_vehicle_changes?: string | null
+          ucr_passenger_vehicles?: number | null
+          ucr_power_units?: number | null
+          ucr_registration_year?: string | null
+          ucr_straight_trucks?: number | null
+          ucr_total_fee?: number | null
           usdot_number?: string
         }
         Relationships: [
