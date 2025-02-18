@@ -63,12 +63,6 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
         <hr className="border-t border-gray-300 my-4" />
         <div className="space-y-2 text-sm">
           <div>
-            <span className="font-medium">Operating Status: </span>
-            <span className={data.operatingStatus === "NOT AUTHORIZED" ? "text-red-500 font-semibold" : ""}>
-              {data.operatingStatus || 'Not Available'}
-            </span>
-          </div>
-          <div>
             <span className="font-medium">Entity Type: </span>
             {data.entityType || 'Not Available'}
           </div>
@@ -86,12 +80,6 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
             <span className="font-medium">Physical Address: </span>
             {data.physicalAddress || 'Not Available'}
           </div>
-          {data.telephone && (
-            <div>
-              <span className="font-medium">Telephone: </span>
-              {data.telephone}
-            </div>
-          )}
           <div>
             <span className="font-medium">Power Units: </span>
             {typeof data.powerUnits === 'number' ? data.powerUnits : 'Not Available'}
@@ -150,7 +138,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           )}
           <div>
             <span className="font-medium">MCS-150 Last Update: </span>
-            {data.mcs150FormDate || 'Not Available'}
+            {data.mcs150Year ? `${data.mcs150Year}` : 'Not Available'}
           </div>
           <div>
             <span className="font-medium">Mileage (Year): </span>
