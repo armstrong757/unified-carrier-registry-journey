@@ -24,6 +24,7 @@ interface USDOTData {
   outOfServiceDate: string | null;
   mcNumber: string;
   mcs150FormDate: string | null;
+  mcs150Date: string | null;
   mcs150Year: number;
   mcs150Mileage: number;
   basicsData: Record<string, any>;
@@ -138,7 +139,7 @@ const USDOTSummary = ({ data }: USDOTSummaryProps) => {
           )}
           <div>
             <span className="font-medium">MCS-150 Last Update: </span>
-            {data.mcs150Year ? `${data.mcs150Year}` : 'Not Available'}
+            {data.mcs150Date || 'Not Available'}
           </div>
           <div>
             <span className="font-medium">Mileage (Year): </span>

@@ -35,6 +35,7 @@ export interface USDOTData {
   riskScore?: string;
   outOfServiceDate?: string | null;
   mcs150FormDate?: string | null;
+  mcs150Date?: string | null;
   mcs150Year?: number;
   mcs150Mileage?: number;
   carrierOperation?: string;

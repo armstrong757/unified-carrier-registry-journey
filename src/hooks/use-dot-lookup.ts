@@ -26,6 +26,7 @@ function transformResponse(data: any): USDOTData {
     riskScore: data.risk_score || 'Unknown',
     outOfServiceDate: data.out_of_service_date || null,
     mcs150FormDate: data.mcs150_form_date || null,
+    mcs150Date: data.mcs150_date || null,
     mcs150Year: Number(data.mcs150_year) || 0,
     mcs150Mileage: Number(data.mcs150_mileage) || 0,
     carrierOperation: data.carrier_operation || '',
