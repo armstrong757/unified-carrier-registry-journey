@@ -3,12 +3,7 @@ import { useState } from "react";
 
 export const useFormState = () => {
   const [formData, setFormData] = useState({
-    reasonForFiling: {
-      biennialUpdate: true,
-      reactivate: false,
-      reapplication: false,
-      outOfBusiness: false,
-    },
+    reasonForFiling: "biennialUpdate", // Single field instead of multiple booleans
     hasChanges: "no",
     changesToMake: {
       companyInfo: false,
@@ -31,6 +26,7 @@ export const useFormState = () => {
       cargo: false,
       hazmat: false,
     },
+    // Company Information
     ownerName: "",
     principalAddress: {
       address: "",
@@ -50,6 +46,8 @@ export const useFormState = () => {
     businessEmail: "",
     companyName: "",
     einSsn: "",
+    
+    // Operating Information
     companyOperations: {
       interstateCarrier: false,
       intrastatehazmatCarrier: false,
@@ -57,8 +55,51 @@ export const useFormState = () => {
       intrastateHazmatShipper: false,
       intrastateNonHazmatShipper: false,
     },
-    operationsClassifications: {},
-    cargoClassifications: {},
+    operationsClassifications: {
+      authorizedForHire: false,
+      exemptForHire: false,
+      privateProperty: false,
+      privatePassengersBusiness: false,
+      privatePassengersNonBusiness: false,
+      migrant: false,
+      usMail: false,
+      federalGovernment: false,
+      stateGovernment: false,
+      localGovernment: false,
+      indianTribe: false,
+    },
+    cargoClassifications: {
+      generalFreight: false,
+      metalSheets: false,
+      driveAway: false,
+      buildingMaterials: false,
+      machinery: false,
+      liquidsGases: false,
+      passengers: false,
+      livestock: false,
+      coal: false,
+      garbage: false,
+      chemicals: false,
+      refrigeratedFood: false,
+      paperProducts: false,
+      farmSupplies: false,
+      waterWell: false,
+      householdGoods: false,
+      motorVehicles: false,
+      logs: false,
+      mobileHomes: false,
+      freshProduce: false,
+      intermodalContainer: false,
+      oilFieldEquipment: false,
+      grain: false,
+      meat: false,
+      usMail: false,
+      dryBulk: false,
+      beverages: false,
+      utility: false,
+      construction: false,
+      other: false,
+    },
     vehicles: {
       straightTrucks: { owned: 0, termLeased: 0, tripLeased: 0 },
       truckTractors: { owned: 0, termLeased: 0, tripLeased: 0 },
@@ -81,18 +122,41 @@ export const useFormState = () => {
       total: "0",
       cdl: "0",
     },
-    hazmatDetails: {},
+    hazmatDetails: {
+      explosives: false,
+      hazardousWaste: false,
+      radioactiveMaterials: false,
+      inhalationHazard: false,
+      fuel: false,
+      commodityDry: false,
+      liquidGas: false,
+      explosivesDiv: false,
+      explosivesDiv2: false,
+      explosivesDiv3: false,
+      combustibleLiquid: false,
+      flammableLiquid: false,
+      flammableSolid: false,
+      oxidizer: false,
+      organicPeroxide: false,
+      poisonA: false,
+      poisonB: false,
+      poisonC: false,
+    },
+    
+    // Operator Information
     operator: {
       firstName: "",
       lastName: "",
-      title: "",  // Added title field
+      title: "",
       email: "",
       phone: "",
       einSsn: "",
-      milesDriven: "",  // Added milesDriven field
+      milesDriven: "",
       licenseFile: null,
       signature: "",
     },
+    
+    // Billing Information
     billing: {
       cardType: "credit",
       termsAccepted: false,

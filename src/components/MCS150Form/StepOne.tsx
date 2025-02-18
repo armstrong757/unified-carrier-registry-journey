@@ -9,16 +9,9 @@ interface StepOneProps {
 
 const StepOne = ({ formData, setFormData }: StepOneProps) => {
   const updateReasonForFiling = (value: string) => {
-    const newReasonForFiling = {
-      biennialUpdate: value === "biennialUpdate",
-      reactivate: value === "reactivate",
-      reapplication: value === "reapplication",
-      outOfBusiness: value === "outOfBusiness",
-    };
-
     setFormData({
       ...formData,
-      reasonForFiling: newReasonForFiling,
+      reasonForFiling: value,
     });
   };
 
@@ -31,7 +24,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           Select your reason for filing <span className="text-red-500">*</span>
         </Label>
         <RadioGroup
-          value={Object.entries(formData.reasonForFiling).find(([_, value]) => value)?.[0] || ""}
+          value={formData.reasonForFiling}
           onValueChange={updateReasonForFiling}
           className="space-y-1.5"
         >

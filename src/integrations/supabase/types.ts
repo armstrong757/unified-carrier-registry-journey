@@ -121,7 +121,9 @@ export type Database = {
       }
       mcs150_airtable_records: {
         Row: {
+          changes_to_make: Json | null
           company_email: string | null
+          company_info_changes: Json | null
           company_mailing_address: Json | null
           company_owner_name: string | null
           company_phone: string | null
@@ -130,6 +132,7 @@ export type Database = {
           ein: string | null
           filing_id: string
           filing_type: string
+          has_changes: boolean | null
           id: string
           license_url: string | null
           mc_number: string | null
@@ -139,22 +142,22 @@ export type Database = {
           operating_company_operations: Json | null
           operating_drivers: Json | null
           operating_hazmat_details: Json | null
+          operating_info_changes: Json | null
           operating_vehicles: Json | null
           operator_miles_driven: number | null
           operator_title: string | null
           payment_amount: number | null
           payment_method: string | null
           payment_status: string | null
-          reason_biennial_update: boolean | null
-          reason_out_of_business: boolean | null
-          reason_reactivate: boolean | null
-          reason_reapplication: boolean | null
+          reason_for_filing: string | null
           signature_url: string | null
           transaction_id: string | null
           usdot_number: string
         }
         Insert: {
+          changes_to_make?: Json | null
           company_email?: string | null
+          company_info_changes?: Json | null
           company_mailing_address?: Json | null
           company_owner_name?: string | null
           company_phone?: string | null
@@ -163,6 +166,7 @@ export type Database = {
           ein?: string | null
           filing_id: string
           filing_type: string
+          has_changes?: boolean | null
           id?: string
           license_url?: string | null
           mc_number?: string | null
@@ -172,22 +176,22 @@ export type Database = {
           operating_company_operations?: Json | null
           operating_drivers?: Json | null
           operating_hazmat_details?: Json | null
+          operating_info_changes?: Json | null
           operating_vehicles?: Json | null
           operator_miles_driven?: number | null
           operator_title?: string | null
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
-          reason_biennial_update?: boolean | null
-          reason_out_of_business?: boolean | null
-          reason_reactivate?: boolean | null
-          reason_reapplication?: boolean | null
+          reason_for_filing?: string | null
           signature_url?: string | null
           transaction_id?: string | null
           usdot_number: string
         }
         Update: {
+          changes_to_make?: Json | null
           company_email?: string | null
+          company_info_changes?: Json | null
           company_mailing_address?: Json | null
           company_owner_name?: string | null
           company_phone?: string | null
@@ -196,6 +200,7 @@ export type Database = {
           ein?: string | null
           filing_id?: string
           filing_type?: string
+          has_changes?: boolean | null
           id?: string
           license_url?: string | null
           mc_number?: string | null
@@ -205,16 +210,14 @@ export type Database = {
           operating_company_operations?: Json | null
           operating_drivers?: Json | null
           operating_hazmat_details?: Json | null
+          operating_info_changes?: Json | null
           operating_vehicles?: Json | null
           operator_miles_driven?: number | null
           operator_title?: string | null
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
-          reason_biennial_update?: boolean | null
-          reason_out_of_business?: boolean | null
-          reason_reactivate?: boolean | null
-          reason_reapplication?: boolean | null
+          reason_for_filing?: string | null
           signature_url?: string | null
           transaction_id?: string | null
           usdot_number?: string
