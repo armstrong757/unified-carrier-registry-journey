@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -24,13 +23,23 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
     }
   }, [formData.powerUnits]);
 
-  // Calculate total vehicles
+  // Calculate total vehicles and log for verification
   const totalVehicles = (
-    (formData.straightTrucks || 0) +
-    (formData.passengerVehicles || 0) +
-    (Number(formData.addVehicles) || 0) -
-    (Number(formData.excludeVehicles) || 0)
+    (parseInt(formData.straightTrucks) || 0) +
+    (parseInt(formData.passengerVehicles) || 0) +
+    (parseInt(formData.addVehicles) || 0) -
+    (parseInt(formData.excludeVehicles) || 0)
   );
+
+  useEffect(() => {
+    console.log('UCR Form Vehicle Data:', {
+      straightTrucks: formData.straightTrucks,
+      passengerVehicles: formData.passengerVehicles,
+      addVehicles: formData.addVehicles,
+      excludeVehicles: formData.excludeVehicles,
+      totalVehicles
+    });
+  }, [formData.straightTrucks, formData.passengerVehicles, formData.addVehicles, formData.excludeVehicles]);
 
   return (
     <div className="space-y-6 animate-fadeIn">
