@@ -3,9 +3,10 @@ import { UCRTableOfContents } from "@/components/UCRForm/UCRTableOfContents";
 import { UCRContentSections } from "@/components/UCRForm/UCRContentSections";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { getFilingByResumeToken } from "@/utils/filingUtils";
+import { getFilingByResumeToken } from "@/utils/filing";
 import { useToast } from "@/components/ui/use-toast";
 import { Filing, UCRFormData } from "@/types/filing";
+
 const UCRFiling = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -72,4 +73,5 @@ const UCRFiling = () => {
       </div>
     </div>;
 };
+
 export default UCRFiling;

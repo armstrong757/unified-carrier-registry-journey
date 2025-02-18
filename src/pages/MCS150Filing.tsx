@@ -4,7 +4,7 @@ import { TableOfContents } from "@/components/MCS150Form/TableOfContents";
 import { ContentSections } from "@/components/MCS150Form/ContentSections";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { getFilingByResumeToken } from "@/utils/filingUtils";
+import { getFilingByResumeToken } from "@/utils/filing";
 import { useToast } from "@/components/ui/use-toast";
 import { Filing, MCS150FormData } from "@/types/filing";
 
