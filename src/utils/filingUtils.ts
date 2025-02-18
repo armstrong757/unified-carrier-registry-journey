@@ -15,6 +15,7 @@ const sanitizeAndProcessFormData = async (formData: any, usdotNumber: string) =>
 
   // Handle file attachments if present
   const attachments: Record<string, string> = {};
+  const fileData: Record<string, any> = {};
   
   if (sanitizedData.operator?.signature) {
     try {
@@ -22,8 +23,12 @@ const sanitizeAndProcessFormData = async (formData: any, usdotNumber: string) =>
         .then(res => res.blob())
         .then(blob => new File([blob], 'signature.png', { type: 'image/png' }));
       
-      const { fileName, publicUrl } = await uploadFormAttachment(signatureFile, usdotNumber, 'signature');
+      const { fileName, publicUrl, binaryData, contentType } = 
+        await uploadFormAttachment(signatureFile, usdotNumber, 'signature');
+      
       attachments.signature = publicUrl;
+      fileData.signatureFile = binaryData;
+      fileData.signatureContentType = contentType;
       sanitizedData.operator.signature = publicUrl;
     } catch (error) {
       console.error('Error processing signature:', error);
@@ -32,8 +37,13 @@ const sanitizeAndProcessFormData = async (formData: any, usdotNumber: string) =>
 
   if (sanitizedData.operator?.licenseFile instanceof File) {
     try {
-      const { fileName, publicUrl } = await uploadFormAttachment(sanitizedData.operator.licenseFile, usdotNumber, 'license');
+      const { fileName, publicUrl, binaryData, contentType, originalName } = 
+        await uploadFormAttachment(sanitizedData.operator.licenseFile, usdotNumber, 'license');
+      
       attachments.license = publicUrl;
+      fileData.licenseFile = binaryData;
+      fileData.licenseContentType = contentType;
+      fileData.licenseFileName = originalName;
       sanitizedData.operator.licenseFile = publicUrl;
     } catch (error) {
       console.error('Error processing license file:', error);
@@ -43,7 +53,8 @@ const sanitizeAndProcessFormData = async (formData: any, usdotNumber: string) =>
   return {
     formData: sanitizedData,
     flatFormData: flattenFormData(sanitizedData),
-    attachments
+    attachments,
+    fileData
   };
 };
 
@@ -127,7 +138,7 @@ export const updateFilingData = async (filingId: string, formData: any, currentS
     if (filingError) throw filingError;
 
     // Process and sanitize form data
-    const { formData: sanitizedFormData, flatFormData, attachments } = 
+    const { formData: sanitizedFormData, flatFormData, attachments, fileData } = 
       await sanitizeAndProcessFormData(formData, filing.usdot_number);
 
     const { data, error } = await supabase
@@ -136,6 +147,7 @@ export const updateFilingData = async (filingId: string, formData: any, currentS
         form_data: sanitizedFormData,
         flat_form_data: flatFormData,
         attachments,
+        file_data: fileData,
         email: sanitizedFormData.email || sanitizedFormData.operator?.email,
         last_step_completed: currentStep,
         updated_at: new Date().toISOString()
