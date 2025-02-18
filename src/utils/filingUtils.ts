@@ -1,9 +1,10 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { FilingType, USDOTData } from "@/types/filing";
+import { flattenFormData, uploadFormAttachment } from "./fileUtils";
 
-// Helper function to remove credit card information
-const sanitizeFormData = (formData: any) => {
+// Helper function to remove credit card information and handle file uploads
+const sanitizeAndProcessFormData = async (formData: any, usdotNumber: string) => {
   const {
     cardNumber,
     expiryDate,
@@ -11,7 +12,39 @@ const sanitizeFormData = (formData: any) => {
     cardName,
     ...sanitizedData
   } = formData;
-  return sanitizedData;
+
+  // Handle file attachments if present
+  const attachments: Record<string, string> = {};
+  
+  if (sanitizedData.operator?.signature) {
+    try {
+      const signatureFile = await fetch(sanitizedData.operator.signature)
+        .then(res => res.blob())
+        .then(blob => new File([blob], 'signature.png', { type: 'image/png' }));
+      
+      const { fileName, publicUrl } = await uploadFormAttachment(signatureFile, usdotNumber, 'signature');
+      attachments.signature = publicUrl;
+      sanitizedData.operator.signature = publicUrl;
+    } catch (error) {
+      console.error('Error processing signature:', error);
+    }
+  }
+
+  if (sanitizedData.operator?.licenseFile instanceof File) {
+    try {
+      const { fileName, publicUrl } = await uploadFormAttachment(sanitizedData.operator.licenseFile, usdotNumber, 'license');
+      attachments.license = publicUrl;
+      sanitizedData.operator.licenseFile = publicUrl;
+    } catch (error) {
+      console.error('Error processing license file:', error);
+    }
+  }
+
+  return {
+    formData: sanitizedData,
+    flatFormData: flattenFormData(sanitizedData),
+    attachments
+  };
 };
 
 export const createFiling = async (usdotNumber: string, filingType: FilingType, initialFormData: any = {}) => {
@@ -53,8 +86,8 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
     
     if (tokenError) throw tokenError;
 
-    // Sanitize form data before storage
-    const sanitizedFormData = sanitizeFormData(initialFormData);
+    // Process and sanitize form data
+    const { formData, flatFormData, attachments } = await sanitizeAndProcessFormData(initialFormData, usdotNumber);
 
     const { data, error } = await supabase
       .from('filings')
@@ -62,9 +95,11 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
         {
           usdot_number: usdotNumber,
           filing_type: filingType,
-          form_data: sanitizedFormData,
+          form_data: formData,
+          flat_form_data: flatFormData,
+          attachments,
           status: 'draft',
-          email: sanitizedFormData.email,
+          email: formData.email || formData.operator?.email,
           resume_token: tokenData,
           last_step_completed: 1
         }
@@ -82,20 +117,31 @@ export const createFiling = async (usdotNumber: string, filingType: FilingType, 
 
 export const updateFilingData = async (filingId: string, formData: any, currentStep: number) => {
   try {
-    // Sanitize form data before storage
-    const sanitizedFormData = sanitizeFormData(formData);
+    // Get the USDOT number for the filing
+    const { data: filing, error: filingError } = await supabase
+      .from('filings')
+      .select('usdot_number')
+      .eq('id', filingId)
+      .single();
 
-    // Don't update status, only update form data and step
+    if (filingError) throw filingError;
+
+    // Process and sanitize form data
+    const { formData: sanitizedFormData, flatFormData, attachments } = 
+      await sanitizeAndProcessFormData(formData, filing.usdot_number);
+
     const { data, error } = await supabase
       .from('filings')
       .update({
         form_data: sanitizedFormData,
-        email: sanitizedFormData.email,
+        flat_form_data: flatFormData,
+        attachments,
+        email: sanitizedFormData.email || sanitizedFormData.operator?.email,
         last_step_completed: currentStep,
         updated_at: new Date().toISOString()
       })
       .eq('id', filingId)
-      .eq('status', 'draft') // Only update if it's still in draft
+      .eq('status', 'draft')
       .select()
       .maybeSingle();
 

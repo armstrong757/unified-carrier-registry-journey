@@ -65,10 +65,12 @@ export type Database = {
       filings: {
         Row: {
           abandoned_cart_email_sent: boolean | null
+          attachments: Json | null
           completed_at: string | null
           created_at: string | null
           email: string | null
           filing_type: Database["public"]["Enums"]["filing_type"]
+          flat_form_data: Json | null
           form_data: Json
           id: string
           last_step_completed: number | null
@@ -81,10 +83,12 @@ export type Database = {
         }
         Insert: {
           abandoned_cart_email_sent?: boolean | null
+          attachments?: Json | null
           completed_at?: string | null
           created_at?: string | null
           email?: string | null
           filing_type: Database["public"]["Enums"]["filing_type"]
+          flat_form_data?: Json | null
           form_data?: Json
           id?: string
           last_step_completed?: number | null
@@ -97,10 +101,12 @@ export type Database = {
         }
         Update: {
           abandoned_cart_email_sent?: boolean | null
+          attachments?: Json | null
           completed_at?: string | null
           created_at?: string | null
           email?: string | null
           filing_type?: Database["public"]["Enums"]["filing_type"]
+          flat_form_data?: Json | null
           form_data?: Json
           id?: string
           last_step_completed?: number | null
@@ -306,6 +312,10 @@ export type Database = {
           cache_hit_rate: number
           avg_requests_per_dot: number
         }[]
+      }
+      migrate_form_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       validate_filing_step: {
         Args: {
