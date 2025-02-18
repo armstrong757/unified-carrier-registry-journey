@@ -2,7 +2,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface StepThreeProps {
   formData: any;
@@ -12,6 +12,24 @@ interface StepThreeProps {
 const StepThree = ({ formData, setFormData }: StepThreeProps) => {
   const [showVehicleInputs, setShowVehicleInputs] = useState(
     formData.needsVehicleChanges === "yes"
+  );
+
+  // Initialize straightTrucks from powerUnits if not already set
+  useEffect(() => {
+    if (!formData.straightTrucks && formData.powerUnits) {
+      setFormData({
+        ...formData,
+        straightTrucks: formData.powerUnits
+      });
+    }
+  }, [formData.powerUnits]);
+
+  // Calculate total vehicles
+  const totalVehicles = (
+    (formData.straightTrucks || 0) +
+    (formData.passengerVehicles || 0) +
+    (Number(formData.addVehicles) || 0) -
+    (Number(formData.excludeVehicles) || 0)
   );
 
   return (
@@ -34,10 +52,7 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
           </div>
           <div className="col-span-2">
             <Label>Total Vehicles:</Label>
-            <p className="font-medium">
-              {(formData.straightTrucks || 0) +
-                (formData.passengerVehicles || 0)}
-            </p>
+            <p className="font-medium">{totalVehicles}</p>
           </div>
         </div>
       </div>
@@ -53,7 +68,6 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
             setFormData({ ...formData, needsVehicleChanges: value });
             setShowVehicleInputs(value === "yes");
             if (value === "no") {
-              // Reset the add/exclude values when switching to "no"
               setFormData({
                 ...formData,
                 needsVehicleChanges: value,
