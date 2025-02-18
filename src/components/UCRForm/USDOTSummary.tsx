@@ -3,32 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
-
-interface USDOTData {
-  usdotNumber: string;
-  operatingStatus: string;
-  entityType: string;
-  legalName: string;
-  dbaName: string;
-  physicalAddress: string;
-  telephone: string;
-  powerUnits: number;
-  drivers: number;
-  busCount: number;
-  limoCount: number;
-  minibusCount: number;
-  motorcoachCount: number;
-  vanCount: number;
-  complaintCount: number;
-  outOfService: boolean;
-  outOfServiceDate: string | null;
-  mcNumber: string;
-  mcs150FormDate: string | null;
-  mcs150Date: string | null;
-  mcs150Year: number;
-  mcs150Mileage: number;
-  basicsData: Record<string, any>;
-}
+import { USDOTData } from "@/types/filing";
 
 interface USDOTSummaryProps {
   data: USDOTData;
