@@ -10,8 +10,9 @@ let debounceTimer: NodeJS.Timeout;
 function transformResponse(data: any): USDOTData {
   console.log('Transforming API response:', data);
   
-  // Create a trimmed version of mcs150_date if it exists
-  const mcs150Date = data.mcs150_date ? data.mcs150_date.trim() : null;
+  // Since mcs150_date might not be present, use mcs150_year to create a date string
+  const mcs150Year = data.mcs150_year ? String(data.mcs150_year).trim() : null;
+  const mcs150DateStr = mcs150Year ? `01/01/${mcs150Year}` : null;
   
   const transformed: USDOTData = {
     usdotNumber: data.dot_number || data.usdot_number || '',
@@ -29,7 +30,7 @@ function transformResponse(data: any): USDOTData {
     riskScore: data.risk_score || 'Unknown',
     outOfServiceDate: data.out_of_service_date || null,
     mcs150FormDate: data.mcs150_form_date || null,
-    mcs150Date: mcs150Date, // Use the cleaned date value
+    mcs150Date: mcs150DateStr,
     mcs150Year: Number(data.mcs150_year) || 0,
     mcs150Mileage: Number(data.mcs150_mileage) || 0,
     carrierOperation: data.carrier_operation || '',
