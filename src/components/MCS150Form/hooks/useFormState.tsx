@@ -85,11 +85,11 @@ export const useFormState = () => {
     operator: {
       firstName: "",
       lastName: "",
-      title: "",
+      title: "",  // Added title field
       email: "",
       phone: "",
       einSsn: "",
-      milesDriven: "",
+      milesDriven: "",  // Added milesDriven field
       licenseFile: null,
       signature: "",
     },
