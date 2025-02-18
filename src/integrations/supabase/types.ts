@@ -274,6 +274,7 @@ export type Database = {
           filing_type: string
           full_name: string | null
           id: string
+          needs_vehicle_changes: string | null
           payment_amount: number | null
           payment_method: string | null
           payment_status: string | null
@@ -301,6 +302,7 @@ export type Database = {
           filing_type: string
           full_name?: string | null
           id?: string
+          needs_vehicle_changes?: string | null
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
@@ -328,6 +330,7 @@ export type Database = {
           filing_type?: string
           full_name?: string | null
           id?: string
+          needs_vehicle_changes?: string | null
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null

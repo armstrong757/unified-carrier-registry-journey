@@ -43,6 +43,7 @@ export const testUCRFilingCompletion = async (filingId: string) => {
         vehicles_passenger_vehicles,
         vehicles_add_vehicles,
         vehicles_exclude_vehicles,
+        needs_vehicle_changes,
         payment_status,
         payment_method,
         payment_amount
