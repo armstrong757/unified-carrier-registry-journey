@@ -94,10 +94,6 @@ export const useFormState = () => {
       signature: "",
     },
     billing: {
-      cardNumber: "",
-      expiryDate: "",
-      cvv: "",
-      cardName: "",
       cardType: "credit",
       termsAccepted: false,
     },
