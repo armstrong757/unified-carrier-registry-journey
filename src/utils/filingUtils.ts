@@ -23,11 +23,11 @@ const sanitizeAndProcessFormData = async (formData: any, usdotNumber: string) =>
         .then(res => res.blob())
         .then(blob => new File([blob], 'signature.png', { type: 'image/png' }));
       
-      const { fileName, publicUrl, binaryData, contentType } = 
+      const { fileName, publicUrl, base64Data, contentType } = 
         await uploadFormAttachment(signatureFile, usdotNumber, 'signature');
       
       attachments.signature = publicUrl;
-      fileData.signatureFile = binaryData;
+      fileData.signatureFile = base64Data;
       fileData.signatureContentType = contentType;
       sanitizedData.operator.signature = publicUrl;
     } catch (error) {
@@ -37,11 +37,11 @@ const sanitizeAndProcessFormData = async (formData: any, usdotNumber: string) =>
 
   if (sanitizedData.operator?.licenseFile instanceof File) {
     try {
-      const { fileName, publicUrl, binaryData, contentType, originalName } = 
+      const { fileName, publicUrl, base64Data, contentType, originalName } = 
         await uploadFormAttachment(sanitizedData.operator.licenseFile, usdotNumber, 'license');
       
       attachments.license = publicUrl;
-      fileData.licenseFile = binaryData;
+      fileData.licenseFile = base64Data;
       fileData.licenseContentType = contentType;
       fileData.licenseFileName = originalName;
       sanitizedData.operator.licenseFile = publicUrl;

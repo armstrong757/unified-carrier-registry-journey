@@ -45,6 +45,20 @@ const resizeImage = async (file: File, maxDimension: number): Promise<Blob> => {
   });
 };
 
+const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      // Remove the data URL prefix (e.g., "data:image/png;base64,")
+      const base64Data = base64String.split(',')[1];
+      resolve(base64Data);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
 export const uploadFormAttachment = async (file: File, usdotNumber: string, type: 'signature' | 'license') => {
   try {
     let processedFile: File | Blob = file;
@@ -79,12 +93,8 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
 
     if (error) throw error;
 
-    // Get the binary data
-    const { data: binaryData, error: downloadError } = await supabase.storage
-      .from('form_attachments')
-      .download(fileName);
-
-    if (downloadError) throw downloadError;
+    // Convert the processed file to base64
+    const base64Data = await blobToBase64(processedFile);
 
     const { data: { publicUrl } } = supabase.storage
       .from('form_attachments')
@@ -93,7 +103,7 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
     return { 
       fileName,
       publicUrl,
-      binaryData,
+      base64Data,
       contentType,
       originalName: file.name
     };
