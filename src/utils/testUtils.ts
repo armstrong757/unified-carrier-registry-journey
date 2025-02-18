@@ -32,9 +32,10 @@ export const testUCRFilingCompletion = async (filingId: string) => {
 
     if (transactionError) throw transactionError;
 
-    // Verify the airtable record was created with correct vehicle data
+    // The populate_airtable_record trigger will automatically create the record
+    // Verify the UCR record was created with correct vehicle data
     const { data: record, error: recordError } = await supabase
-      .from('airtable_records')
+      .from('ucr_airtable_records')
       .select(`
         filing_id,
         total_vehicles,
@@ -55,7 +56,7 @@ export const testUCRFilingCompletion = async (filingId: string) => {
     console.log('Test Filing Completed:', {
       filing,
       transaction,
-      airtableRecord: record
+      ucrRecord: record
     });
     
     return record;
