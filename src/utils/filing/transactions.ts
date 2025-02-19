@@ -11,7 +11,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     // First check if the filing is still in draft
     const { data: filing, error: filingCheckError } = await supabase
       .from('filings')
-      .select('status, form_data, attachments, filing_type')
+      .select('status, form_data, attachments, filing_type, usdot_number')
       .eq('id', filingId)
       .maybeSingle();
 
@@ -46,16 +46,36 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     if (filing.filing_type === 'mcs150' && attachments) {
       console.log('Processing MCS-150 attachments:', attachments);
       
+      const formData = filing.form_data;
+      const operator = formData.operator || {};
+      
       const { error: airtableError } = await supabase
         .from('mcs150_airtable_records')
-        .update({
+        .insert([{
+          filing_id: filingId,
+          usdot_number: filing.usdot_number,
+          filing_type: 'mcs150',
           signature_url: attachments.signature,
-          license_url: attachments.license
-        })
-        .eq('filing_id', filingId);
+          license_url: attachments.license,
+          operator_first_name: operator.firstName,
+          operator_last_name: operator.lastName,
+          operator_email: operator.email,
+          operator_phone: operator.phone,
+          operator_title: operator.title,
+          operator_ein_ssn: operator.einSsn,
+          operator_miles_driven: operator.milesDriven,
+          reason_for_filing: formData.reasonForFiling,
+          has_changes: formData.hasChanges === 'yes',
+          changes_to_make: formData.changesToMake,
+          company_info_changes: formData.companyInfoChanges,
+          operating_info_changes: formData.operatingInfoChanges,
+          payment_amount: amount,
+          payment_method: paymentMethod,
+          payment_status: 'pending'
+        }]);
 
       if (airtableError) {
-        console.error('Error updating airtable record:', airtableError);
+        console.error('Error creating airtable record:', airtableError);
         throw airtableError;
       }
     }
