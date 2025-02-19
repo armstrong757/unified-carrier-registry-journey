@@ -166,38 +166,25 @@ export type Database = {
           company_ein_ssn: string | null
           company_email: string | null
           company_info_changes: Json | null
-          company_mailing_address: Json | null
           company_owner_name: string | null
           company_phone: string | null
-          company_principal_address: Json | null
           created_at: string | null
           filing_id: string
           filing_type: string
           has_changes: boolean | null
           id: string
-          license_content_type: string | null
-          license_file: string | null
-          license_filename: string | null
           license_url: string | null
           mailing_address_city: string | null
           mailing_address_country: string | null
           mailing_address_state: string | null
           mailing_address_street: string | null
           mailing_address_zip: string | null
-          mc_number: string | null
-          mcs_operator_info: Json | null
           operating_info_changes: Json | null
           operation_interstate_carrier: boolean | null
           operation_intrastate_hazmat_carrier: boolean | null
           operation_intrastate_hazmat_shipper: boolean | null
           operation_intrastate_non_hazmat_carrier: boolean | null
           operation_intrastate_non_hazmat_shipper: boolean | null
-          operations_cargo_classifications: Json | null
-          operations_classifications: Json | null
-          operations_company_operations: Json | null
-          operations_drivers: Json | null
-          operations_hazmat_details: Json | null
-          operations_vehicles: Json | null
           operator_ein_ssn: string | null
           operator_email: string | null
           operator_first_name: string | null
@@ -214,9 +201,6 @@ export type Database = {
           principal_address_street: string | null
           principal_address_zip: string | null
           reason_for_filing: string | null
-          signature_content_type: string | null
-          signature_file: string | null
-          signature_filename: string | null
           signature_url: string | null
           transaction_id: string | null
           usdot_number: string
@@ -267,38 +251,25 @@ export type Database = {
           company_ein_ssn?: string | null
           company_email?: string | null
           company_info_changes?: Json | null
-          company_mailing_address?: Json | null
           company_owner_name?: string | null
           company_phone?: string | null
-          company_principal_address?: Json | null
           created_at?: string | null
           filing_id: string
           filing_type: string
           has_changes?: boolean | null
           id?: string
-          license_content_type?: string | null
-          license_file?: string | null
-          license_filename?: string | null
           license_url?: string | null
           mailing_address_city?: string | null
           mailing_address_country?: string | null
           mailing_address_state?: string | null
           mailing_address_street?: string | null
           mailing_address_zip?: string | null
-          mc_number?: string | null
-          mcs_operator_info?: Json | null
           operating_info_changes?: Json | null
           operation_interstate_carrier?: boolean | null
           operation_intrastate_hazmat_carrier?: boolean | null
           operation_intrastate_hazmat_shipper?: boolean | null
           operation_intrastate_non_hazmat_carrier?: boolean | null
           operation_intrastate_non_hazmat_shipper?: boolean | null
-          operations_cargo_classifications?: Json | null
-          operations_classifications?: Json | null
-          operations_company_operations?: Json | null
-          operations_drivers?: Json | null
-          operations_hazmat_details?: Json | null
-          operations_vehicles?: Json | null
           operator_ein_ssn?: string | null
           operator_email?: string | null
           operator_first_name?: string | null
@@ -315,9 +286,6 @@ export type Database = {
           principal_address_street?: string | null
           principal_address_zip?: string | null
           reason_for_filing?: string | null
-          signature_content_type?: string | null
-          signature_file?: string | null
-          signature_filename?: string | null
           signature_url?: string | null
           transaction_id?: string | null
           usdot_number: string
@@ -368,38 +336,25 @@ export type Database = {
           company_ein_ssn?: string | null
           company_email?: string | null
           company_info_changes?: Json | null
-          company_mailing_address?: Json | null
           company_owner_name?: string | null
           company_phone?: string | null
-          company_principal_address?: Json | null
           created_at?: string | null
           filing_id?: string
           filing_type?: string
           has_changes?: boolean | null
           id?: string
-          license_content_type?: string | null
-          license_file?: string | null
-          license_filename?: string | null
           license_url?: string | null
           mailing_address_city?: string | null
           mailing_address_country?: string | null
           mailing_address_state?: string | null
           mailing_address_street?: string | null
           mailing_address_zip?: string | null
-          mc_number?: string | null
-          mcs_operator_info?: Json | null
           operating_info_changes?: Json | null
           operation_interstate_carrier?: boolean | null
           operation_intrastate_hazmat_carrier?: boolean | null
           operation_intrastate_hazmat_shipper?: boolean | null
           operation_intrastate_non_hazmat_carrier?: boolean | null
           operation_intrastate_non_hazmat_shipper?: boolean | null
-          operations_cargo_classifications?: Json | null
-          operations_classifications?: Json | null
-          operations_company_operations?: Json | null
-          operations_drivers?: Json | null
-          operations_hazmat_details?: Json | null
-          operations_vehicles?: Json | null
           operator_ein_ssn?: string | null
           operator_email?: string | null
           operator_first_name?: string | null
@@ -416,9 +371,6 @@ export type Database = {
           principal_address_street?: string | null
           principal_address_zip?: string | null
           reason_for_filing?: string | null
-          signature_content_type?: string | null
-          signature_file?: string | null
-          signature_filename?: string | null
           signature_url?: string | null
           transaction_id?: string | null
           usdot_number?: string

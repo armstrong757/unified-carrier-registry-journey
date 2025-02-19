@@ -61,6 +61,12 @@ export const sanitizeAndProcessFormData = async (formData: any, usdotNumber: str
     company_owner_name: sanitizedData.ownerName,
     company_phone: sanitizedData.businessPhone,
     company_email: sanitizedData.businessEmail,
+    operator_first_name: sanitizedData.operator?.firstName,
+    operator_last_name: sanitizedData.operator?.lastName,
+    operator_title: sanitizedData.operator?.title,
+    operator_email: sanitizedData.operator?.email,
+    operator_phone: sanitizedData.operator?.phone,
+    operator_miles_driven: sanitizedData.operator?.milesDriven,
     
     // Operations
     operation_interstate_carrier: sanitizedData.companyOperations?.interstateCarrier || false,
@@ -112,15 +118,7 @@ export const sanitizeAndProcessFormData = async (formData: any, usdotNumber: str
     cargo_agricultural: sanitizedData.cargoClassifications?.farmSupplies || false,
     cargo_construction: sanitizedData.cargoClassifications?.construction || false,
     cargo_water_well: sanitizedData.cargoClassifications?.waterWell || false,
-    cargo_other: sanitizedData.cargoClassifications?.other || false,
-
-    // Operator information
-    operator_first_name: sanitizedData.operator?.firstName,
-    operator_last_name: sanitizedData.operator?.lastName,
-    operator_title: sanitizedData.operator?.title,
-    operator_email: sanitizedData.operator?.email,
-    operator_phone: sanitizedData.operator?.phone,
-    operator_miles_driven: sanitizedData.operator?.milesDriven,
+    cargo_other: sanitizedData.cargoClassifications?.other || false
   };
 
   return {
@@ -129,4 +127,3 @@ export const sanitizeAndProcessFormData = async (formData: any, usdotNumber: str
     attachments
   };
 };
-
