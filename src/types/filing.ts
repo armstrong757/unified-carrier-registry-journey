@@ -1,14 +1,39 @@
-
 export type FilingType = 'ucr' | 'mcs150';
 
 export interface MCS150FormData {
-  companyName?: string;
-  businessPhone?: string;
-  principalAddress?: {
-    address?: string;
-    city?: string;
-    state?: string;
-    zip?: string;
+  reasonForFiling: string;
+  hasChanges: 'yes' | 'no';
+  changesToMake: {
+    companyInfo?: boolean;
+    operatingInfo?: boolean;
+    other?: boolean;
+  };
+  companyInfoChanges: {
+    ownerName?: boolean;
+    address?: boolean;
+    phone?: boolean;
+    email?: boolean;
+    companyName?: boolean;
+    einSsn?: boolean;
+  };
+  operatingInfoChanges: {
+    vehicles?: boolean;
+    drivers?: boolean;
+    operations?: boolean;
+    classifications?: boolean;
+    cargo?: boolean;
+    hazmat?: boolean;
+  };
+  operator?: {
+    firstName?: string;
+    lastName?: string;
+    title?: string;
+    email?: string;
+    phone?: string;
+    einSsn?: string;
+    milesDriven?: string;
+    licenseFile?: File | null;
+    signature?: string;
   };
   // Add other form fields as needed
 }

@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { MCS150FormData } from "@/types/filing";
 
 interface FilingAttachments {
   signature?: string;
@@ -46,7 +47,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     if (filing.filing_type === 'mcs150' && attachments) {
       console.log('Processing MCS-150 attachments:', attachments);
       
-      const formData = filing.form_data;
+      const formData = filing.form_data as MCS150FormData;
       const operator = formData.operator || {};
       
       const { error: airtableError } = await supabase
