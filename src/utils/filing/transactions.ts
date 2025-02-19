@@ -1,6 +1,11 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
+interface FilingAttachments {
+  signature?: string;
+  license?: string;
+}
+
 export const createTransaction = async (filingId: string, amount: number, paymentMethod: string) => {
   try {
     // First check if the filing is still in draft
@@ -15,8 +20,10 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       throw new Error('Filing is not in draft status');
     }
 
+    const attachments = filing.attachments as FilingAttachments;
+
     // Verify attachments exist for MCS-150 filings
-    if (filing.filing_type === 'mcs150' && (!filing.attachments?.signature || !filing.attachments?.license)) {
+    if (filing.filing_type === 'mcs150' && (!attachments?.signature || !attachments?.license)) {
       throw new Error('Missing required attachments for MCS-150 filing');
     }
 
@@ -36,14 +43,14 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     if (transactionError) throw transactionError;
 
     // Update airtable records with URLs based on filing type
-    if (filing.filing_type === 'mcs150') {
-      console.log('Processing MCS-150 attachments:', filing.attachments);
+    if (filing.filing_type === 'mcs150' && attachments) {
+      console.log('Processing MCS-150 attachments:', attachments);
       
       const { error: airtableError } = await supabase
         .from('mcs150_airtable_records')
         .update({
-          signature_url: filing.attachments.signature,
-          license_url: filing.attachments.license
+          signature_url: attachments.signature,
+          license_url: attachments.license
         })
         .eq('filing_id', filingId);
 
