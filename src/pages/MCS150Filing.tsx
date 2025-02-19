@@ -58,21 +58,17 @@ const MCS150Filing = () => {
         try {
           const filing = await getFilingByResumeToken(resumeToken);
           if (filing) {
-            const formData = filing.form_data as MCS150FormData;
-            sessionStorage.setItem('usdotData', JSON.stringify({
+            const formData = filing.form_data as unknown as MCS150FormData;
+            const usdotData = {
               usdotNumber: filing.usdot_number,
               legalName: formData.companyName || '',
               telephone: formData.businessPhone || '',
               physicalAddress: formData.principalAddress?.address || ''
-            }));
+            };
+            sessionStorage.setItem('usdotData', JSON.stringify(usdotData));
             navigate("/mcs150", {
               state: {
-                usdotData: {
-                  usdotNumber: filing.usdot_number,
-                  legalName: formData.companyName || '',
-                  telephone: formData.businessPhone || '',
-                  physicalAddress: formData.principalAddress?.address || ''
-                },
+                usdotData,
                 resumedFiling: filing
               },
               replace: true

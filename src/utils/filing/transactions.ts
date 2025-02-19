@@ -47,33 +47,37 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     if (filing.filing_type === 'mcs150' && attachments) {
       console.log('Processing MCS-150 attachments:', attachments);
       
-      const formData = filing.form_data as MCS150FormData;
+      const formData = filing.form_data as unknown as MCS150FormData;
       const operator = formData.operator || {};
       
+      // Convert the form data to match the table structure
+      const record = {
+        filing_id: filingId,
+        usdot_number: filing.usdot_number,
+        filing_type: filing.filing_type,
+        signature_url: attachments.signature || '',
+        license_url: attachments.license || '',
+        operator_first_name: operator.firstName || '',
+        operator_last_name: operator.lastName || '',
+        operator_email: operator.email || '',
+        operator_phone: operator.phone || '',
+        operator_title: operator.title || '',
+        operator_ein_ssn: operator.einSsn || '',
+        operator_miles_driven: operator.milesDriven || '',
+        reason_for_filing: formData.reasonForFiling || '',
+        has_changes: formData.hasChanges === 'yes',
+        changes_to_make: formData.changesToMake || {},
+        company_info_changes: formData.companyInfoChanges || {},
+        operating_info_changes: formData.operatingInfoChanges || {},
+        payment_amount: amount,
+        payment_method: paymentMethod,
+        payment_status: 'pending',
+        created_at: new Date().toISOString()
+      };
+
       const { error: airtableError } = await supabase
         .from('mcs150_airtable_records')
-        .insert([{
-          filing_id: filingId,
-          usdot_number: filing.usdot_number,
-          filing_type: 'mcs150',
-          signature_url: attachments.signature,
-          license_url: attachments.license,
-          operator_first_name: operator.firstName,
-          operator_last_name: operator.lastName,
-          operator_email: operator.email,
-          operator_phone: operator.phone,
-          operator_title: operator.title,
-          operator_ein_ssn: operator.einSsn,
-          operator_miles_driven: operator.milesDriven,
-          reason_for_filing: formData.reasonForFiling,
-          has_changes: formData.hasChanges === 'yes',
-          changes_to_make: formData.changesToMake,
-          company_info_changes: formData.companyInfoChanges,
-          operating_info_changes: formData.operatingInfoChanges,
-          payment_amount: amount,
-          payment_method: paymentMethod,
-          payment_status: 'pending'
-        }]);
+        .insert(record);
 
       if (airtableError) {
         console.error('Error creating airtable record:', airtableError);

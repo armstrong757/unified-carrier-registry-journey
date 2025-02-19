@@ -1,3 +1,4 @@
+
 export type FilingType = 'ucr' | 'mcs150';
 
 export interface MCS150FormData {
@@ -35,7 +36,16 @@ export interface MCS150FormData {
     licenseFile?: File | null;
     signature?: string;
   };
-  // Add other form fields as needed
+  // Company Information fields
+  companyName?: string;
+  businessPhone?: string;
+  principalAddress?: {
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    country?: string;
+  };
 }
 
 export interface UCRFormData {
