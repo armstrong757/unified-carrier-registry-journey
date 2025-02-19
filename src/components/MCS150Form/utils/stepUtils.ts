@@ -18,7 +18,7 @@ export const getNextStep = (currentStep: number, formData: any) => {
   }
 
   // Special case for out of business
-  if (currentStep === 1 && formData.reasonForFiling?.outOfBusiness) {
+  if (currentStep === 1 && formData.reasonForFiling === "outOfBusiness") {
     return 5;
   }
 
@@ -48,7 +48,7 @@ export const getNextStep = (currentStep: number, formData: any) => {
 
 export const getPreviousStep = (currentStep: number, formData: any) => {
   if (currentStep === 5) {
-    if (formData.reasonForFiling?.outOfBusiness) return 1;
+    if (formData.reasonForFiling === "outOfBusiness") return 1;
     if (shouldSkipStep3(formData) && shouldSkipStep4(formData)) return 2;
     if (shouldSkipStep4(formData)) return 3;
     return 4;
@@ -65,22 +65,19 @@ export const getPreviousStep = (currentStep: number, formData: any) => {
 const isStepComplete = (step: number, formData: any): boolean => {
   switch (step) {
     case 1:
-      return formData.reasonForFiling && 
-        (formData.reasonForFiling.biennialUpdate || 
-         formData.reasonForFiling.reactivate ||
-         formData.reasonForFiling.reapplication ||
-         formData.reasonForFiling.outOfBusiness);
+      // Check if a reason for filing is selected
+      return formData.reasonForFiling != null && formData.reasonForFiling !== "";
     
     case 2:
       return formData.hasChanges === "yes" || formData.hasChanges === "no";
     
     case 3:
-      if (!formData.changesToMake.companyInfo) return true;
+      if (!formData.changesToMake?.companyInfo) return true;
       // Add validation for company info changes
       return true; // Implement specific validation if needed
     
     case 4:
-      if (!formData.changesToMake.operatingInfo) return true;
+      if (!formData.changesToMake?.operatingInfo) return true;
       // Add validation for operating info changes
       return true; // Implement specific validation if needed
     
