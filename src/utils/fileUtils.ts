@@ -70,22 +70,22 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
     const fileExt = type === 'signature' ? 'png' : file.name.split('.').pop();
     const fileName = `${usdotNumber}/${type}_${Date.now()}.${fileExt}`;
 
-    const { data, error } = await supabase.storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from('form_attachments')
       .upload(fileName, processedFile, {
         contentType,
         upsert: true
       });
 
-    if (error) throw error;
+    if (uploadError) throw uploadError;
 
-    const { data: { publicUrl } } = supabase.storage
+    const { data: urlData } = supabase.storage
       .from('form_attachments')
       .getPublicUrl(fileName);
 
     return { 
       fileName,
-      publicUrl,
+      publicUrl: urlData.publicUrl,
       contentType,
       originalName: file.name
     };
