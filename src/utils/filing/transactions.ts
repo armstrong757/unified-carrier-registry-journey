@@ -73,7 +73,6 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         payment_method: paymentMethod,
         payment_status: 'pending',
         created_at: new Date().toISOString(),
-        // Add all required cargo fields with default values
         cargo_agricultural: false,
         cargo_beverages: false,
         cargo_building_materials: false,
