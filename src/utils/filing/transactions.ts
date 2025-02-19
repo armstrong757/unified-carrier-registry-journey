@@ -6,7 +6,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     // First check if the filing is still in draft
     const { data: filing, error: filingCheckError } = await supabase
       .from('filings')
-      .select('status')
+      .select('status, form_data, attachments')
       .eq('id', filingId)
       .maybeSingle();
 
@@ -30,6 +30,19 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
     if (transactionError) throw transactionError;
 
+    // Update mcs150_airtable_records with URLs
+    if (filing.attachments) {
+      const { error: airtableError } = await supabase
+        .from('mcs150_airtable_records')
+        .update({
+          signature_url: filing.attachments.signature,
+          license_url: filing.attachments.license
+        })
+        .eq('filing_id', filingId);
+
+      if (airtableError) throw airtableError;
+    }
+
     // Only mark as completed if transaction is created successfully
     const { error: filingError } = await supabase
       .from('filings')
@@ -38,7 +51,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         completed_at: new Date().toISOString()
       })
       .eq('id', filingId)
-      .eq('status', 'draft'); // Only update if still in draft
+      .eq('status', 'draft');
 
     if (filingError) throw filingError;
 

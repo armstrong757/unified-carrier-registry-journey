@@ -45,20 +45,6 @@ const resizeImage = async (file: File, maxDimension: number): Promise<Blob> => {
   });
 };
 
-const blobToBase64 = (blob: Blob): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      // Remove the data URL prefix (e.g., "data:image/png;base64,")
-      const base64Data = base64String.split(',')[1];
-      resolve(base64Data);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
-
 export const uploadFormAttachment = async (file: File, usdotNumber: string, type: 'signature' | 'license') => {
   try {
     let processedFile: File | Blob = file;
@@ -93,9 +79,6 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
 
     if (error) throw error;
 
-    // Convert the processed file to base64
-    const base64Data = await blobToBase64(processedFile);
-
     const { data: { publicUrl } } = supabase.storage
       .from('form_attachments')
       .getPublicUrl(fileName);
@@ -103,7 +86,6 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
     return { 
       fileName,
       publicUrl,
-      base64Data,
       contentType,
       originalName: file.name
     };
@@ -111,25 +93,4 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
     console.error('Error uploading file:', error);
     throw error;
   }
-};
-
-// Helper to flatten nested objects for Airtable compatibility
-export const flattenFormData = (data: any, parentKey = ''): Record<string, any> => {
-  return Object.keys(data).reduce((acc, key) => {
-    const newKey = parentKey ? `${parentKey}_${key}` : key;
-    
-    if (
-      typeof data[key] === 'object' && 
-      data[key] !== null && 
-      !(data[key] instanceof File) &&
-      !(data[key] instanceof Blob) &&
-      !Array.isArray(data[key])
-    ) {
-      Object.assign(acc, flattenFormData(data[key], newKey));
-    } else {
-      acc[newKey] = data[key];
-    }
-    
-    return acc;
-  }, {} as Record<string, any>);
 };

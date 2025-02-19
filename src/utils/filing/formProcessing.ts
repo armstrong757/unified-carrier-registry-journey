@@ -12,7 +12,6 @@ export const sanitizeAndProcessFormData = async (formData: any, usdotNumber: str
 
   // Handle file attachments if present
   const attachments: Record<string, string> = {};
-  const fileData: Record<string, any> = {};
   
   if (sanitizedData.operator?.signature) {
     try {
@@ -20,12 +19,10 @@ export const sanitizeAndProcessFormData = async (formData: any, usdotNumber: str
         .then(res => res.blob())
         .then(blob => new File([blob], 'signature.png', { type: 'image/png' }));
       
-      const { fileName, publicUrl, base64Data, contentType } = 
+      const { publicUrl } = 
         await uploadFormAttachment(signatureFile, usdotNumber, 'signature');
       
       attachments.signature = publicUrl;
-      fileData.signatureFile = base64Data;
-      fileData.signatureContentType = contentType;
       sanitizedData.operator.signature = publicUrl;
     } catch (error) {
       console.error('Error processing signature:', error);
@@ -34,13 +31,10 @@ export const sanitizeAndProcessFormData = async (formData: any, usdotNumber: str
 
   if (sanitizedData.operator?.licenseFile instanceof File) {
     try {
-      const { fileName, publicUrl, base64Data, contentType, originalName } = 
+      const { publicUrl, originalName } = 
         await uploadFormAttachment(sanitizedData.operator.licenseFile, usdotNumber, 'license');
       
       attachments.license = publicUrl;
-      fileData.licenseFile = base64Data;
-      fileData.licenseContentType = contentType;
-      fileData.licenseFileName = originalName;
       sanitizedData.operator.licenseFile = publicUrl;
     } catch (error) {
       console.error('Error processing license file:', error);
@@ -50,8 +44,7 @@ export const sanitizeAndProcessFormData = async (formData: any, usdotNumber: str
   return {
     formData: sanitizedData,
     flatFormData: flattenFormData(sanitizedData),
-    attachments,
-    fileData
+    attachments
   };
 };
 

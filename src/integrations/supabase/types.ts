@@ -137,6 +137,7 @@ export type Database = {
           license_content_type: string | null
           license_file: string | null
           license_filename: string | null
+          license_url: string | null
           mc_number: string | null
           mcs_operator_info: Json | null
           operating_info_changes: Json | null
@@ -160,6 +161,7 @@ export type Database = {
           signature_content_type: string | null
           signature_file: string | null
           signature_filename: string | null
+          signature_url: string | null
           transaction_id: string | null
           usdot_number: string
         }
@@ -180,6 +182,7 @@ export type Database = {
           license_content_type?: string | null
           license_file?: string | null
           license_filename?: string | null
+          license_url?: string | null
           mc_number?: string | null
           mcs_operator_info?: Json | null
           operating_info_changes?: Json | null
@@ -203,6 +206,7 @@ export type Database = {
           signature_content_type?: string | null
           signature_file?: string | null
           signature_filename?: string | null
+          signature_url?: string | null
           transaction_id?: string | null
           usdot_number: string
         }
@@ -223,6 +227,7 @@ export type Database = {
           license_content_type?: string | null
           license_file?: string | null
           license_filename?: string | null
+          license_url?: string | null
           mc_number?: string | null
           mcs_operator_info?: Json | null
           operating_info_changes?: Json | null
@@ -246,6 +251,7 @@ export type Database = {
           signature_content_type?: string | null
           signature_file?: string | null
           signature_filename?: string | null
+          signature_url?: string | null
           transaction_id?: string | null
           usdot_number?: string
         }
