@@ -121,7 +121,48 @@ export type Database = {
       }
       mcs150_airtable_records: {
         Row: {
+          cargo_agricultural: boolean | null
+          cargo_beverages: boolean | null
+          cargo_building_materials: boolean | null
+          cargo_chemicals: boolean | null
+          cargo_coal: boolean | null
+          cargo_commodities_dry_bulk: boolean | null
+          cargo_construction: boolean | null
+          cargo_drive_away: boolean | null
+          cargo_fresh_produce: boolean | null
+          cargo_garbage: boolean | null
+          cargo_general_freight: boolean | null
+          cargo_grain: boolean | null
+          cargo_household_goods: boolean | null
+          cargo_intermodal_containers: boolean | null
+          cargo_liquids_gases: boolean | null
+          cargo_livestock: boolean | null
+          cargo_logs: boolean | null
+          cargo_machinery: boolean | null
+          cargo_meat: boolean | null
+          cargo_metal_sheets: boolean | null
+          cargo_mobile_homes: boolean | null
+          cargo_motor_vehicles: boolean | null
+          cargo_oilfield_equipment: boolean | null
+          cargo_other: boolean | null
+          cargo_paper_products: boolean | null
+          cargo_passengers: boolean | null
+          cargo_refrigerated_food: boolean | null
+          cargo_us_mail: boolean | null
+          cargo_utilities: boolean | null
+          cargo_water_well: boolean | null
           changes_to_make: Json | null
+          classification_authorized_for_hire: boolean | null
+          classification_exempt_for_hire: boolean | null
+          classification_federal_government: boolean | null
+          classification_indian_tribe: boolean | null
+          classification_local_government: boolean | null
+          classification_migrant: boolean | null
+          classification_private_passengers_business: boolean | null
+          classification_private_passengers_non_business: boolean | null
+          classification_private_property: boolean | null
+          classification_state_government: boolean | null
+          classification_us_mail: boolean | null
           company_ein_ssn: string | null
           company_email: string | null
           company_info_changes: Json | null
@@ -138,9 +179,19 @@ export type Database = {
           license_file: string | null
           license_filename: string | null
           license_url: string | null
+          mailing_address_city: string | null
+          mailing_address_country: string | null
+          mailing_address_state: string | null
+          mailing_address_street: string | null
+          mailing_address_zip: string | null
           mc_number: string | null
           mcs_operator_info: Json | null
           operating_info_changes: Json | null
+          operation_interstate_carrier: boolean | null
+          operation_intrastate_hazmat_carrier: boolean | null
+          operation_intrastate_hazmat_shipper: boolean | null
+          operation_intrastate_non_hazmat_carrier: boolean | null
+          operation_intrastate_non_hazmat_shipper: boolean | null
           operations_cargo_classifications: Json | null
           operations_classifications: Json | null
           operations_company_operations: Json | null
@@ -157,6 +208,11 @@ export type Database = {
           payment_amount: number | null
           payment_method: string | null
           payment_status: string | null
+          principal_address_city: string | null
+          principal_address_country: string | null
+          principal_address_state: string | null
+          principal_address_street: string | null
+          principal_address_zip: string | null
           reason_for_filing: string | null
           signature_content_type: string | null
           signature_file: string | null
@@ -166,7 +222,48 @@ export type Database = {
           usdot_number: string
         }
         Insert: {
+          cargo_agricultural?: boolean | null
+          cargo_beverages?: boolean | null
+          cargo_building_materials?: boolean | null
+          cargo_chemicals?: boolean | null
+          cargo_coal?: boolean | null
+          cargo_commodities_dry_bulk?: boolean | null
+          cargo_construction?: boolean | null
+          cargo_drive_away?: boolean | null
+          cargo_fresh_produce?: boolean | null
+          cargo_garbage?: boolean | null
+          cargo_general_freight?: boolean | null
+          cargo_grain?: boolean | null
+          cargo_household_goods?: boolean | null
+          cargo_intermodal_containers?: boolean | null
+          cargo_liquids_gases?: boolean | null
+          cargo_livestock?: boolean | null
+          cargo_logs?: boolean | null
+          cargo_machinery?: boolean | null
+          cargo_meat?: boolean | null
+          cargo_metal_sheets?: boolean | null
+          cargo_mobile_homes?: boolean | null
+          cargo_motor_vehicles?: boolean | null
+          cargo_oilfield_equipment?: boolean | null
+          cargo_other?: boolean | null
+          cargo_paper_products?: boolean | null
+          cargo_passengers?: boolean | null
+          cargo_refrigerated_food?: boolean | null
+          cargo_us_mail?: boolean | null
+          cargo_utilities?: boolean | null
+          cargo_water_well?: boolean | null
           changes_to_make?: Json | null
+          classification_authorized_for_hire?: boolean | null
+          classification_exempt_for_hire?: boolean | null
+          classification_federal_government?: boolean | null
+          classification_indian_tribe?: boolean | null
+          classification_local_government?: boolean | null
+          classification_migrant?: boolean | null
+          classification_private_passengers_business?: boolean | null
+          classification_private_passengers_non_business?: boolean | null
+          classification_private_property?: boolean | null
+          classification_state_government?: boolean | null
+          classification_us_mail?: boolean | null
           company_ein_ssn?: string | null
           company_email?: string | null
           company_info_changes?: Json | null
@@ -183,9 +280,19 @@ export type Database = {
           license_file?: string | null
           license_filename?: string | null
           license_url?: string | null
+          mailing_address_city?: string | null
+          mailing_address_country?: string | null
+          mailing_address_state?: string | null
+          mailing_address_street?: string | null
+          mailing_address_zip?: string | null
           mc_number?: string | null
           mcs_operator_info?: Json | null
           operating_info_changes?: Json | null
+          operation_interstate_carrier?: boolean | null
+          operation_intrastate_hazmat_carrier?: boolean | null
+          operation_intrastate_hazmat_shipper?: boolean | null
+          operation_intrastate_non_hazmat_carrier?: boolean | null
+          operation_intrastate_non_hazmat_shipper?: boolean | null
           operations_cargo_classifications?: Json | null
           operations_classifications?: Json | null
           operations_company_operations?: Json | null
@@ -202,6 +309,11 @@ export type Database = {
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
+          principal_address_city?: string | null
+          principal_address_country?: string | null
+          principal_address_state?: string | null
+          principal_address_street?: string | null
+          principal_address_zip?: string | null
           reason_for_filing?: string | null
           signature_content_type?: string | null
           signature_file?: string | null
@@ -211,7 +323,48 @@ export type Database = {
           usdot_number: string
         }
         Update: {
+          cargo_agricultural?: boolean | null
+          cargo_beverages?: boolean | null
+          cargo_building_materials?: boolean | null
+          cargo_chemicals?: boolean | null
+          cargo_coal?: boolean | null
+          cargo_commodities_dry_bulk?: boolean | null
+          cargo_construction?: boolean | null
+          cargo_drive_away?: boolean | null
+          cargo_fresh_produce?: boolean | null
+          cargo_garbage?: boolean | null
+          cargo_general_freight?: boolean | null
+          cargo_grain?: boolean | null
+          cargo_household_goods?: boolean | null
+          cargo_intermodal_containers?: boolean | null
+          cargo_liquids_gases?: boolean | null
+          cargo_livestock?: boolean | null
+          cargo_logs?: boolean | null
+          cargo_machinery?: boolean | null
+          cargo_meat?: boolean | null
+          cargo_metal_sheets?: boolean | null
+          cargo_mobile_homes?: boolean | null
+          cargo_motor_vehicles?: boolean | null
+          cargo_oilfield_equipment?: boolean | null
+          cargo_other?: boolean | null
+          cargo_paper_products?: boolean | null
+          cargo_passengers?: boolean | null
+          cargo_refrigerated_food?: boolean | null
+          cargo_us_mail?: boolean | null
+          cargo_utilities?: boolean | null
+          cargo_water_well?: boolean | null
           changes_to_make?: Json | null
+          classification_authorized_for_hire?: boolean | null
+          classification_exempt_for_hire?: boolean | null
+          classification_federal_government?: boolean | null
+          classification_indian_tribe?: boolean | null
+          classification_local_government?: boolean | null
+          classification_migrant?: boolean | null
+          classification_private_passengers_business?: boolean | null
+          classification_private_passengers_non_business?: boolean | null
+          classification_private_property?: boolean | null
+          classification_state_government?: boolean | null
+          classification_us_mail?: boolean | null
           company_ein_ssn?: string | null
           company_email?: string | null
           company_info_changes?: Json | null
@@ -228,9 +381,19 @@ export type Database = {
           license_file?: string | null
           license_filename?: string | null
           license_url?: string | null
+          mailing_address_city?: string | null
+          mailing_address_country?: string | null
+          mailing_address_state?: string | null
+          mailing_address_street?: string | null
+          mailing_address_zip?: string | null
           mc_number?: string | null
           mcs_operator_info?: Json | null
           operating_info_changes?: Json | null
+          operation_interstate_carrier?: boolean | null
+          operation_intrastate_hazmat_carrier?: boolean | null
+          operation_intrastate_hazmat_shipper?: boolean | null
+          operation_intrastate_non_hazmat_carrier?: boolean | null
+          operation_intrastate_non_hazmat_shipper?: boolean | null
           operations_cargo_classifications?: Json | null
           operations_classifications?: Json | null
           operations_company_operations?: Json | null
@@ -247,6 +410,11 @@ export type Database = {
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
+          principal_address_city?: string | null
+          principal_address_country?: string | null
+          principal_address_state?: string | null
+          principal_address_street?: string | null
+          principal_address_zip?: string | null
           reason_for_filing?: string | null
           signature_content_type?: string | null
           signature_file?: string | null
@@ -322,6 +490,11 @@ export type Database = {
           payment_status: string | null
           phone: string | null
           physical_address: string | null
+          physical_address_city: string | null
+          physical_address_country: string | null
+          physical_address_state: string | null
+          physical_address_street: string | null
+          physical_address_zip: string | null
           registration_year: string | null
           transaction_id: string | null
           usdot_number: string
@@ -350,6 +523,11 @@ export type Database = {
           payment_status?: string | null
           phone?: string | null
           physical_address?: string | null
+          physical_address_city?: string | null
+          physical_address_country?: string | null
+          physical_address_state?: string | null
+          physical_address_street?: string | null
+          physical_address_zip?: string | null
           registration_year?: string | null
           transaction_id?: string | null
           usdot_number: string
@@ -378,6 +556,11 @@ export type Database = {
           payment_status?: string | null
           phone?: string | null
           physical_address?: string | null
+          physical_address_city?: string | null
+          physical_address_country?: string | null
+          physical_address_state?: string | null
+          physical_address_street?: string | null
+          physical_address_zip?: string | null
           registration_year?: string | null
           transaction_id?: string | null
           usdot_number?: string
