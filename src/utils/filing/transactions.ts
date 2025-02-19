@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { MCS150FormData } from "@/types/filing";
+import { toast } from "@/components/ui/use-toast";
 
 interface FilingAttachments {
   signature?: string;
@@ -9,25 +10,35 @@ interface FilingAttachments {
 
 export const createTransaction = async (filingId: string, amount: number, paymentMethod: string) => {
   try {
-    // First check if the filing is still in draft
+    // First check if the filing is still in draft and get all necessary data
     const { data: filing, error: filingCheckError } = await supabase
       .from('filings')
       .select('status, form_data, attachments, filing_type, usdot_number')
       .eq('id', filingId)
       .maybeSingle();
 
-    if (filingCheckError) throw filingCheckError;
+    if (filingCheckError) {
+      console.error('Error checking filing:', filingCheckError);
+      throw filingCheckError;
+    }
+    
     if (!filing || filing.status !== 'draft') {
       throw new Error('Filing is not in draft status');
     }
 
+    // Ensure attachments are properly typed and present
     const attachments = filing.attachments as FilingAttachments;
+    console.log('Current attachments:', attachments);
 
     // Verify attachments exist for MCS-150 filings
-    if (filing.filing_type === 'mcs150' && (!attachments?.signature || !attachments?.license)) {
-      throw new Error('Missing required attachments for MCS-150 filing');
+    if (filing.filing_type === 'mcs150') {
+      if (!attachments?.signature || !attachments?.license) {
+        console.error('Missing attachments:', { attachments });
+        throw new Error('Missing required attachments for MCS-150 filing');
+      }
     }
 
+    // Create the transaction
     const { data: transactionData, error: transactionError } = await supabase
       .from('transactions')
       .insert([
@@ -41,7 +52,10 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       .select()
       .maybeSingle();
 
-    if (transactionError) throw transactionError;
+    if (transactionError) {
+      console.error('Error creating transaction:', transactionError);
+      throw transactionError;
+    }
 
     // Update airtable records with URLs based on filing type
     if (filing.filing_type === 'mcs150' && attachments) {
@@ -75,6 +89,8 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         created_at: new Date().toISOString()
       };
 
+      console.log('Creating airtable record:', record);
+
       const { error: airtableError } = await supabase
         .from('mcs150_airtable_records')
         .insert(record);
@@ -95,11 +111,19 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       .eq('id', filingId)
       .eq('status', 'draft');
 
-    if (filingError) throw filingError;
+    if (filingError) {
+      console.error('Error updating filing:', filingError);
+      throw filingError;
+    }
 
     return transactionData;
   } catch (error) {
-    console.error('Error creating transaction:', error);
+    console.error('Error in createTransaction:', error);
+    toast({
+      variant: "destructive",
+      title: "Error creating transaction",
+      description: error instanceof Error ? error.message : "An unexpected error occurred"
+    });
     throw error;
   }
 };
