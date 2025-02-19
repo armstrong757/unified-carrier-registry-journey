@@ -437,18 +437,13 @@ export type Database = {
           full_name: string | null
           id: string
           needs_vehicle_changes: string | null
-          payment_amount: number | null
-          payment_method: string | null
-          payment_status: string | null
           phone: string | null
-          physical_address: string | null
           physical_address_city: string | null
           physical_address_country: string | null
           physical_address_state: string | null
           physical_address_street: string | null
           physical_address_zip: string | null
           registration_year: string | null
-          transaction_id: string | null
           usdot_number: string
           vehicles_add_vehicles: number | null
           vehicles_exclude_vehicles: number | null
@@ -470,18 +465,13 @@ export type Database = {
           full_name?: string | null
           id?: string
           needs_vehicle_changes?: string | null
-          payment_amount?: number | null
-          payment_method?: string | null
-          payment_status?: string | null
           phone?: string | null
-          physical_address?: string | null
           physical_address_city?: string | null
           physical_address_country?: string | null
           physical_address_state?: string | null
           physical_address_street?: string | null
           physical_address_zip?: string | null
           registration_year?: string | null
-          transaction_id?: string | null
           usdot_number: string
           vehicles_add_vehicles?: number | null
           vehicles_exclude_vehicles?: number | null
@@ -503,18 +493,13 @@ export type Database = {
           full_name?: string | null
           id?: string
           needs_vehicle_changes?: string | null
-          payment_amount?: number | null
-          payment_method?: string | null
-          payment_status?: string | null
           phone?: string | null
-          physical_address?: string | null
           physical_address_city?: string | null
           physical_address_country?: string | null
           physical_address_state?: string | null
           physical_address_street?: string | null
           physical_address_zip?: string | null
           registration_year?: string | null
-          transaction_id?: string | null
           usdot_number?: string
           vehicles_add_vehicles?: number | null
           vehicles_exclude_vehicles?: number | null
