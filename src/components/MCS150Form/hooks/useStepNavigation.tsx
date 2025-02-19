@@ -1,3 +1,4 @@
+
 import { useCallback } from "react";
 import { updateFilingData, createTransaction } from "@/utils/filing";
 import { getNextStep, getPreviousStep } from "../utils/stepUtils";
@@ -13,7 +14,12 @@ export const useStepNavigation = (
   const handleNext = useCallback(async () => {
     if (currentStep < totalSteps) {
       try {
+        console.log('Current step:', currentStep);
+        console.log('Form data for current step:', formData);
+        
         const nextStep = getNextStep(currentStep, formData);
+        console.log('Calculated next step:', nextStep);
+        
         if (nextStep === currentStep) {
           // If step didn't change, show a message to user
           toast({
@@ -25,10 +31,12 @@ export const useStepNavigation = (
         }
 
         if (filingId) {
+          console.log('Updating filing data for step:', nextStep);
           const updatedFiling = await updateFilingData(filingId, formData, nextStep);
           if (!updatedFiling) {
             throw new Error('Failed to update filing data');
           }
+          console.log('Filing data updated successfully');
         }
 
         setCurrentStep(nextStep);
@@ -66,13 +74,17 @@ export const useStepNavigation = (
   const handleBack = useCallback(async () => {
     if (currentStep > 1) {
       try {
+        console.log('Calculating previous step from:', currentStep);
         const previousStep = getPreviousStep(currentStep, formData);
+        console.log('Calculated previous step:', previousStep);
         
         if (filingId) {
+          console.log('Updating filing data for previous step');
           const updatedFiling = await updateFilingData(filingId, formData, previousStep);
           if (!updatedFiling) {
             throw new Error('Failed to update filing data');
           }
+          console.log('Filing data updated successfully');
         }
 
         setCurrentStep(previousStep);
