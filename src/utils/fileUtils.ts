@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_IMAGE_DIMENSION = 1200; // Max width/height for resized images
@@ -59,6 +60,11 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
         processedFile = await resizeImage(file, MAX_IMAGE_DIMENSION);
         contentType = 'image/png';
       } else {
+        toast({
+          variant: "destructive",
+          title: "File too large",
+          description: `Maximum file size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`
+        });
         throw new Error(`File size exceeds maximum limit of ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
       }
     }
@@ -70,19 +76,31 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
     }
     
     const fileExt = type === 'signature' ? 'png' : file.name.split('.').pop();
-    const fileName = `${usdotNumber}/${type}_${Date.now()}.${fileExt}`;
+    const sanitizedUsdot = usdotNumber.replace(/[^a-zA-Z0-9-]/g, '');
+    const fileName = `${sanitizedUsdot}/${type}_${Date.now()}.${fileExt}`;
 
     console.log('Uploading file to storage:', { fileName, contentType });
+
+    // Ensure the storage client is properly initialized
+    if (!supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('form_attachments')
       .upload(fileName, processedFile, {
         contentType,
-        upsert: true
+        upsert: true,
+        cacheControl: '3600'
       });
 
     if (uploadError) {
       console.error('Upload error:', uploadError);
+      toast({
+        variant: "destructive",
+        title: "Upload failed",
+        description: uploadError.message
+      });
       throw uploadError;
     }
 
@@ -100,6 +118,11 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
     };
   } catch (error) {
     console.error('Error uploading file:', error);
+    toast({
+      variant: "destructive",
+      title: "Upload failed",
+      description: error instanceof Error ? error.message : "An unexpected error occurred"
+    });
     throw error;
   }
 };
