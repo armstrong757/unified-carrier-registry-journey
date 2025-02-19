@@ -31,12 +31,13 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     if (transactionError) throw transactionError;
 
     // Update mcs150_airtable_records with URLs
-    if (filing.attachments) {
+    if (filing.attachments && typeof filing.attachments === 'object') {
+      const attachments = filing.attachments as Record<string, string>;
       const { error: airtableError } = await supabase
         .from('mcs150_airtable_records')
         .update({
-          signature_url: filing.attachments.signature,
-          license_url: filing.attachments.license
+          signature_url: attachments.signature,
+          license_url: attachments.license
         })
         .eq('filing_id', filingId);
 

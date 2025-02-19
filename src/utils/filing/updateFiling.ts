@@ -14,7 +14,7 @@ export const updateFilingData = async (filingId: string, formData: any, currentS
     if (filingError) throw filingError;
 
     // Process and sanitize form data
-    const { formData: sanitizedFormData, flatFormData, attachments, fileData } = 
+    const { formData: sanitizedFormData, flatFormData, attachments } = 
       await sanitizeAndProcessFormData(formData, filing.usdot_number);
 
     const { data, error } = await supabase
@@ -23,7 +23,6 @@ export const updateFilingData = async (filingId: string, formData: any, currentS
         form_data: sanitizedFormData,
         flat_form_data: flatFormData,
         attachments,
-        file_data: fileData,
         email: sanitizedFormData.email || sanitizedFormData.operator?.email,
         last_step_completed: currentStep,
         updated_at: new Date().toISOString()
