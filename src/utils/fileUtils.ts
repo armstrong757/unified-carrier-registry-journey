@@ -47,6 +47,8 @@ const resizeImage = async (file: File, maxDimension: number): Promise<Blob> => {
 
 export const uploadFormAttachment = async (file: File, usdotNumber: string, type: 'signature' | 'license') => {
   try {
+    console.log(`Starting upload for ${type} file:`, { name: file.name, size: file.size });
+    
     let processedFile: File | Blob = file;
     let contentType = file.type;
     
@@ -70,6 +72,8 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
     const fileExt = type === 'signature' ? 'png' : file.name.split('.').pop();
     const fileName = `${usdotNumber}/${type}_${Date.now()}.${fileExt}`;
 
+    console.log('Uploading file to storage:', { fileName, contentType });
+
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('form_attachments')
       .upload(fileName, processedFile, {
@@ -77,11 +81,16 @@ export const uploadFormAttachment = async (file: File, usdotNumber: string, type
         upsert: true
       });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      throw uploadError;
+    }
 
     const { data: urlData } = supabase.storage
       .from('form_attachments')
       .getPublicUrl(fileName);
+
+    console.log('File uploaded successfully:', { fileName, publicUrl: urlData.publicUrl });
 
     return { 
       fileName,

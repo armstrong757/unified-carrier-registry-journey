@@ -15,6 +15,11 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       throw new Error('Filing is not in draft status');
     }
 
+    // Verify attachments exist for MCS-150 filings
+    if (filing.filing_type === 'mcs150' && (!filing.attachments?.signature || !filing.attachments?.license)) {
+      throw new Error('Missing required attachments for MCS-150 filing');
+    }
+
     const { data: transactionData, error: transactionError } = await supabase
       .from('transactions')
       .insert([
@@ -31,19 +36,20 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     if (transactionError) throw transactionError;
 
     // Update airtable records with URLs based on filing type
-    if (filing.attachments && typeof filing.attachments === 'object') {
-      const attachments = filing.attachments as Record<string, string>;
+    if (filing.filing_type === 'mcs150') {
+      console.log('Processing MCS-150 attachments:', filing.attachments);
       
-      if (filing.filing_type === 'mcs150') {
-        const { error: airtableError } = await supabase
-          .from('mcs150_airtable_records')
-          .update({
-            signature_url: attachments.signature,
-            license_url: attachments.license
-          })
-          .eq('filing_id', filingId);
+      const { error: airtableError } = await supabase
+        .from('mcs150_airtable_records')
+        .update({
+          signature_url: filing.attachments.signature,
+          license_url: filing.attachments.license
+        })
+        .eq('filing_id', filingId);
 
-        if (airtableError) throw airtableError;
+      if (airtableError) {
+        console.error('Error updating airtable record:', airtableError);
+        throw airtableError;
       }
     }
 
