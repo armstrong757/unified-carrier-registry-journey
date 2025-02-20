@@ -57,9 +57,8 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
                 operator: { ...formData.operator, title: e.target.value },
               })
             }
-            placeholder="Job Title"
+            placeholder="Owner, Manager, etc."
           />
-          <p className="text-sm text-muted-foreground">This can be Owner, Manager, etc.</p>
         </div>
 
         <OperatorIdentifier formData={formData} setFormData={setFormData} />
