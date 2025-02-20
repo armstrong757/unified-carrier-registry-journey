@@ -19,6 +19,12 @@ const VehicleInformation = ({
 
   if (!formData.operatingInfoChanges.vehicles) return null;
 
+  const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '');
+    const formatted = value ? parseInt(value).toLocaleString() : '';
+    return formatted;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2">
@@ -42,34 +48,37 @@ const VehicleInformation = ({
                 <div>
                   <Label className="text-sm text-gray-600">Owned</Label>
                   <Input
-                    type="number"
-                    min="0"
+                    type="text"
                     value={formData.vehicles[id].owned}
-                    onChange={(e) =>
-                      updateVehicleCount(id, "owned", e.target.value)
-                    }
+                    onChange={(e) => {
+                      const formatted = handleNumericInput(e);
+                      updateVehicleCount(id, "owned", formatted);
+                    }}
+                    placeholder="0"
                   />
                 </div>
                 <div>
                   <Label className="text-sm text-gray-600">Term Leased</Label>
                   <Input
-                    type="number"
-                    min="0"
+                    type="text"
                     value={formData.vehicles[id].termLeased}
-                    onChange={(e) =>
-                      updateVehicleCount(id, "termLeased", e.target.value)
-                    }
+                    onChange={(e) => {
+                      const formatted = handleNumericInput(e);
+                      updateVehicleCount(id, "termLeased", formatted);
+                    }}
+                    placeholder="0"
                   />
                 </div>
                 <div>
                   <Label className="text-sm text-gray-600">Trip Leased</Label>
                   <Input
-                    type="number"
-                    min="0"
+                    type="text"
                     value={formData.vehicles[id].tripLeased}
-                    onChange={(e) =>
-                      updateVehicleCount(id, "tripLeased", e.target.value)
-                    }
+                    onChange={(e) => {
+                      const formatted = handleNumericInput(e);
+                      updateVehicleCount(id, "tripLeased", formatted);
+                    }}
+                    placeholder="0"
                   />
                 </div>
               </div>
@@ -102,34 +111,37 @@ const VehicleInformation = ({
                     <div>
                       <Label className="text-sm text-gray-600">Owned</Label>
                       <Input
-                        type="number"
-                        min="0"
+                        type="text"
                         value={formData.vehicles[id].owned}
-                        onChange={(e) =>
-                          updateVehicleCount(id, "owned", e.target.value)
-                        }
+                        onChange={(e) => {
+                          const formatted = handleNumericInput(e);
+                          updateVehicleCount(id, "owned", formatted);
+                        }}
+                        placeholder="0"
                       />
                     </div>
                     <div>
                       <Label className="text-sm text-gray-600">Term Leased</Label>
                       <Input
-                        type="number"
-                        min="0"
+                        type="text"
                         value={formData.vehicles[id].termLeased}
-                        onChange={(e) =>
-                          updateVehicleCount(id, "termLeased", e.target.value)
-                        }
+                        onChange={(e) => {
+                          const formatted = handleNumericInput(e);
+                          updateVehicleCount(id, "termLeased", formatted);
+                        }}
+                        placeholder="0"
                       />
                     </div>
                     <div>
                       <Label className="text-sm text-gray-600">Trip Leased</Label>
                       <Input
-                        type="number"
-                        min="0"
+                        type="text"
                         value={formData.vehicles[id].tripLeased}
-                        onChange={(e) =>
-                          updateVehicleCount(id, "tripLeased", e.target.value)
-                        }
+                        onChange={(e) => {
+                          const formatted = handleNumericInput(e);
+                          updateVehicleCount(id, "tripLeased", formatted);
+                        }}
+                        placeholder="0"
                       />
                     </div>
                   </div>
@@ -186,34 +198,37 @@ const VehicleInformation = ({
                     <div>
                       <Label className="text-sm text-gray-600">Owned</Label>
                       <Input
-                        type="number"
-                        min="0"
+                        type="text"
                         value={formData.vehicles[id].owned}
-                        onChange={(e) =>
-                          updateVehicleCount(id, "owned", e.target.value)
-                        }
+                        onChange={(e) => {
+                          const formatted = handleNumericInput(e);
+                          updateVehicleCount(id, "owned", formatted);
+                        }}
+                        placeholder="0"
                       />
                     </div>
                     <div>
                       <Label className="text-sm text-gray-600">Term Leased</Label>
                       <Input
-                        type="number"
-                        min="0"
+                        type="text"
                         value={formData.vehicles[id].termLeased}
-                        onChange={(e) =>
-                          updateVehicleCount(id, "termLeased", e.target.value)
-                        }
+                        onChange={(e) => {
+                          const formatted = handleNumericInput(e);
+                          updateVehicleCount(id, "termLeased", formatted);
+                        }}
+                        placeholder="0"
                       />
                     </div>
                     <div>
                       <Label className="text-sm text-gray-600">Trip Leased</Label>
                       <Input
-                        type="number"
-                        min="0"
+                        type="text"
                         value={formData.vehicles[id].tripLeased}
-                        onChange={(e) =>
-                          updateVehicleCount(id, "tripLeased", e.target.value)
-                        }
+                        onChange={(e) => {
+                          const formatted = handleNumericInput(e);
+                          updateVehicleCount(id, "tripLeased", formatted);
+                        }}
+                        placeholder="0"
                       />
                     </div>
                   </div>
