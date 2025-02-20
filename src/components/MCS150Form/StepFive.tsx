@@ -25,6 +25,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
         email: '',
         title: '',
         milesDriven: '',
+        licenseFile: null,
         signature: '',
       }
     });
@@ -35,21 +36,40 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
       <h2 className="text-2xl font-bold text-primary">Operator Information</h2>
       
       <div className="space-y-6">
-        <OperatorBasicInfo formData={formData} setFormData={setFormData} />
-        <OperatorIdentifier formData={formData} setFormData={setFormData} />
-        <OperatorContact formData={formData} setFormData={setFormData} />
-        <OperatorDetails formData={formData} setFormData={setFormData} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <OperatorBasicInfo formData={formData} setFormData={setFormData} />
+          <OperatorIdentifier formData={formData} setFormData={setFormData} />
+          <OperatorContact formData={formData} setFormData={setFormData} />
+          <OperatorDetails formData={formData} setFormData={setFormData} />
+        </div>
 
-        <div className="space-y-4">
-          <Label>Signature <span className="text-red-500">*</span></Label>
-          <SignaturePad
-            onChange={(signature) =>
-              setFormData({
-                ...formData,
-                operator: { ...formData.operator, signature },
-              })
-            }
-          />
+        <div className="grid grid-cols-1 gap-6">
+          <div className="space-y-4">
+            <Label>Driver's License</Label>
+            <Input
+              type="file"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                setFormData({
+                  ...formData,
+                  operator: { ...formData.operator, licenseFile: file },
+                });
+              }}
+              accept=".pdf,.jpg,.jpeg,.png"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <Label>Signature <span className="text-red-500">*</span></Label>
+            <SignaturePad
+              onChange={(signature) =>
+                setFormData({
+                  ...formData,
+                  operator: { ...formData.operator, signature },
+                })
+              }
+            />
+          </div>
         </div>
       </div>
     </div>
