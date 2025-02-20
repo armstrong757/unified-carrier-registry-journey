@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -20,14 +19,18 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
   // Calculate total vehicles including adjustments
-  const baseVehicles = (parseInt(formData.straightTrucks?.replace(/,/g, '') || '0')) + 
-                      (parseInt(formData.passengerVehicles?.replace(/,/g, '') || '0'));
-  const addedVehicles = formData.needsVehicleChanges === "yes" ? 
-                       (parseInt(formData.addVehicles?.replace(/,/g, '') || '0')) : 0;
-  const excludedVehicles = formData.needsVehicleChanges === "yes" ? 
-                          (parseInt(formData.excludeVehicles?.replace(/,/g, '') || '0')) : 0;
-  
-  const totalVehicles = baseVehicles + addedVehicles - excludedVehicles;
+  const calculateTotalVehicles = () => {
+    const straightTrucks = parseInt(String(formData.straightTrucks || '0').replace(/,/g, ''));
+    const passengerVehicles = parseInt(String(formData.passengerVehicles || '0').replace(/,/g, ''));
+    const addVehicles = formData.needsVehicleChanges === "yes" ? 
+                       parseInt(String(formData.addVehicles || '0').replace(/,/g, '')) : 0;
+    const excludeVehicles = formData.needsVehicleChanges === "yes" ? 
+                          parseInt(String(formData.excludeVehicles || '0').replace(/,/g, '')) : 0;
+    
+    return straightTrucks + passengerVehicles + addVehicles - excludeVehicles;
+  };
+
+  const totalVehicles = calculateTotalVehicles();
   const ucrFee = calculateUCRFee(totalVehicles);
   const displayedFee = ucrFee === 0 ? "Contact Us" : `$${ucrFee.toFixed(2)}`;
 
