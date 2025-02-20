@@ -25,19 +25,23 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
     setFormData({ ...formData, phone: formatted });
+
+    // Clear error when user starts typing again
+    if (fieldErrors.phone) {
+      setFieldErrors(prev => ({ ...prev, phone: '' }));
+    }
   };
 
   const handlePhoneBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value && value.length === 14) {
+    if (value) {  // Only validate if there's a value
       const validation = validateField('phone', value);
-      setFieldErrors(prev => ({ ...prev, phone: validation.error || '' }));
-      
       if (validation.error) {
+        setFieldErrors(prev => ({ ...prev, phone: validation.error }));
         toast({
           variant: "destructive",
           title: "Invalid Phone Number",
-          description: validation.error
+          description: "Please enter a valid 10-digit phone number"
         });
       }
     }
@@ -46,19 +50,23 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFormData({ ...formData, email: value });
+
+    // Clear error when user starts typing again
+    if (fieldErrors.email) {
+      setFieldErrors(prev => ({ ...prev, email: '' }));
+    }
   };
 
   const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value) {
+    if (value) {  // Only validate if there's a value
       const validation = validateField('email', value);
-      setFieldErrors(prev => ({ ...prev, email: validation.error || '' }));
-      
       if (validation.error) {
+        setFieldErrors(prev => ({ ...prev, email: validation.error }));
         toast({
           variant: "destructive",
           title: "Invalid Email",
-          description: validation.error
+          description: "Please enter a valid email address"
         });
       }
     }
