@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatPhoneNumber, validateField } from "@/utils/formValidation";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface StepOneProps {
   formData: any;
@@ -25,10 +25,12 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
     setFormData({ ...formData, phone: formatted });
-    
-    // Only validate if we have a complete phone number
-    if (formatted.length === 14) {
-      const validation = validateField('phone', formatted);
+  };
+
+  const handlePhoneBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value && value.length === 14) {
+      const validation = validateField('phone', value);
       setFieldErrors(prev => ({ ...prev, phone: validation.error || '' }));
       
       if (validation.error) {
@@ -44,16 +46,21 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFormData({ ...formData, email: value });
-    
-    const validation = validateField('email', value);
-    setFieldErrors(prev => ({ ...prev, email: validation.error || '' }));
-    
-    if (validation.error) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Email",
-        description: validation.error
-      });
+  };
+
+  const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value) {
+      const validation = validateField('email', value);
+      setFieldErrors(prev => ({ ...prev, email: validation.error || '' }));
+      
+      if (validation.error) {
+        toast({
+          variant: "destructive",
+          title: "Invalid Email",
+          description: validation.error
+        });
+      }
     }
   };
 
@@ -105,6 +112,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
             type="email"
             value={formData.email || ''}
             onChange={handleEmailChange}
+            onBlur={handleEmailBlur}
             placeholder="email@example.com"
             className={fieldErrors.email ? 'border-red-500' : ''}
           />
@@ -121,6 +129,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
             id="phone"
             value={formData.phone || ''}
             onChange={handlePhoneChange}
+            onBlur={handlePhoneBlur}
             placeholder="(555) 555-5555"
             maxLength={14}
             className={fieldErrors.phone ? 'border-red-500' : ''}
