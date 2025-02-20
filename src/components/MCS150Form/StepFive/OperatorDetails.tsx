@@ -1,7 +1,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { CloudIcon } from "lucide-react";
+import { UploadIcon } from "lucide-react";
 
 interface OperatorDetailsProps {
   formData: any;
@@ -66,14 +66,14 @@ const OperatorDetails = ({ formData, setFormData, fieldErrors }: OperatorDetails
       <div className="space-y-2">
         <Label>Driver's License <span className="text-red-500">*</span></Label>
         <div 
-          className={`relative border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center bg-white cursor-pointer hover:border-gray-400 transition-colors ${fieldErrors?.licenseFile ? 'border-red-500' : 'border-gray-300'}`}
+          className={`relative border border-dashed rounded-md p-4 flex flex-col items-center justify-center bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors ${fieldErrors?.licenseFile ? 'border-red-500' : 'border-gray-300'}`}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onClick={() => document.getElementById('licenseFile')?.click()}
         >
-          <CloudIcon className="h-8 w-8 text-gray-400 mb-2" />
-          <div className="text-sm font-medium text-gray-700">Browse Files</div>
-          <div className="text-xs text-gray-500 mt-1">Drag and drop files here</div>
+          <UploadIcon className="h-6 w-6 stroke-1 text-gray-400" />
+          <div className="text-sm font-normal text-gray-600 mt-2">Click to upload or drag and drop</div>
+          <div className="text-xs text-gray-400 mt-1">PDF, PNG or JPG (max 5MB)</div>
           <Input
             id="licenseFile"
             type="file"
@@ -83,7 +83,7 @@ const OperatorDetails = ({ formData, setFormData, fieldErrors }: OperatorDetails
           />
           {formData.operator?.licenseFile && (
             <div className="mt-2 text-sm text-gray-600">
-              Selected: {formData.operator.licenseFile.name}
+              {formData.operator.licenseFile.name}
             </div>
           )}
         </div>
