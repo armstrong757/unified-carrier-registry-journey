@@ -7,7 +7,7 @@ import OperatorContact from "./StepFive/OperatorContact";
 import OperatorDetails from "./StepFive/OperatorDetails";
 import SignaturePad from "./SignaturePad";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface StepFiveProps {
   formData: any;
@@ -97,15 +97,13 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
       <h2 className="text-2xl font-bold text-primary">Operator Information</h2>
       
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <OperatorBasicInfo formData={formData} setFormData={setFormData} />
-          <OperatorIdentifier formData={formData} setFormData={setFormData} />
-          <OperatorContact formData={formData} setFormData={setFormData} />
-          <OperatorDetails formData={formData} setFormData={setFormData} />
-        </div>
+        <OperatorBasicInfo formData={formData} setFormData={setFormData} />
+        <OperatorIdentifier formData={formData} setFormData={setFormData} />
+        <OperatorContact formData={formData} setFormData={setFormData} />
+        <OperatorDetails formData={formData} setFormData={setFormData} />
 
-        <div className="grid grid-cols-1 gap-6">
-          <div className="space-y-4">
+        <div className="space-y-4">
+          <div className="space-y-2">
             <Label>Driver's License</Label>
             <Input
               type="file"
@@ -118,7 +116,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             )}
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-2">
             <Label>Signature <span className="text-red-500">*</span></Label>
             <SignaturePad
               onChange={(signature) =>

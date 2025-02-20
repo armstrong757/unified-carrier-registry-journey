@@ -3,8 +3,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatEIN, formatSSN, validateField } from "@/utils/formValidation";
-import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface OperatorIdentifierProps {
   formData: any;
@@ -19,12 +19,6 @@ const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) 
     const value = e.target.value;
     const type = formData.operator?.identifierType || 'ein';
     
-    console.log('Identifier Change:', {
-      input: value,
-      type,
-      current: formData.operator?.einSsn
-    });
-    
     const formatted = type === 'ein' ? formatEIN(value) : formatSSN(value);
     
     setFormData({
@@ -35,12 +29,20 @@ const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) 
       }
     });
 
-    if ((type === 'ein' && formatted.length === 10) || 
-        (type === 'ssn' && formatted.length === 11)) {
-      const validation = validateField(type, formatted);
-      setFieldErrors(prev => ({ ...prev, identifier: validation.error || '' }));
-      
+    // Clear error when user starts typing again
+    if (fieldErrors.identifier) {
+      setFieldErrors(prev => ({ ...prev, identifier: '' }));
+    }
+  };
+
+  const handleIdentifierBlur = () => {
+    const value = formData.operator?.einSsn;
+    const type = formData.operator?.identifierType;
+    
+    if (value) {
+      const validation = validateField(type, value);
       if (validation.error) {
+        setFieldErrors(prev => ({ ...prev, identifier: validation.error }));
         toast({
           variant: "destructive",
           title: `Invalid ${type.toUpperCase()}`,
@@ -50,27 +52,13 @@ const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) 
     }
   };
 
-  // Log whenever operator identifier info changes
-  useEffect(() => {
-    console.log('Operator Identifier Info:', {
-      type: formData.operator?.identifierType,
-      value: formData.operator?.einSsn,
-      errors: fieldErrors
-    });
-  }, [formData.operator?.identifierType, formData.operator?.einSsn, fieldErrors]);
-
   const handleTypeChange = (value: string) => {
-    console.log('Identifier Type Change:', {
-      from: formData.operator?.identifierType,
-      to: value
-    });
-
     setFormData({
       ...formData,
       operator: {
         ...formData.operator,
         identifierType: value,
-        einSsn: ''
+        einSsn: '' // Clear the field when switching types
       }
     });
     setFieldErrors({});
@@ -78,40 +66,42 @@ const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) 
 
   return (
     <div className="space-y-4">
-      <Label>
-        Identifier Type <span className="text-red-500">*</span>
-      </Label>
-      <RadioGroup
-        value={formData.operator?.identifierType || 'ein'}
-        onValueChange={handleTypeChange}
-        className="flex flex-col space-y-2"
-      >
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="ein" id="operatorEin" />
-          <Label htmlFor="operatorEin">Employer Identification Number (EIN)</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="ssn" id="operatorSsn" />
-          <Label htmlFor="operatorSsn">Social Security Number (SSN)</Label>
-        </div>
-      </RadioGroup>
-      
       <div className="space-y-2">
-        <Label htmlFor="einSsn">
-          {formData.operator?.identifierType === 'ein' ? 'EIN' : 'SSN'}{' '}
-          <span className="text-red-500">*</span>
+        <Label>
+          Identifier Information <span className="text-red-500">*</span>
         </Label>
-        <Input
-          id="einSsn"
-          value={formData.operator?.einSsn || ''}
-          onChange={handleIdentifierChange}
-          placeholder={formData.operator?.identifierType === 'ein' ? 'XX-XXXXXXX' : 'XXX-XX-XXXX'}
-          maxLength={formData.operator?.identifierType === 'ein' ? 10 : 11}
-          className={fieldErrors.identifier ? 'border-red-500' : ''}
-        />
-        {fieldErrors.identifier && (
-          <p className="text-sm text-red-500">{fieldErrors.identifier}</p>
-        )}
+        
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center space-x-6">
+            <RadioGroup
+              value={formData.operator?.identifierType || 'ein'}
+              onValueChange={handleTypeChange}
+              className="flex space-x-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="ein" id="operatorEin" />
+                <Label htmlFor="operatorEin">EIN</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="ssn" id="operatorSsn" />
+                <Label htmlFor="operatorSsn">SSN</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <Input
+            id="einSsn"
+            value={formData.operator?.einSsn || ''}
+            onChange={handleIdentifierChange}
+            onBlur={handleIdentifierBlur}
+            placeholder={formData.operator?.identifierType === 'ein' ? 'XX-XXXXXXX' : 'XXX-XX-XXXX'}
+            maxLength={formData.operator?.identifierType === 'ein' ? 10 : 11}
+            className={fieldErrors.identifier ? 'border-red-500' : ''}
+          />
+          {fieldErrors.identifier && (
+            <p className="text-sm text-red-500">{fieldErrors.identifier}</p>
+          )}
+        </div>
       </div>
     </div>
   );
