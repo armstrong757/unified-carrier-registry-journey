@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { UploadIcon } from "lucide-react";
@@ -65,7 +66,7 @@ const OperatorDetails = ({ formData, setFormData, fieldErrors }: OperatorDetails
       <div className="space-y-2">
         <Label>Driver's License <span className="text-red-500">*</span></Label>
         <div 
-          className={`relative border border-dashed rounded-md h-10 px-4 flex items-center justify-center bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors ${fieldErrors?.licenseFile ? 'border-red-500' : 'border-gray-300'}`}
+          className={`relative border border-dashed rounded-md h-10 px-4 flex items-center bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors ${fieldErrors?.licenseFile ? 'border-red-500' : 'border-gray-300'}`}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onClick={() => document.getElementById('licenseFile')?.click()}
