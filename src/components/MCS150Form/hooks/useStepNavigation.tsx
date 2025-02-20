@@ -11,7 +11,71 @@ export const useStepNavigation = (
   formData: any,
   toast: any
 ) => {
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        if (!formData.reasonForFiling) {
+          toast({
+            title: "Required Field",
+            description: "Please select a reason for filing.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+
+      case 2:
+        if (!formData.hasChanges) {
+          toast({
+            title: "Required Field",
+            description: "Please indicate whether you need to make any changes.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (formData.hasChanges === "yes" && 
+            (!formData.changesToMake || !Object.values(formData.changesToMake).some(Boolean))) {
+          toast({
+            title: "Required Field",
+            description: "Please select at least one type of change to make.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+
+      case 6:
+        if (!formData.billing?.termsAccepted) {
+          toast({
+            title: "Required Field",
+            description: "Please accept the terms and conditions to continue.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (!formData.billing?.cardNumber || 
+            !formData.billing?.expiryDate || 
+            !formData.billing?.cvv || 
+            !formData.billing?.cardName) {
+          toast({
+            title: "Required Fields",
+            description: "Please fill out all payment information fields.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+
+      default:
+        return true;
+    }
+  };
+
   const handleNext = useCallback(async () => {
+    if (!validateStep(currentStep)) {
+      return;
+    }
+
     if (currentStep < totalSteps) {
       try {
         console.log('Current step:', currentStep);
@@ -21,7 +85,6 @@ export const useStepNavigation = (
         console.log('Calculated next step:', nextStep);
         
         if (nextStep === currentStep) {
-          // If step didn't change, show a message to user
           toast({
             title: "Action Required",
             description: "Please complete all required fields before proceeding.",
@@ -54,7 +117,7 @@ export const useStepNavigation = (
     } else {
       try {
         if (filingId) {
-          await createTransaction(filingId, 149, formData.billing.cardType);
+          await createTransaction(filingId, 149, formData.billing?.cardType);
           toast({
             title: "Success",
             description: "Your MCS-150 form has been submitted successfully.",
