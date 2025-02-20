@@ -26,7 +26,7 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
 
   const handleVehicleCountChange = (field: string, value: string) => {
     const numericValue = value.replace(/\D/g, '');
-    const formatted = numericValue ? parseInt(numericValue).toLocaleString() : '';
+    const formatted = numericValue ? parseInt(numericValue).toLocaleString() : '0';
     
     setFormData({
       ...formData,
@@ -35,12 +35,16 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
   };
 
   // Calculate total vehicles and log for verification
-  const totalVehicles = (
-    (parseInt(formData.straightTrucks?.replace(/,/g, '') || '0')) +
-    (parseInt(formData.passengerVehicles?.replace(/,/g, '') || '0')) +
-    (parseInt(formData.addVehicles?.replace(/,/g, '') || '0')) -
-    (parseInt(formData.excludeVehicles?.replace(/,/g, '') || '0'))
-  );
+  const calculateTotalVehicles = () => {
+    const straightTrucks = parseInt(String(formData.straightTrucks || '0').replace(/,/g, ''));
+    const passengerVehicles = parseInt(String(formData.passengerVehicles || '0').replace(/,/g, ''));
+    const addVehicles = parseInt(String(formData.addVehicles || '0').replace(/,/g, ''));
+    const excludeVehicles = parseInt(String(formData.excludeVehicles || '0').replace(/,/g, ''));
+
+    return straightTrucks + passengerVehicles + addVehicles - excludeVehicles;
+  };
+
+  const totalVehicles = calculateTotalVehicles();
 
   useEffect(() => {
     console.log('UCR Form Vehicle Data:', {
@@ -64,11 +68,11 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>Straight Trucks / Tractors:</Label>
-            <p className="font-medium">{formData.straightTrucks || 0}</p>
+            <p className="font-medium">{String(formData.straightTrucks || 0).toLocaleString()}</p>
           </div>
           <div>
             <Label>Passenger Vehicles:</Label>
-            <p className="font-medium">{formData.passengerVehicles || 0}</p>
+            <p className="font-medium">{String(formData.passengerVehicles || 0).toLocaleString()}</p>
           </div>
           <div className="col-span-2">
             <Label>Total Vehicles:</Label>
@@ -117,7 +121,7 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               <Input
                 id="addVehicles"
                 type="text"
-                value={formData.addVehicles || '0'}
+                value={String(formData.addVehicles || '0')}
                 onChange={(e) => handleVehicleCountChange('addVehicles', e.target.value)}
               />
             </div>
@@ -130,7 +134,7 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               <Input
                 id="excludeVehicles"
                 type="text"
-                value={formData.excludeVehicles || '0'}
+                value={String(formData.excludeVehicles || '0')}
                 onChange={(e) => handleVehicleCountChange('excludeVehicles', e.target.value)}
               />
             </div>
