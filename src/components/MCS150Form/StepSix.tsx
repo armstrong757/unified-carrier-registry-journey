@@ -1,9 +1,10 @@
 
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { formatCardNumber, formatExpiryDate, validateField } from "@/utils/formValidation";
 
 interface StepSixProps {
   formData: any;
@@ -11,6 +12,8 @@ interface StepSixProps {
 }
 
 const StepSix = ({ formData, setFormData }: StepSixProps) => {
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
   const updateBilling = (field: string, value: any) => {
     setFormData({
       ...formData,
@@ -19,6 +22,48 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
         [field]: value,
       },
     });
+  };
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCardNumber(e.target.value);
+    updateBilling("cardNumber", formatted);
+    
+    if (formatted.length === 19) {
+      const validation = validateField('cardNumber', formatted);
+      setFieldErrors(prev => ({ ...prev, cardNumber: validation.error || '' }));
+    }
+  };
+
+  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatExpiryDate(e.target.value);
+    updateBilling("expiryDate", formatted);
+    
+    if (formatted.length === 5) {
+      const [month, year] = formatted.split('/');
+      const currentYear = new Date().getFullYear() % 100;
+      const currentMonth = new Date().getMonth() + 1;
+      const numMonth = parseInt(month);
+      const numYear = parseInt(year);
+      
+      let error = '';
+      if (numMonth > 12 || numMonth < 1) {
+        error = 'Invalid month';
+      } else if (numYear < currentYear || (numYear === currentYear && numMonth < currentMonth)) {
+        error = 'Card has expired';
+      }
+      
+      setFieldErrors(prev => ({ ...prev, expiryDate: error }));
+    }
+  };
+
+  const handleCVVChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 3);
+    updateBilling("cvv", value);
+    
+    if (value.length === 3) {
+      const validation = validateField('cvv', value);
+      setFieldErrors(prev => ({ ...prev, cvv: validation.error || '' }));
+    }
   };
 
   return (
@@ -35,9 +80,14 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
               <Input
                 id="cardNumber"
                 placeholder="1234 5678 9012 3456"
-                value={formData.billing.cardNumber}
-                onChange={(e) => updateBilling("cardNumber", e.target.value)}
+                value={formData.billing?.cardNumber || ''}
+                onChange={handleCardNumberChange}
+                maxLength={19}
+                className={fieldErrors.cardNumber ? 'border-red-500' : ''}
               />
+              {fieldErrors.cardNumber && (
+                <p className="text-sm text-red-500">{fieldErrors.cardNumber}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -48,9 +98,14 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
                 <Input
                   id="expiryDate"
                   placeholder="MM/YY"
-                  value={formData.billing.expiryDate}
-                  onChange={(e) => updateBilling("expiryDate", e.target.value)}
+                  value={formData.billing?.expiryDate || ''}
+                  onChange={handleExpiryChange}
+                  maxLength={5}
+                  className={fieldErrors.expiryDate ? 'border-red-500' : ''}
                 />
+                {fieldErrors.expiryDate && (
+                  <p className="text-sm text-red-500">{fieldErrors.expiryDate}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="cvv">
@@ -59,9 +114,14 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
                 <Input
                   id="cvv"
                   placeholder="123"
-                  value={formData.billing.cvv}
-                  onChange={(e) => updateBilling("cvv", e.target.value)}
+                  value={formData.billing?.cvv || ''}
+                  onChange={handleCVVChange}
+                  maxLength={3}
+                  className={fieldErrors.cvv ? 'border-red-500' : ''}
                 />
+                {fieldErrors.cvv && (
+                  <p className="text-sm text-red-500">{fieldErrors.cvv}</p>
+                )}
               </div>
             </div>
 
@@ -72,7 +132,7 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
               <Input
                 id="cardName"
                 placeholder="John Doe"
-                value={formData.billing.cardName}
+                value={formData.billing?.cardName || ''}
                 onChange={(e) => updateBilling("cardName", e.target.value)}
               />
             </div>
@@ -80,7 +140,7 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
             <div className="flex items-start space-x-2 pt-4">
               <Checkbox
                 id="terms"
-                checked={formData.billing.termsAccepted}
+                checked={formData.billing?.termsAccepted || false}
                 onCheckedChange={(checked) => updateBilling("termsAccepted", checked)}
                 className="mt-1"
               />
