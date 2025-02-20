@@ -2,7 +2,8 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { formatPhoneNumber, validateField } from "@/utils/formValidation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface OperatorContactProps {
   formData: any;
@@ -11,9 +12,17 @@ interface OperatorContactProps {
 
 const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const { toast } = useToast();
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
+    
+    console.log('Phone Change:', {
+      input: e.target.value,
+      formatted,
+      current: formData.operator?.phone
+    });
+
     setFormData({
       ...formData,
       operator: {
@@ -25,11 +34,25 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
     if (formatted.length === 14) {
       const validation = validateField('phone', formatted);
       setFieldErrors(prev => ({ ...prev, phone: validation.error || '' }));
+      
+      if (validation.error) {
+        toast({
+          variant: "destructive",
+          title: "Invalid phone number",
+          description: validation.error
+        });
+      }
     }
   };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    
+    console.log('Email Change:', {
+      input: value,
+      current: formData.operator?.email
+    });
+
     setFormData({
       ...formData,
       operator: {
@@ -40,7 +63,24 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
     
     const validation = validateField('email', value);
     setFieldErrors(prev => ({ ...prev, email: validation.error || '' }));
+    
+    if (validation.error) {
+      toast({
+        variant: "destructive",
+        title: "Invalid email",
+        description: validation.error
+      });
+    }
   };
+
+  // Log whenever operator contact info changes
+  useEffect(() => {
+    console.log('Operator Contact Info:', {
+      phone: formData.operator?.phone,
+      email: formData.operator?.email,
+      errors: fieldErrors
+    });
+  }, [formData.operator?.phone, formData.operator?.email, fieldErrors]);
 
   return (
     <div className="space-y-4">
