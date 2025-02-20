@@ -96,7 +96,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
     <div className="space-y-6 animate-fadeIn">
       <h2 className="text-2xl font-bold text-primary">Operator Information</h2>
       
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-xl">
         <OperatorBasicInfo formData={formData} setFormData={setFormData} />
         <OperatorIdentifier formData={formData} setFormData={setFormData} />
         <OperatorContact formData={formData} setFormData={setFormData} />

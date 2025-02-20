@@ -2,8 +2,8 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { formatPhoneNumber, validateField } from "@/utils/formValidation";
-import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface OperatorContactProps {
   formData: any;
@@ -16,13 +16,6 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
-    
-    console.log('Phone Change:', {
-      input: e.target.value,
-      formatted,
-      current: formData.operator?.phone
-    });
-
     setFormData({
       ...formData,
       operator: {
@@ -30,15 +23,22 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
         phone: formatted
       }
     });
-    
-    if (formatted.length === 14) {
-      const validation = validateField('phone', formatted);
-      setFieldErrors(prev => ({ ...prev, phone: validation.error || '' }));
-      
+
+    // Clear error when user starts typing again
+    if (fieldErrors.phone) {
+      setFieldErrors(prev => ({ ...prev, phone: '' }));
+    }
+  };
+
+  const handlePhoneBlur = () => {
+    const value = formData.operator?.phone;
+    if (value) {
+      const validation = validateField('phone', value);
       if (validation.error) {
+        setFieldErrors(prev => ({ ...prev, phone: validation.error }));
         toast({
           variant: "destructive",
-          title: "Invalid phone number",
+          title: "Invalid Phone Number",
           description: validation.error
         });
       }
@@ -47,12 +47,6 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    
-    console.log('Email Change:', {
-      input: value,
-      current: formData.operator?.email
-    });
-
     setFormData({
       ...formData,
       operator: {
@@ -60,27 +54,27 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
         email: value
       }
     });
-    
-    const validation = validateField('email', value);
-    setFieldErrors(prev => ({ ...prev, email: validation.error || '' }));
-    
-    if (validation.error) {
-      toast({
-        variant: "destructive",
-        title: "Invalid email",
-        description: validation.error
-      });
+
+    // Clear error when user starts typing again
+    if (fieldErrors.email) {
+      setFieldErrors(prev => ({ ...prev, email: '' }));
     }
   };
 
-  // Log whenever operator contact info changes
-  useEffect(() => {
-    console.log('Operator Contact Info:', {
-      phone: formData.operator?.phone,
-      email: formData.operator?.email,
-      errors: fieldErrors
-    });
-  }, [formData.operator?.phone, formData.operator?.email, fieldErrors]);
+  const handleEmailBlur = () => {
+    const value = formData.operator?.email;
+    if (value) {
+      const validation = validateField('email', value);
+      if (validation.error) {
+        setFieldErrors(prev => ({ ...prev, email: validation.error }));
+        toast({
+          variant: "destructive",
+          title: "Invalid Email",
+          description: validation.error
+        });
+      }
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -92,6 +86,7 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
           id="phone"
           value={formData.operator?.phone || ''}
           onChange={handlePhoneChange}
+          onBlur={handlePhoneBlur}
           placeholder="(555) 555-5555"
           maxLength={14}
           className={fieldErrors.phone ? 'border-red-500' : ''}
@@ -110,6 +105,7 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
           type="email"
           value={formData.operator?.email || ''}
           onChange={handleEmailChange}
+          onBlur={handleEmailBlur}
           placeholder="email@example.com"
           className={fieldErrors.email ? 'border-red-500' : ''}
         />
@@ -122,3 +118,4 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
 };
 
 export default OperatorContact;
+

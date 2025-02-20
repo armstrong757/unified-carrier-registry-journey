@@ -70,24 +70,21 @@ const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) 
         <Label>
           Identifier Information <span className="text-red-500">*</span>
         </Label>
-        
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center space-x-6">
-            <RadioGroup
-              value={formData.operator?.identifierType || 'ein'}
-              onValueChange={handleTypeChange}
-              className="flex space-x-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="ein" id="operatorEin" />
-                <Label htmlFor="operatorEin">EIN</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="ssn" id="operatorSsn" />
-                <Label htmlFor="operatorSsn">SSN</Label>
-              </div>
-            </RadioGroup>
-          </div>
+        <div className="space-y-2">
+          <RadioGroup
+            value={formData.operator?.identifierType || 'ein'}
+            onValueChange={handleTypeChange}
+            className="flex space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="ein" id="operatorEin" />
+              <Label htmlFor="operatorEin">EIN</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="ssn" id="operatorSsn" />
+              <Label htmlFor="operatorSsn">SSN</Label>
+            </div>
+          </RadioGroup>
 
           <Input
             id="einSsn"
@@ -108,3 +105,4 @@ const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) 
 };
 
 export default OperatorIdentifier;
+
