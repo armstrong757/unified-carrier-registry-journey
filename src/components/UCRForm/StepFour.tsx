@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,6 @@ interface StepFourProps {
 const StepFour = ({ formData, setFormData }: StepFourProps) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
-  // Calculate total vehicles including adjustments
   const calculateTotalVehicles = () => {
     const straightTrucks = parseInt(String(formData.straightTrucks || '0').replace(/,/g, ''));
     const passengerVehicles = parseInt(String(formData.passengerVehicles || '0').replace(/,/g, ''));
@@ -48,9 +48,24 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
     const formatted = formatExpiryDate(e.target.value);
     setFormData({ ...formData, expiryDate: formatted });
     
+    // Only validate if we have a complete date (MM/YY)
     if (formatted.length === 5) {
-      const validation = validateField('expiryDate', formatted);
-      setFieldErrors(prev => ({ ...prev, expiryDate: validation.error || '' }));
+      const [month, year] = formatted.split('/');
+      const currentYear = new Date().getFullYear() % 100;
+      const currentMonth = new Date().getMonth() + 1;
+      const numMonth = parseInt(month);
+      const numYear = parseInt(year);
+      
+      let error = '';
+      if (numMonth > 12 || numMonth < 1) {
+        error = 'Invalid month';
+      } else if (numYear < currentYear || (numYear === currentYear && numMonth < currentMonth)) {
+        error = 'Card has expired';
+      }
+      
+      setFieldErrors(prev => ({ ...prev, expiryDate: error }));
+    } else {
+      setFieldErrors(prev => ({ ...prev, expiryDate: '' }));
     }
   };
 

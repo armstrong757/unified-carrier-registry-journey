@@ -14,7 +14,59 @@ export const useStepNavigation = (
     toast: ToastFunction;
   }
 ) => {
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        if (!formData.authorization) {
+          toast.toast({
+            title: "Required Field",
+            description: "Please certify that you are authorized to submit this registration.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+
+      case 2:
+        if (!formData.classifications || !Object.values(formData.classifications).some(Boolean)) {
+          toast.toast({
+            title: "Required Field",
+            description: "Please select at least one classification.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+
+      case 4:
+        if (!formData.termsAccepted) {
+          toast.toast({
+            title: "Required Field",
+            description: "Please accept the terms and conditions to continue.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (!formData.cardNumber || !formData.expiryDate || !formData.cvv || !formData.cardName) {
+          toast.toast({
+            title: "Required Fields",
+            description: "Please fill out all payment information fields.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+
+      default:
+        return true;
+    }
+  };
+
   const handleNext = async () => {
+    if (!validateStep(currentStep)) {
+      return;
+    }
+
     if (currentStep < totalSteps) {
       try {
         if (filingId) {
@@ -31,16 +83,6 @@ export const useStepNavigation = (
         });
       }
     } else {
-      // Only attempt transaction if we have payment info
-      if (!formData.cardNumber || !formData.expiryDate || !formData.cvv || !formData.cardName) {
-        toast.toast({
-          title: "Missing Payment Information",
-          description: "Please fill out all payment fields before submitting.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       try {
         if (filingId) {
           const transaction = await createTransaction(filingId, 149, formData.cardType);
