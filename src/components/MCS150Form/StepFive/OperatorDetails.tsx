@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 interface OperatorDetailsProps {
   formData: any;
   setFormData: (data: any) => void;
+  fieldErrors?: Record<string, string>;
 }
 
-const OperatorDetails = ({ formData, setFormData }: OperatorDetailsProps) => {
+const OperatorDetails = ({ formData, setFormData, fieldErrors }: OperatorDetailsProps) => {
   const handleMileageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, '');
     const formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -21,8 +22,16 @@ const OperatorDetails = ({ formData, setFormData }: OperatorDetailsProps) => {
     });
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setFormData({
+      ...formData,
+      operator: { ...formData.operator, licenseFile: file },
+    });
+  };
+
   return (
-    <>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <Label htmlFor="milesDriven">
           Miles Driven Last 12 Months <span className="text-red-500">*</span>
@@ -36,20 +45,18 @@ const OperatorDetails = ({ formData, setFormData }: OperatorDetailsProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="title">Job Title</Label>
+        <Label>Driver's License</Label>
         <Input
-          id="title"
-          value={formData.operator?.title || ''}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              operator: { ...formData.operator, title: e.target.value },
-            })
-          }
-          placeholder="Job Title"
+          type="file"
+          onChange={handleFileChange}
+          accept=".pdf,.jpg,.jpeg,.png"
+          className={fieldErrors?.licenseFile ? 'border-red-500' : ''}
         />
+        {fieldErrors?.licenseFile && (
+          <p className="text-sm text-red-500">{fieldErrors.licenseFile}</p>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

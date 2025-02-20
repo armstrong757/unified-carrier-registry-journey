@@ -25,11 +25,11 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
       operator: {
         firstName: '',
         lastName: '',
-        identifierType: 'ein',
+        title: '',
+        identifierType: 'ssn',
         einSsn: '',
         phone: '',
         email: '',
-        title: '',
         milesDriven: '',
         licenseFile: null,
         signature: '',
@@ -37,96 +37,46 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
     });
   }
 
-  const validateFile = (file: File | null) => {
-    if (!file) {
-      return { isValid: true, error: "" };
-    }
-
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = ['.pdf', '.jpg', '.jpeg', '.png'];
-    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
-
-    if (file.size > maxSize) {
-      return {
-        isValid: false,
-        error: "File size must be less than 5MB"
-      };
-    }
-
-    if (!allowedTypes.includes(fileExtension)) {
-      return {
-        isValid: false,
-        error: "File must be PDF, JPG, or PNG"
-      };
-    }
-
-    return { isValid: true, error: "" };
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    const validation = validateFile(file);
-
-    if (!validation.isValid) {
-      setFieldErrors(prev => ({
-        ...prev,
-        licenseFile: validation.error
-      }));
-      toast({
-        variant: "destructive",
-        title: "Invalid File",
-        description: validation.error
-      });
-      e.target.value = ''; // Reset file input
-      return;
-    }
-
-    setFieldErrors(prev => ({
-      ...prev,
-      licenseFile: ''
-    }));
-
-    setFormData({
-      ...formData,
-      operator: { ...formData.operator, licenseFile: file },
-    });
-  };
-
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6 animate-fadeIn max-w-[800px]">
       <h2 className="text-2xl font-bold text-primary">Operator Information</h2>
       
-      <div className="space-y-6 max-w-xl">
+      <div className="space-y-6">
         <OperatorBasicInfo formData={formData} setFormData={setFormData} />
+        
+        <div className="space-y-2">
+          <Label htmlFor="title">Job Title</Label>
+          <Input
+            id="title"
+            value={formData.operator?.title || ''}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                operator: { ...formData.operator, title: e.target.value },
+              })
+            }
+            placeholder="Job Title"
+          />
+        </div>
+
         <OperatorIdentifier formData={formData} setFormData={setFormData} />
         <OperatorContact formData={formData} setFormData={setFormData} />
-        <OperatorDetails formData={formData} setFormData={setFormData} />
+        <OperatorDetails 
+          formData={formData} 
+          setFormData={setFormData} 
+          fieldErrors={fieldErrors}
+        />
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Driver's License</Label>
-            <Input
-              type="file"
-              onChange={handleFileChange}
-              accept=".pdf,.jpg,.jpeg,.png"
-              className={fieldErrors.licenseFile ? 'border-red-500' : ''}
-            />
-            {fieldErrors.licenseFile && (
-              <p className="text-sm text-red-500">{fieldErrors.licenseFile}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label>Signature <span className="text-red-500">*</span></Label>
-            <SignaturePad
-              onChange={(signature) =>
-                setFormData({
-                  ...formData,
-                  operator: { ...formData.operator, signature },
-                })
-              }
-            />
-          </div>
+        <div className="space-y-2">
+          <Label>Signature <span className="text-red-500">*</span></Label>
+          <SignaturePad
+            onChange={(signature) =>
+              setFormData({
+                ...formData,
+                operator: { ...formData.operator, signature },
+              })
+            }
+          />
         </div>
       </div>
     </div>
