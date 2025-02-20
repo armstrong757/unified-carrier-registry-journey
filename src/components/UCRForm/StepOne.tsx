@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatPhoneNumber, validateField } from "@/utils/formValidation";
+import { useToast } from "@/components/ui/use-toast";
 
 interface StepOneProps {
   formData: any;
@@ -19,14 +20,24 @@ interface StepOneProps {
 
 const StepOne = ({ formData, setFormData }: StepOneProps) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const { toast } = useToast();
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
     setFormData({ ...formData, phone: formatted });
     
+    // Only validate if we have a complete phone number
     if (formatted.length === 14) {
       const validation = validateField('phone', formatted);
       setFieldErrors(prev => ({ ...prev, phone: validation.error || '' }));
+      
+      if (validation.error) {
+        toast({
+          variant: "destructive",
+          title: "Invalid Phone Number",
+          description: validation.error
+        });
+      }
     }
   };
 
@@ -36,6 +47,14 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
     
     const validation = validateField('email', value);
     setFieldErrors(prev => ({ ...prev, email: validation.error || '' }));
+    
+    if (validation.error) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Email",
+        description: validation.error
+      });
+    }
   };
 
   return (
@@ -48,9 +67,9 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
             Registration Year <span className="text-red-500">*</span>
           </Label>
           <Select
-            value={formData.registrationYear}
+            value={formData.registrationYear.toString()}
             onValueChange={(value) =>
-              setFormData({ ...formData, registrationYear: value })
+              setFormData({ ...formData, registrationYear: parseInt(value) })
             }
           >
             <SelectTrigger id="registrationYear">
@@ -73,6 +92,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
             onChange={(e) =>
               setFormData({ ...formData, representative: e.target.value })
             }
+            placeholder="Enter your full name"
           />
         </div>
 
@@ -85,6 +105,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
             type="email"
             value={formData.email || ''}
             onChange={handleEmailChange}
+            placeholder="email@example.com"
             className={fieldErrors.email ? 'border-red-500' : ''}
           />
           {fieldErrors.email && (
@@ -113,7 +134,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           <Checkbox
             id="authorization"
             checked={formData.authorization}
-            onCheckedChange={(checked) =>
+            onCheckedChange={(checked: boolean) =>
               setFormData({ ...formData, authorization: checked })
             }
             className="mt-1"
