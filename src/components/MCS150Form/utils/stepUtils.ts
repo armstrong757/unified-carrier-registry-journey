@@ -102,7 +102,9 @@ const isStepComplete = (step: number, formData: any): boolean => {
       const operatorValid = formData.operator && 
         formData.operator.firstName &&
         formData.operator.lastName &&
-        formData.operator.email;
+        formData.operator.email &&
+        formData.operator.licenseFile && // Added license file validation
+        formData.operator.signature; // Added signature validation
       console.log('Step 5 validation result:', operatorValid);
       return operatorValid;
     
