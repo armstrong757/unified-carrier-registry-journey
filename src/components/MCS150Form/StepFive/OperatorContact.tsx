@@ -43,7 +43,7 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
   };
 
   return (
-    <>
+    <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="phone">
           Phone Number <span className="text-red-500">*</span>
@@ -77,7 +77,7 @@ const OperatorContact = ({ formData, setFormData }: OperatorContactProps) => {
           <p className="text-sm text-red-500">{fieldErrors.email}</p>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

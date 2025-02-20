@@ -12,6 +12,24 @@ interface StepFiveProps {
 }
 
 const StepFive = ({ formData, setFormData }: StepFiveProps) => {
+  // Initialize operator data structure if it doesn't exist
+  if (!formData.operator) {
+    setFormData({
+      ...formData,
+      operator: {
+        firstName: '',
+        lastName: '',
+        identifierType: 'ein',
+        einSsn: '',
+        phone: '',
+        email: '',
+        title: '',
+        milesDriven: '',
+        signature: '',
+      }
+    });
+  }
+
   return (
     <div className="space-y-6 animate-fadeIn">
       <h2 className="text-2xl font-bold text-primary">Operator Information</h2>
