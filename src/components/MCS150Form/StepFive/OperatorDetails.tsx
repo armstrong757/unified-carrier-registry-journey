@@ -45,7 +45,7 @@ const OperatorDetails = ({ formData, setFormData, fieldErrors }: OperatorDetails
       </div>
 
       <div className="space-y-2">
-        <Label>Driver's License</Label>
+        <Label>Driver's License <span className="text-red-500">*</span></Label>
         <Input
           type="file"
           onChange={handleFileChange}
