@@ -50,7 +50,7 @@ const OperatorDetails = ({ formData, setFormData, fieldErrors }: OperatorDetails
           type="file"
           onChange={handleFileChange}
           accept=".pdf,.jpg,.jpeg,.png"
-          className={fieldErrors?.licenseFile ? 'border-red-500' : ''}
+          className={`bg-[#F1F1F1] ${fieldErrors?.licenseFile ? 'border-red-500' : ''}`}
         />
         {fieldErrors?.licenseFile && (
           <p className="text-sm text-red-500">{fieldErrors.licenseFile}</p>
