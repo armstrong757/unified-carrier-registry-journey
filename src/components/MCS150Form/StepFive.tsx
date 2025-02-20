@@ -45,7 +45,9 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
         <OperatorBasicInfo formData={formData} setFormData={setFormData} />
         
         <div className="space-y-2">
-          <Label htmlFor="title">Job Title</Label>
+          <Label htmlFor="title">
+            Job Title <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="title"
             value={formData.operator?.title || ''}
@@ -57,6 +59,7 @@ const StepFive = ({ formData, setFormData }: StepFiveProps) => {
             }
             placeholder="Job Title"
           />
+          <p className="text-sm text-muted-foreground">This can be Owner, Manager, etc.</p>
         </div>
 
         <OperatorIdentifier formData={formData} setFormData={setFormData} />
