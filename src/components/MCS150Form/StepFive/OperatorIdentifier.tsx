@@ -2,6 +2,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { formatEIN, formatSSN } from "@/utils/formValidation";
 
 interface OperatorIdentifierProps {
   formData: any;
@@ -9,6 +10,17 @@ interface OperatorIdentifierProps {
 }
 
 const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) => {
+  const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const isEIN = formData.operator?.identifierType === 'ein';
+    const formattedValue = isEIN ? formatEIN(value) : formatSSN(value);
+    
+    setFormData({
+      ...formData,
+      operator: { ...formData.operator, einSsn: formattedValue },
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -21,7 +33,11 @@ const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) 
             onValueChange={(value) =>
               setFormData({
                 ...formData,
-                operator: { ...formData.operator, identifierType: value },
+                operator: { 
+                  ...formData.operator, 
+                  identifierType: value,
+                  einSsn: '' // Clear the value when switching types
+                },
               })
             }
             className="flex space-x-4"
@@ -45,13 +61,10 @@ const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) 
           <Input
             id="einSsn"
             value={formData.operator?.einSsn || ''}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                operator: { ...formData.operator, einSsn: e.target.value },
-              })
-            }
+            onChange={handleIdentifierChange}
             placeholder={formData.operator?.identifierType === 'ein' ? 'XX-XXXXXXX' : 'XXX-XX-XXXX'}
+            maxLength={formData.operator?.identifierType === 'ein' ? 10 : 11}
+            className="font-mono"
           />
         </div>
       </div>
