@@ -1,6 +1,8 @@
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { formatEIN, formatSSN, validateField } from "@/utils/formValidation";
+import { useState } from "react";
 
 interface StepThreeProps {
   formData: any;
@@ -8,6 +10,8 @@ interface StepThreeProps {
 }
 
 const StepThree = ({ formData, setFormData }: StepThreeProps) => {
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
   // If user selected "No changes" or didn't select company info changes, skip this step
   if (formData.hasChanges !== "yes" || !formData.changesToMake.companyInfo) {
     return (
@@ -19,6 +23,36 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
       </div>
     );
   }
+
+  const handleCompanyIdentifierChange = (value: string) => {
+    // Clear previous identifier value when switching types
+    setFormData({
+      ...formData,
+      companyIdentifierType: value,
+      companyIdentifier: ''
+    });
+    setFieldErrors({});
+  };
+
+  const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const type = formData.companyIdentifierType;
+    
+    // Format based on type
+    const formatted = type === 'ein' ? formatEIN(value) : formatSSN(value);
+    
+    setFormData({
+      ...formData,
+      companyIdentifier: formatted
+    });
+
+    // Validate if complete
+    if ((type === 'ein' && formatted.length === 10) || 
+        (type === 'ssn' && formatted.length === 11)) {
+      const validation = validateField(type, formatted);
+      setFieldErrors(prev => ({ ...prev, identifier: validation.error || '' }));
+    }
+  };
 
   const updatePrincipalAddress = (field: string, value: string) => {
     setFormData({
@@ -58,6 +92,46 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               }
               placeholder="Full Name"
             />
+          </div>
+        )}
+
+        {formData.companyInfoChanges.einSsn && (
+          <div className="space-y-4">
+            <Label>
+              Company Identifier Type <span className="text-red-500">*</span>
+            </Label>
+            <RadioGroup
+              value={formData.companyIdentifierType || 'ein'}
+              onValueChange={handleCompanyIdentifierChange}
+              className="flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="ein" id="ein" />
+                <Label htmlFor="ein">Employer Identification Number (EIN)</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="ssn" id="ssn" />
+                <Label htmlFor="ssn">Social Security Number (SSN)</Label>
+              </div>
+            </RadioGroup>
+            
+            <div className="space-y-2">
+              <Label htmlFor="companyIdentifier">
+                {formData.companyIdentifierType === 'ein' ? 'EIN' : 'SSN'}{' '}
+                <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="companyIdentifier"
+                value={formData.companyIdentifier || ''}
+                onChange={handleIdentifierChange}
+                placeholder={formData.companyIdentifierType === 'ein' ? 'XX-XXXXXXX' : 'XXX-XX-XXXX'}
+                maxLength={formData.companyIdentifierType === 'ein' ? 10 : 11}
+                className={fieldErrors.identifier ? 'border-red-500' : ''}
+              />
+              {fieldErrors.identifier && (
+                <p className="text-sm text-red-500">{fieldErrors.identifier}</p>
+              )}
+            </div>
           </div>
         )}
 
@@ -180,22 +254,6 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
                 setFormData({ ...formData, companyName: e.target.value })
               }
               placeholder="Company Name"
-            />
-          </div>
-        )}
-
-        {formData.companyInfoChanges.einSsn && (
-          <div className="space-y-2">
-            <Label htmlFor="einSsn">
-              EIN or SSN Number <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="einSsn"
-              value={formData.einSsn}
-              onChange={(e) =>
-                setFormData({ ...formData, einSsn: e.target.value })
-              }
-              placeholder="EIN/SSN"
             />
           </div>
         )}
