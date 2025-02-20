@@ -1,10 +1,16 @@
 
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { calculateUCRFee } from "@/utils/ucrFeeCalculator";
+import { 
+  formatCardNumber, 
+  formatExpiryDate, 
+  validateField 
+} from "@/utils/formValidation";
 
 interface StepFourProps {
   formData: any;
@@ -12,23 +18,52 @@ interface StepFourProps {
 }
 
 const StepFour = ({ formData, setFormData }: StepFourProps) => {
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  
   // Calculate total vehicles including adjustments
   const baseVehicles = (formData.straightTrucks || 0) + (formData.passengerVehicles || 0);
   const addedVehicles = formData.needsVehicleChanges === "yes" ? (formData.addVehicles || 0) : 0;
   const excludedVehicles = formData.needsVehicleChanges === "yes" ? (formData.excludeVehicles || 0) : 0;
   
   const totalVehicles = baseVehicles + addedVehicles - excludedVehicles;
-
-  // Calculate UCR fee
   const ucrFee = calculateUCRFee(totalVehicles);
   const displayedFee = ucrFee === 0 ? "Contact Us" : `$${ucrFee.toFixed(2)}`;
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCardNumber(e.target.value);
+    setFormData({ ...formData, cardNumber: formatted });
+    
+    if (formatted.length === 19) {
+      const validation = validateField('cardNumber', formatted);
+      setFieldErrors(prev => ({ ...prev, cardNumber: validation.error || '' }));
+    }
+  };
+
+  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatExpiryDate(e.target.value);
+    setFormData({ ...formData, expiryDate: formatted });
+    
+    if (formatted.length === 5) {
+      const validation = validateField('expiryDate', formatted);
+      setFieldErrors(prev => ({ ...prev, expiryDate: validation.error || '' }));
+    }
+  };
+
+  const handleCVVChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 3);
+    setFormData({ ...formData, cvv: value });
+    
+    if (value.length === 3) {
+      const validation = validateField('cvv', value);
+      setFieldErrors(prev => ({ ...prev, cvv: validation.error || '' }));
+    }
+  };
 
   return (
     <div className="space-y-6 animate-fadeIn">
       <h2 className="text-2xl font-bold text-primary">Billing Information</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Billing Information Column */}
         <Card>
           <CardContent className="space-y-4 pt-6">
             <div className="space-y-2">
@@ -38,11 +73,14 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
               <Input
                 id="cardNumber"
                 placeholder="1234 5678 9012 3456"
-                value={formData.cardNumber}
-                onChange={(e) =>
-                  setFormData({ ...formData, cardNumber: e.target.value })
-                }
+                value={formData.cardNumber || ''}
+                onChange={handleCardNumberChange}
+                maxLength={19}
+                className={fieldErrors.cardNumber ? 'border-red-500' : ''}
               />
+              {fieldErrors.cardNumber && (
+                <p className="text-sm text-red-500">{fieldErrors.cardNumber}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -53,11 +91,14 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
                 <Input
                   id="expiryDate"
                   placeholder="MM/YY"
-                  value={formData.expiryDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, expiryDate: e.target.value })
-                  }
+                  value={formData.expiryDate || ''}
+                  onChange={handleExpiryChange}
+                  maxLength={5}
+                  className={fieldErrors.expiryDate ? 'border-red-500' : ''}
                 />
+                {fieldErrors.expiryDate && (
+                  <p className="text-sm text-red-500">{fieldErrors.expiryDate}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="cvv">
@@ -66,9 +107,14 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
                 <Input
                   id="cvv"
                   placeholder="123"
-                  value={formData.cvv}
-                  onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
+                  value={formData.cvv || ''}
+                  onChange={handleCVVChange}
+                  maxLength={3}
+                  className={fieldErrors.cvv ? 'border-red-500' : ''}
                 />
+                {fieldErrors.cvv && (
+                  <p className="text-sm text-red-500">{fieldErrors.cvv}</p>
+                )}
               </div>
             </div>
 
@@ -79,7 +125,7 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
               <Input
                 id="cardName"
                 placeholder="John Doe"
-                value={formData.cardName}
+                value={formData.cardName || ''}
                 onChange={(e) =>
                   setFormData({ ...formData, cardName: e.target.value })
                 }
@@ -129,7 +175,6 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
           </CardContent>
         </Card>
 
-        {/* Order Details Column */}
         <Card>
           <CardContent className="pt-6">
             <h3 className="text-sm font-semibold text-primary mb-4">Order Details</h3>

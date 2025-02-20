@@ -1,8 +1,8 @@
+
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatPhoneNumber, validateField } from "@/utils/formValidation";
 
 interface StepOneProps {
   formData: any;
@@ -17,6 +18,26 @@ interface StepOneProps {
 }
 
 const StepOne = ({ formData, setFormData }: StepOneProps) => {
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setFormData({ ...formData, phone: formatted });
+    
+    if (formatted.length === 14) {
+      const validation = validateField('phone', formatted);
+      setFieldErrors(prev => ({ ...prev, phone: validation.error || '' }));
+    }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData({ ...formData, email: value });
+    
+    const validation = validateField('email', value);
+    setFieldErrors(prev => ({ ...prev, email: validation.error || '' }));
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-primary">Confirm Your Official Representative</h2>
@@ -48,7 +69,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           </Label>
           <Input
             id="representative"
-            value={formData.representative}
+            value={formData.representative || ''}
             onChange={(e) =>
               setFormData({ ...formData, representative: e.target.value })
             }
@@ -62,11 +83,13 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           <Input
             id="email"
             type="email"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
+            value={formData.email || ''}
+            onChange={handleEmailChange}
+            className={fieldErrors.email ? 'border-red-500' : ''}
           />
+          {fieldErrors.email && (
+            <p className="text-sm text-red-500">{fieldErrors.email}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -75,11 +98,15 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           </Label>
           <Input
             id="phone"
-            value={formData.phone}
-            onChange={(e) =>
-              setFormData({ ...formData, phone: e.target.value })
-            }
+            value={formData.phone || ''}
+            onChange={handlePhoneChange}
+            placeholder="(555) 555-5555"
+            maxLength={14}
+            className={fieldErrors.phone ? 'border-red-500' : ''}
           />
+          {fieldErrors.phone && (
+            <p className="text-sm text-red-500">{fieldErrors.phone}</p>
+          )}
         </div>
 
         <div className="flex items-start space-x-2">
