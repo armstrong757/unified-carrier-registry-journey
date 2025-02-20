@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -23,12 +24,22 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
     }
   }, [formData.powerUnits]);
 
+  const handleVehicleCountChange = (field: string, value: string) => {
+    const numericValue = value.replace(/\D/g, '');
+    const formatted = numericValue ? parseInt(numericValue).toLocaleString() : '';
+    
+    setFormData({
+      ...formData,
+      [field]: formatted
+    });
+  };
+
   // Calculate total vehicles and log for verification
   const totalVehicles = (
-    (parseInt(formData.straightTrucks) || 0) +
-    (parseInt(formData.passengerVehicles) || 0) +
-    (parseInt(formData.addVehicles) || 0) -
-    (parseInt(formData.excludeVehicles) || 0)
+    (parseInt(formData.straightTrucks?.replace(/,/g, '') || '0')) +
+    (parseInt(formData.passengerVehicles?.replace(/,/g, '') || '0')) +
+    (parseInt(formData.addVehicles?.replace(/,/g, '') || '0')) -
+    (parseInt(formData.excludeVehicles?.replace(/,/g, '') || '0'))
   );
 
   useEffect(() => {
@@ -61,7 +72,7 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
           </div>
           <div className="col-span-2">
             <Label>Total Vehicles:</Label>
-            <p className="font-medium">{totalVehicles}</p>
+            <p className="font-medium">{totalVehicles.toLocaleString()}</p>
           </div>
         </div>
       </div>
@@ -80,8 +91,8 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               setFormData({
                 ...formData,
                 needsVehicleChanges: value,
-                addVehicles: 0,
-                excludeVehicles: 0
+                addVehicles: '0',
+                excludeVehicles: '0'
               });
             }
           }}
@@ -105,12 +116,9 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               </Label>
               <Input
                 id="addVehicles"
-                type="number"
-                min="0"
-                value={formData.addVehicles || 0}
-                onChange={(e) =>
-                  setFormData({ ...formData, addVehicles: parseInt(e.target.value) || 0 })
-                }
+                type="text"
+                value={formData.addVehicles || '0'}
+                onChange={(e) => handleVehicleCountChange('addVehicles', e.target.value)}
               />
             </div>
 
@@ -121,12 +129,9 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               </Label>
               <Input
                 id="excludeVehicles"
-                type="number"
-                min="0"
-                value={formData.excludeVehicles || 0}
-                onChange={(e) =>
-                  setFormData({ ...formData, excludeVehicles: parseInt(e.target.value) || 0 })
-                }
+                type="text"
+                value={formData.excludeVehicles || '0'}
+                onChange={(e) => handleVehicleCountChange('excludeVehicles', e.target.value)}
               />
             </div>
           </div>

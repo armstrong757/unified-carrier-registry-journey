@@ -4,7 +4,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { calculateUCRFee } from "@/utils/ucrFeeCalculator";
 import { 
   formatCardNumber, 
@@ -21,9 +20,12 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
   // Calculate total vehicles including adjustments
-  const baseVehicles = (formData.straightTrucks || 0) + (formData.passengerVehicles || 0);
-  const addedVehicles = formData.needsVehicleChanges === "yes" ? (formData.addVehicles || 0) : 0;
-  const excludedVehicles = formData.needsVehicleChanges === "yes" ? (formData.excludeVehicles || 0) : 0;
+  const baseVehicles = (parseInt(formData.straightTrucks?.replace(/,/g, '') || '0')) + 
+                      (parseInt(formData.passengerVehicles?.replace(/,/g, '') || '0'));
+  const addedVehicles = formData.needsVehicleChanges === "yes" ? 
+                       (parseInt(formData.addVehicles?.replace(/,/g, '') || '0')) : 0;
+  const excludedVehicles = formData.needsVehicleChanges === "yes" ? 
+                          (parseInt(formData.excludeVehicles?.replace(/,/g, '') || '0')) : 0;
   
   const totalVehicles = baseVehicles + addedVehicles - excludedVehicles;
   const ucrFee = calculateUCRFee(totalVehicles);
@@ -180,7 +182,7 @@ const StepFour = ({ formData, setFormData }: StepFourProps) => {
             <h3 className="text-sm font-semibold text-primary mb-4">Order Details</h3>
             <div className="space-y-4">
               <div className="text-gray-600 text-sm">
-                Total Vehicles: {totalVehicles}
+                Total Vehicles: {totalVehicles.toLocaleString()}
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 text-sm">Registration Fee:</span>
