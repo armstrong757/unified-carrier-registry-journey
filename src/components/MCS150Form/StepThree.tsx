@@ -1,7 +1,8 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { formatEIN, formatSSN, validateField } from "@/utils/formValidation";
+import { formatEIN, formatSSN, formatPhoneNumber, validateField } from "@/utils/formValidation";
 import { useState } from "react";
 
 interface StepThreeProps {
@@ -52,6 +53,24 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
       const validation = validateField(type, formatted);
       setFieldErrors(prev => ({ ...prev, identifier: validation.error || '' }));
     }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setFormData({ ...formData, businessPhone: formatted });
+    
+    if (formatted.length === 14) {
+      const validation = validateField('phone', formatted);
+      setFieldErrors(prev => ({ ...prev, phone: validation.error || '' }));
+    }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData({ ...formData, businessEmail: value });
+    
+    const validation = validateField('email', value);
+    setFieldErrors(prev => ({ ...prev, email: validation.error || '' }));
   };
 
   const updatePrincipalAddress = (field: string, value: string) => {
@@ -216,12 +235,15 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
             </Label>
             <Input
               id="businessPhone"
-              value={formData.businessPhone}
-              onChange={(e) =>
-                setFormData({ ...formData, businessPhone: e.target.value })
-              }
-              placeholder="Phone Number"
+              value={formData.businessPhone || ''}
+              onChange={handlePhoneChange}
+              placeholder="(555) 555-5555"
+              maxLength={14}
+              className={fieldErrors.phone ? 'border-red-500' : ''}
             />
+            {fieldErrors.phone && (
+              <p className="text-sm text-red-500">{fieldErrors.phone}</p>
+            )}
           </div>
         )}
 
@@ -233,12 +255,14 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
             <Input
               id="businessEmail"
               type="email"
-              value={formData.businessEmail}
-              onChange={(e) =>
-                setFormData({ ...formData, businessEmail: e.target.value })
-              }
-              placeholder="Email Address"
+              value={formData.businessEmail || ''}
+              onChange={handleEmailChange}
+              placeholder="email@example.com"
+              className={fieldErrors.email ? 'border-red-500' : ''}
             />
+            {fieldErrors.email && (
+              <p className="text-sm text-red-500">{fieldErrors.email}</p>
+            )}
           </div>
         )}
 
