@@ -55,6 +55,9 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         throw new Error('Missing required attachments for MCS-150 filing');
       }
 
+      // Convert milesDriven from string to number, removing commas
+      const milesDriven = parseInt(String(formData.operator?.milesDriven || '0').replace(/,/g, ''));
+
       const mcs150Record = {
         filing_id: filingId,
         usdot_number: filing.usdot_number,
@@ -66,7 +69,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         operator_title: formData.operator?.title || '',
         operator_ssn: formData.operator?.identifierType === 'ssn' ? formData.operator.einSsn : null,
         operator_ein: formData.operator?.identifierType === 'ein' ? formData.operator.einSsn : null,
-        operator_miles_driven: formData.operator?.milesDriven || '',
+        operator_miles_driven: milesDriven,
         signature_url: attachments.signature,
         license_url: attachments.license,
         created_at: new Date().toISOString(),
