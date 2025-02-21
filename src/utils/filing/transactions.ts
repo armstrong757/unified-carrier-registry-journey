@@ -1,4 +1,3 @@
-
 import { MCS150FormData, UCRFormData, USDOTData } from "@/types/filing";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,38 +12,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       .from('filings')
       .select(`
         *,
-        usdot_info (
-          id,
-          legal_name,
-          dba_name,
-          operating_status,
-          entity_type,
-          physical_address,
-          api_physical_address_street,
-          api_physical_address_city,
-          api_physical_address_state,
-          api_physical_address_zip,
-          api_physical_address_country,
-          api_mailing_address_street,
-          api_mailing_address_city,
-          api_mailing_address_state,
-          api_mailing_address_zip,
-          api_mailing_address_country,
-          telephone,
-          power_units,
-          drivers,
-          bus_count,
-          limo_count,
-          minibus_count,
-          motorcoach_count,
-          van_count,
-          complaint_count,
-          out_of_service,
-          out_of_service_date,
-          mc_number,
-          mileage_year,
-          basics_data
-        )
+        usdot_info (*)
       `)
       .eq('id', filingId)
       .maybeSingle();
@@ -86,7 +54,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
           license: attachments.license
         },
         filing.usdot_number,
-        transactionData.id // Pass transaction ID
+        transactionData.id
       );
     } else if (filing.filing_type === 'ucr') {
       // Type cast UCR form data with validation

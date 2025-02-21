@@ -12,7 +12,7 @@ export const createMCS150Record = async (
   formData: MCS150FormData,
   attachments: FilingAttachments,
   usdotNumber: string,
-  transactionId?: string
+  transactionId: string
 ) => {
   if (!attachments?.signature || !attachments?.license) {
     throw new Error('Missing required attachments for MCS-150 filing');
@@ -41,7 +41,7 @@ export const createMCS150Record = async (
     license_url: attachments.license,
     created_at: new Date().toISOString(),
     reason_for_filing: formData.reasonForFiling || 'biennialUpdate',
-    transaction_id: transactionId,  // Link to transaction
+    transaction_id: transactionId,
     
     // Principal address fields with defaults
     principal_address_street: principalAddress.address || '',
