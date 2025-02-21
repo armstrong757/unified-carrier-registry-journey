@@ -33,15 +33,15 @@ function transformToUSDOTData(mappedData: any): USDOTData {
     telephone: mappedData.telephone || '',
     powerUnits: mappedData.power_units,
     drivers: mappedData.drivers,
-    insuranceBIPD: 0, // These will be populated from basics_data
+    insuranceBIPD: 0,
     insuranceBond: 0,
     insuranceCargo: 0,
     riskScore: 'Unknown',
     outOfServiceDate: mappedData.out_of_service_date,
     mcs150FormDate: mappedData.mcs150_last_update,
     mcs150Date: mappedData.mcs150_last_update,
-    mcs150Year: 0, // Will be populated from basics_data
-    mcs150Mileage: 0,
+    mcs150Year: mappedData.mcs150_year || 0,
+    mcs150Mileage: mappedData.mcs150_mileage || 0,
     carrierOperation: '',
     cargoCarried: [],
     busCount: 0,

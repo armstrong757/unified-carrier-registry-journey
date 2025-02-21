@@ -44,6 +44,8 @@ export function mapAPIResponse(apiResponse: any) {
     mcs150_last_update: formatDate(data.mcs150_last_update || data.mcs150_date),
     out_of_service: Boolean(data.out_of_service || data.out_of_service_flag),
     out_of_service_date: formatDate(data.out_of_service_date),
+    mcs150_year: parseNumericValue(data.mcs150_year),
+    mcs150_mileage: parseNumericValue(data.mcs150_mileage),
     physical_address_parsed: physicalAddress || {
       street: data.api_physical_address_street || data.physical_address_street || '',
       city: data.api_physical_address_city || data.physical_address_city || '',
