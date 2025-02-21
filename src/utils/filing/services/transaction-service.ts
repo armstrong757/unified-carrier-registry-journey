@@ -23,7 +23,7 @@ export const createTransactionRecord = async (
       filing_id: filingId,
       amount,
       status: 'completed',
-      payment_method: paymentMethod || 'credit', // Default to credit if not specified
+      payment_method: 'credit',
       usdot_number: usdotNumber,
       filing_type: filingType
     })

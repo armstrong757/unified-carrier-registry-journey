@@ -4,7 +4,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatCardNumber, formatExpiryDate, validateField } from "@/utils/formValidation";
 
 interface StepSixProps {
@@ -75,24 +74,6 @@ const StepSix = ({ formData, setFormData }: StepSixProps) => {
         <Card>
           <CardContent className="space-y-4 pt-6">
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Payment Method <span className="text-red-500">*</span></Label>
-                <RadioGroup
-                  value={formData.billing?.paymentMethod || 'credit'}
-                  onValueChange={(value) => updateBilling("paymentMethod", value)}
-                  className="flex space-x-4"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="credit" id="credit" />
-                    <Label htmlFor="credit">Credit Card</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="debit" id="debit" />
-                    <Label htmlFor="debit">Debit Card</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="cardNumber">
                   Card Number <span className="text-red-500">*</span>

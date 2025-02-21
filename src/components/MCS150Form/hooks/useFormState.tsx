@@ -158,7 +158,6 @@ export const useFormState = () => {
     
     // Billing Information
     billing: {
-      paymentMethod: 'credit',  // Set default payment method
       cardNumber: '',
       expiryDate: '',
       cvv: '',
