@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { MCS150FormData, UCRFormData } from "@/types/filing";
 import { toast } from "@/components/ui/use-toast";
@@ -13,7 +12,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     // First check if the filing is still in draft and get all necessary data
     const { data: filing, error: filingCheckError } = await supabase
       .from('filings')
-      .select('*, id')  // Added id to the selection
+      .select('*, id')
       .eq('id', filingId)
       .maybeSingle();
 
@@ -66,64 +65,25 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       
       // Convert the form data to match the table structure
       const record = {
-        filing_id: filingId,
-        usdot_number: filing.usdot_number,
         filing_type: filing.filing_type,
-        signature_url: attachments.signature || '',
-        license_url: attachments.license || '',
-        operator_first_name: operator.firstName || '',
-        operator_last_name: operator.lastName || '',
-        operator_email: operator.email || '',
-        operator_phone: operator.phone || '',
-        operator_title: operator.title || '',
-        // Handle EIN/SSN separately based on the selected type
-        operator_ein: operator.identifierType === 'ein' ? operator.einSsn : null,
-        operator_ssn: operator.identifierType === 'ssn' ? operator.einSsn : null,
-        // For company identifier, use the same logic as operator
-        company_ein: formData.companyIdentifierType === 'ein' ? formData.companyIdentifier : null,
-        company_ssn: formData.companyIdentifierType === 'ssn' ? formData.companyIdentifier : null,
-        // Convert miles driven string to number
-        operator_miles_driven: operator.milesDriven ? parseInt(operator.milesDriven.replace(/,/g, '')) : null,
-        reason_for_filing: formData.reasonForFiling || '',
-        has_changes: formData.hasChanges === 'yes',
-        changes_to_make: formData.changesToMake || {},
-        company_info_changes: formData.companyInfoChanges || {},
-        operating_info_changes: formData.operatingInfoChanges || {},
-        payment_amount: amount,
-        payment_method: paymentMethod,
-        payment_status: 'completed',
-        created_at: new Date().toISOString(),
-        // Add all the required cargo fields with default values
-        cargo_agricultural: false,
-        cargo_beverages: false,
-        cargo_building_materials: false,
-        cargo_chemicals: false,
-        cargo_coal: false,
-        cargo_commodities_dry_bulk: false,
-        cargo_construction: false,
-        cargo_drive_away: false,
-        cargo_fresh_produce: false,
-        cargo_garbage: false,
-        cargo_general_freight: false,
-        cargo_grain: false,
-        cargo_household_goods: false,
-        cargo_intermodal_containers: false,
-        cargo_liquids_gases: false,
-        cargo_livestock: false,
-        cargo_logs: false,
-        cargo_machinery: false,
-        cargo_meat: false,
-        cargo_metal_sheets: false,
-        cargo_mobile_homes: false,
-        cargo_motor_vehicles: false,
-        cargo_oilfield_equipment: false,
-        cargo_other: false,
-        cargo_paper_products: false,
-        cargo_passengers: false,
-        cargo_refrigerated_food: false,
-        cargo_us_mail: false,
-        cargo_utilities: false,
-        cargo_water_well: false
+        usdot_number: filing.usdot_number,
+        full_name: formData.representative || '',
+        email: formData.email || '',
+        phone: formData.phone || '',
+        registration_year: formData.registrationYear?.toString() || '',
+        needs_vehicle_changes: formData.needsVehicleChanges || 'no',
+        vehicles_straight_trucks: parseInt(String(formData.straightTrucks || '0').replace(/,/g, '')),
+        vehicles_power_units: parseInt(String(formData.straightTrucks || '0').replace(/,/g, '')),
+        vehicles_passenger_vehicles: parseInt(String(formData.passengerVehicles || '0').replace(/,/g, '')),
+        vehicles_add_vehicles: parseInt(String(formData.addVehicles || '0').replace(/,/g, '')),
+        vehicles_exclude_vehicles: parseInt(String(formData.excludeVehicles || '0').replace(/,/g, '')),
+        vehicles_total: parseInt(String(formData.straightTrucks || '0').replace(/,/g, '')) + parseInt(String(formData.passengerVehicles || '0').replace(/,/g, '')) + parseInt(String(formData.addVehicles || '0').replace(/,/g, '')) - parseInt(String(formData.excludeVehicles || '0').replace(/,/g, '')),
+        classification_motor_carrier: formData.classifications?.motorCarrier || false,
+        classification_motor_private: formData.classifications?.motorPrivate || false,
+        classification_freight_forwarder: formData.classifications?.freightForwarder || false,
+        classification_broker: formData.classifications?.broker || false,
+        classification_leasing_company: formData.classifications?.leasingCompany || false,
+        created_at: new Date().toISOString()
       };
 
       console.log('Creating airtable record:', record);
@@ -153,7 +113,6 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
       // Convert the form data to match the table structure
       const record = {
-        filing_id: filing.id, // Changed from id to filing_id
         filing_type: filing.filing_type,
         usdot_number: filing.usdot_number,
         full_name: formData.representative || '',
@@ -162,7 +121,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         registration_year: formData.registrationYear?.toString() || '',
         needs_vehicle_changes: formData.needsVehicleChanges || 'no',
         vehicles_straight_trucks: straightTrucks,
-        vehicles_power_units: straightTrucks, // Same as straight trucks for UCR
+        vehicles_power_units: straightTrucks,
         vehicles_passenger_vehicles: passengerVehicles,
         vehicles_add_vehicles: addVehicles,
         vehicles_exclude_vehicles: excludeVehicles,
