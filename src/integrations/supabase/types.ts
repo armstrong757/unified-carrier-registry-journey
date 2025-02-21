@@ -122,16 +122,6 @@ export type Database = {
       mcs150_airtable_records: {
         Row: {
           address_modified: boolean | null
-          api_mailing_address_city: string | null
-          api_mailing_address_country: string | null
-          api_mailing_address_state: string | null
-          api_mailing_address_street: string | null
-          api_mailing_address_zip: string | null
-          api_physical_address_city: string | null
-          api_physical_address_country: string | null
-          api_physical_address_state: string | null
-          api_physical_address_street: string | null
-          api_physical_address_zip: string | null
           cargo_agricultural: boolean | null
           cargo_beverages: boolean | null
           cargo_building_materials: boolean | null
@@ -183,6 +173,16 @@ export type Database = {
           created_at: string | null
           filing_id: string
           filing_type: string
+          form_mailing_address_city: string | null
+          form_mailing_address_country: string | null
+          form_mailing_address_state: string | null
+          form_mailing_address_street: string | null
+          form_mailing_address_zip: string | null
+          form_physical_address_city: string | null
+          form_physical_address_country: string | null
+          form_physical_address_state: string | null
+          form_physical_address_street: string | null
+          form_physical_address_zip: string | null
           has_changes: boolean | null
           id: string
           license_url: string | null
@@ -220,16 +220,6 @@ export type Database = {
         }
         Insert: {
           address_modified?: boolean | null
-          api_mailing_address_city?: string | null
-          api_mailing_address_country?: string | null
-          api_mailing_address_state?: string | null
-          api_mailing_address_street?: string | null
-          api_mailing_address_zip?: string | null
-          api_physical_address_city?: string | null
-          api_physical_address_country?: string | null
-          api_physical_address_state?: string | null
-          api_physical_address_street?: string | null
-          api_physical_address_zip?: string | null
           cargo_agricultural?: boolean | null
           cargo_beverages?: boolean | null
           cargo_building_materials?: boolean | null
@@ -281,6 +271,16 @@ export type Database = {
           created_at?: string | null
           filing_id: string
           filing_type: string
+          form_mailing_address_city?: string | null
+          form_mailing_address_country?: string | null
+          form_mailing_address_state?: string | null
+          form_mailing_address_street?: string | null
+          form_mailing_address_zip?: string | null
+          form_physical_address_city?: string | null
+          form_physical_address_country?: string | null
+          form_physical_address_state?: string | null
+          form_physical_address_street?: string | null
+          form_physical_address_zip?: string | null
           has_changes?: boolean | null
           id?: string
           license_url?: string | null
@@ -318,16 +318,6 @@ export type Database = {
         }
         Update: {
           address_modified?: boolean | null
-          api_mailing_address_city?: string | null
-          api_mailing_address_country?: string | null
-          api_mailing_address_state?: string | null
-          api_mailing_address_street?: string | null
-          api_mailing_address_zip?: string | null
-          api_physical_address_city?: string | null
-          api_physical_address_country?: string | null
-          api_physical_address_state?: string | null
-          api_physical_address_street?: string | null
-          api_physical_address_zip?: string | null
           cargo_agricultural?: boolean | null
           cargo_beverages?: boolean | null
           cargo_building_materials?: boolean | null
@@ -379,6 +369,16 @@ export type Database = {
           created_at?: string | null
           filing_id?: string
           filing_type?: string
+          form_mailing_address_city?: string | null
+          form_mailing_address_country?: string | null
+          form_mailing_address_state?: string | null
+          form_mailing_address_street?: string | null
+          form_mailing_address_zip?: string | null
+          form_physical_address_city?: string | null
+          form_physical_address_country?: string | null
+          form_physical_address_state?: string | null
+          form_physical_address_street?: string | null
+          form_physical_address_zip?: string | null
           has_changes?: boolean | null
           id?: string
           license_url?: string | null
@@ -418,7 +418,7 @@ export type Database = {
           {
             foreignKeyName: "mcs150_airtable_records_filing_id_fkey"
             columns: ["filing_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "filings"
             referencedColumns: ["id"]
           },
