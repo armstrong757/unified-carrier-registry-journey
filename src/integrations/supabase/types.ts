@@ -185,12 +185,13 @@ export type Database = {
           operation_intrastate_hazmat_shipper: boolean | null
           operation_intrastate_non_hazmat_carrier: boolean | null
           operation_intrastate_non_hazmat_shipper: boolean | null
-          operator_ein_ssn: string | null
+          operator_ein: string | null
           operator_email: string | null
           operator_first_name: string | null
           operator_last_name: string | null
           operator_miles_driven: number | null
           operator_phone: string | null
+          operator_ssn: string | null
           operator_title: string | null
           payment_amount: number | null
           payment_method: string | null
@@ -270,12 +271,13 @@ export type Database = {
           operation_intrastate_hazmat_shipper?: boolean | null
           operation_intrastate_non_hazmat_carrier?: boolean | null
           operation_intrastate_non_hazmat_shipper?: boolean | null
-          operator_ein_ssn?: string | null
+          operator_ein?: string | null
           operator_email?: string | null
           operator_first_name?: string | null
           operator_last_name?: string | null
           operator_miles_driven?: number | null
           operator_phone?: string | null
+          operator_ssn?: string | null
           operator_title?: string | null
           payment_amount?: number | null
           payment_method?: string | null
@@ -355,12 +357,13 @@ export type Database = {
           operation_intrastate_hazmat_shipper?: boolean | null
           operation_intrastate_non_hazmat_carrier?: boolean | null
           operation_intrastate_non_hazmat_shipper?: boolean | null
-          operator_ein_ssn?: string | null
+          operator_ein?: string | null
           operator_email?: string | null
           operator_first_name?: string | null
           operator_last_name?: string | null
           operator_miles_driven?: number | null
           operator_phone?: string | null
+          operator_ssn?: string | null
           operator_title?: string | null
           payment_amount?: number | null
           payment_method?: string | null
@@ -669,6 +672,12 @@ export type Database = {
       migrate_form_data: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      parse_numeric_with_commas: {
+        Args: {
+          input_str: string
+        }
+        Returns: number
       }
       validate_filing_step: {
         Args: {

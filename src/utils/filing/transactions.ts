@@ -38,14 +38,14 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       }
     }
 
-    // Create the transaction
+    // Create the transaction with completed status
     const { data: transactionData, error: transactionError } = await supabase
       .from('transactions')
       .insert([
         {
           filing_id: filingId,
           amount,
-          status: 'pending',
+          status: 'completed', // Changed from 'pending' to 'completed'
           payment_method: paymentMethod
         }
       ])
@@ -76,8 +76,10 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         operator_email: operator.email || '',
         operator_phone: operator.phone || '',
         operator_title: operator.title || '',
-        operator_ein_ssn: operator.einSsn || '',
-        operator_miles_driven: operator.milesDriven ? parseInt(operator.milesDriven) : null,
+        // Handle EIN/SSN separately based on the selected type
+        operator_ein: operator.identifierType === 'ein' ? operator.einSsn : null,
+        operator_ssn: operator.identifierType === 'ssn' ? operator.einSsn : null,
+        operator_miles_driven: operator.milesDriven ? operator.milesDriven.replace(/,/g, '') : null,
         reason_for_filing: formData.reasonForFiling || '',
         has_changes: formData.hasChanges === 'yes',
         changes_to_make: formData.changesToMake || {},
@@ -85,7 +87,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         operating_info_changes: formData.operatingInfoChanges || {},
         payment_amount: amount,
         payment_method: paymentMethod,
-        payment_status: 'pending',
+        payment_status: 'completed', // Set to completed
         created_at: new Date().toISOString()
       };
 
