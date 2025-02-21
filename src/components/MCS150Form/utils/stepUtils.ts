@@ -29,45 +29,12 @@ export const getNextStep = (currentStep: number, formData: any) => {
     return 5;
   }
 
-  // Handle skipping steps based on form data
-  if (currentStep === 2) {
-    // If both steps should be skipped, go to step 5
-    if (shouldSkipStep3(formData) && shouldSkipStep4(formData)) {
-      return 5;
-    }
-    // If only step 3 should be skipped, go to step 4
-    if (shouldSkipStep3(formData)) {
-      return 4;
-    }
-    return 3;
-  }
-
-  if (currentStep === 3) {
-    if (shouldSkipStep4(formData)) {
-      return 5;
-    }
-    return 4;
-  }
-
-  // For all other cases, move to the next step
-  return Math.min(currentStep + 1, 6);
+  // For other cases, always move one step at a time
+  // The database trigger will enforce step validation
+  return currentStep + 1;
 };
 
 export const getPreviousStep = (currentStep: number, formData: any) => {
-  console.log('Getting previous step. Current step:', currentStep);
-  console.log('Form data:', formData);
-
-  if (currentStep === 5) {
-    if (formData.reasonForFiling === "outOfBusiness") return 1;
-    if (shouldSkipStep3(formData) && shouldSkipStep4(formData)) return 2;
-    if (shouldSkipStep4(formData)) return 3;
-    return 4;
-  }
-
-  if (currentStep === 4 && shouldSkipStep3(formData)) {
-    return 2;
-  }
-
   return Math.max(currentStep - 1, 1); // Never go below step 1
 };
 
