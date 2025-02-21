@@ -80,6 +80,7 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
         ...formData.principalAddress,
         [field]: value,
       },
+      address_modified: true // Track that address was modified
     });
   };
 
@@ -90,6 +91,7 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
         ...formData.mailingAddress,
         [field]: value,
       },
+      address_modified: true // Track that address was modified
     });
   };
 
@@ -163,29 +165,29 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   placeholder="Address"
-                  value={formData.principalAddress.address}
+                  value={formData.principalAddress?.address || ''}
                   onChange={(e) =>
                     updatePrincipalAddress("address", e.target.value)
                   }
                 />
                 <Input
                   placeholder="City"
-                  value={formData.principalAddress.city}
+                  value={formData.principalAddress?.city || ''}
                   onChange={(e) => updatePrincipalAddress("city", e.target.value)}
                 />
                 <Input
                   placeholder="State"
-                  value={formData.principalAddress.state}
+                  value={formData.principalAddress?.state || ''}
                   onChange={(e) => updatePrincipalAddress("state", e.target.value)}
                 />
                 <Input
                   placeholder="ZIP Code"
-                  value={formData.principalAddress.zip}
+                  value={formData.principalAddress?.zip || ''}
                   onChange={(e) => updatePrincipalAddress("zip", e.target.value)}
                 />
                 <Input
                   placeholder="Country"
-                  value={formData.principalAddress.country}
+                  value={formData.principalAddress?.country || 'USA'}
                   onChange={(e) =>
                     updatePrincipalAddress("country", e.target.value)
                   }
@@ -200,27 +202,27 @@ const StepThree = ({ formData, setFormData }: StepThreeProps) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   placeholder="Address"
-                  value={formData.mailingAddress.address}
+                  value={formData.mailingAddress?.address || ''}
                   onChange={(e) => updateMailingAddress("address", e.target.value)}
                 />
                 <Input
                   placeholder="City"
-                  value={formData.mailingAddress.city}
+                  value={formData.mailingAddress?.city || ''}
                   onChange={(e) => updateMailingAddress("city", e.target.value)}
                 />
                 <Input
                   placeholder="State"
-                  value={formData.mailingAddress.state}
+                  value={formData.mailingAddress?.state || ''}
                   onChange={(e) => updateMailingAddress("state", e.target.value)}
                 />
                 <Input
                   placeholder="ZIP Code"
-                  value={formData.mailingAddress.zip}
+                  value={formData.mailingAddress?.zip || ''}
                   onChange={(e) => updateMailingAddress("zip", e.target.value)}
                 />
                 <Input
                   placeholder="Country"
-                  value={formData.mailingAddress.country}
+                  value={formData.mailingAddress?.country || 'USA'}
                   onChange={(e) => updateMailingAddress("country", e.target.value)}
                 />
               </div>
