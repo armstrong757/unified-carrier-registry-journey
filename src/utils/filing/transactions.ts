@@ -8,12 +8,12 @@ import { createTransactionRecord, markFilingComplete } from "./services/transact
 
 export const createTransaction = async (filingId: string, amount: number, paymentMethod: string) => {
   try {
-    // First check if the filing is still in draft and get the filing data
+    // First check if the filing is still in draft and get both filing and USDOT info
     const { data: filing, error: filingCheckError } = await supabase
       .from('filings')
       .select(`
         *,
-        usdot_info (*)
+        usdot_info:usdot_info_id (*)
       `)
       .eq('id', filingId)
       .maybeSingle();
@@ -27,7 +27,24 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       throw new Error('Filing is not in draft status');
     }
 
-    if (!filing.usdot_info) {
+    // Get USDOT info directly if needed
+    let usdotInfo = filing.usdot_info;
+    if (!usdotInfo) {
+      const { data: directUsdotInfo, error: usdotError } = await supabase
+        .from('usdot_info')
+        .select('*')
+        .eq('usdot_number', filing.usdot_number)
+        .maybeSingle();
+
+      if (usdotError) {
+        console.error('Error fetching USDOT info:', usdotError);
+        throw usdotError;
+      }
+
+      usdotInfo = directUsdotInfo;
+    }
+
+    if (!usdotInfo) {
       console.error('Missing USDOT info in filing');
       throw new Error('Missing USDOT information');
     }
@@ -65,7 +82,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         },
         filing.usdot_number,
         transactionData.id,
-        filing.usdot_info // Pass the USDOT info that we already have
+        usdotInfo // Pass the USDOT info that we now have
       );
     } else if (filing.filing_type === 'ucr') {
       // Type cast UCR form data with validation
@@ -77,7 +94,6 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       const ucrFormData = formData as UCRFormData;
       
       // Create USDOTData object with null checks
-      const usdotInfo = filing.usdot_info;
       if (!usdotInfo) {
         throw new Error('USDOT information not found');
       }
