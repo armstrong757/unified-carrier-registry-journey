@@ -36,7 +36,14 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
-      const mcs150FormData = filing.form_data as MCS150FormData;
+      // Properly type cast the form_data
+      const mcs150FormData = filing.form_data as unknown as MCS150FormData;
+      console.log('MCS150 form data:', mcs150FormData); // Debug log
+      
+      if (!mcs150FormData.reasonForFiling) {
+        throw new Error('Missing reason for filing in form data');
+      }
+
       await createMCS150Record(
         filingId,
         mcs150FormData,
@@ -44,11 +51,12 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         filing.usdot_number
       );
     } else if (filing.filing_type === 'ucr') {
-      const ucrFormData = filing.form_data as UCRFormData;
+      const ucrFormData = filing.form_data as unknown as UCRFormData;
       await createUCRRecord(
         filingId,
         ucrFormData,
-        filing.usdot_number
+        filing.usdot_number,
+        amount // Add the missing amount parameter
       );
     }
 
