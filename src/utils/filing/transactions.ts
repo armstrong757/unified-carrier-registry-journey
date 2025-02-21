@@ -45,7 +45,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         {
           filing_id: filingId,
           amount,
-          status: 'completed', // Changed from 'pending' to 'completed'
+          status: 'completed',
           payment_method: paymentMethod
         }
       ])
@@ -79,7 +79,8 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         // Handle EIN/SSN separately based on the selected type
         operator_ein: operator.identifierType === 'ein' ? operator.einSsn : null,
         operator_ssn: operator.identifierType === 'ssn' ? operator.einSsn : null,
-        operator_miles_driven: operator.milesDriven ? operator.milesDriven.replace(/,/g, '') : null,
+        // Convert miles driven string to number using parse_numeric_with_commas
+        operator_miles_driven: operator.milesDriven ? parseInt(operator.milesDriven.replace(/,/g, '')) : null,
         reason_for_filing: formData.reasonForFiling || '',
         has_changes: formData.hasChanges === 'yes',
         changes_to_make: formData.changesToMake || {},
@@ -87,8 +88,39 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         operating_info_changes: formData.operatingInfoChanges || {},
         payment_amount: amount,
         payment_method: paymentMethod,
-        payment_status: 'completed', // Set to completed
-        created_at: new Date().toISOString()
+        payment_status: 'completed',
+        created_at: new Date().toISOString(),
+        // Add all the required cargo fields with default values
+        cargo_agricultural: false,
+        cargo_beverages: false,
+        cargo_building_materials: false,
+        cargo_chemicals: false,
+        cargo_coal: false,
+        cargo_commodities_dry_bulk: false,
+        cargo_construction: false,
+        cargo_drive_away: false,
+        cargo_fresh_produce: false,
+        cargo_garbage: false,
+        cargo_general_freight: false,
+        cargo_grain: false,
+        cargo_household_goods: false,
+        cargo_intermodal_containers: false,
+        cargo_liquids_gases: false,
+        cargo_livestock: false,
+        cargo_logs: false,
+        cargo_machinery: false,
+        cargo_meat: false,
+        cargo_metal_sheets: false,
+        cargo_mobile_homes: false,
+        cargo_motor_vehicles: false,
+        cargo_oilfield_equipment: false,
+        cargo_other: false,
+        cargo_paper_products: false,
+        cargo_passengers: false,
+        cargo_refrigerated_food: false,
+        cargo_us_mail: false,
+        cargo_utilities: false,
+        cargo_water_well: false
       };
 
       console.log('Creating airtable record:', record);

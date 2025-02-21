@@ -1,4 +1,3 @@
-
 export type FilingType = 'ucr' | 'mcs150';
 
 export interface MCS150FormData {
@@ -31,6 +30,7 @@ export interface MCS150FormData {
     title?: string;
     email?: string;
     phone?: string;
+    identifierType?: 'ein' | 'ssn';
     einSsn?: string;
     milesDriven?: string;
     licenseFile?: File | null;
