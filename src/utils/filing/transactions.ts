@@ -26,24 +26,30 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       throw new Error('Filing is not in draft status');
     }
 
+    console.log('Creating transaction for filing:', {
+      filingId,
+      amount,
+      paymentMethod
+    });
+
     // Create the transaction first
     const { data: transactionData, error: transactionError } = await supabase
       .from('transactions')
-      .insert([
-        {
-          filing_id: filingId,
-          amount,
-          status: 'completed',
-          payment_method: paymentMethod
-        }
-      ])
-      .select()
-      .maybeSingle();
+      .insert({
+        filing_id: filingId,
+        amount,
+        status: 'completed',
+        payment_method: paymentMethod
+      })
+      .select('*')
+      .single();
 
     if (transactionError) {
       console.error('Error creating transaction:', transactionError);
       throw transactionError;
     }
+
+    console.log('Transaction created successfully:', transactionData);
 
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
@@ -172,6 +178,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     }
 
     // Only mark as completed if transaction and records are created successfully
+    console.log('Updating filing status to completed');
     const { error: filingError } = await supabase
       .from('filings')
       .update({
