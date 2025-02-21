@@ -1,3 +1,4 @@
+
 export type FilingType = 'ucr' | 'mcs150';
 
 export interface MCS150FormData {
@@ -36,6 +37,8 @@ export interface MCS150FormData {
     licenseFile?: File | null;
     signature?: string;
   };
+  companyIdentifierType?: 'ein' | 'ssn';
+  companyIdentifier?: string;
   // Company Information fields
   companyName?: string;
   businessPhone?: string;

@@ -163,11 +163,12 @@ export type Database = {
           classification_private_property: boolean | null
           classification_state_government: boolean | null
           classification_us_mail: boolean | null
-          company_ein_ssn: string | null
+          company_ein: string | null
           company_email: string | null
           company_info_changes: Json | null
           company_owner_name: string | null
           company_phone: string | null
+          company_ssn: string | null
           created_at: string | null
           filing_id: string
           filing_type: string
@@ -249,11 +250,12 @@ export type Database = {
           classification_private_property?: boolean | null
           classification_state_government?: boolean | null
           classification_us_mail?: boolean | null
-          company_ein_ssn?: string | null
+          company_ein?: string | null
           company_email?: string | null
           company_info_changes?: Json | null
           company_owner_name?: string | null
           company_phone?: string | null
+          company_ssn?: string | null
           created_at?: string | null
           filing_id: string
           filing_type: string
@@ -335,11 +337,12 @@ export type Database = {
           classification_private_property?: boolean | null
           classification_state_government?: boolean | null
           classification_us_mail?: boolean | null
-          company_ein_ssn?: string | null
+          company_ein?: string | null
           company_email?: string | null
           company_info_changes?: Json | null
           company_owner_name?: string | null
           company_phone?: string | null
+          company_ssn?: string | null
           created_at?: string | null
           filing_id?: string
           filing_type?: string

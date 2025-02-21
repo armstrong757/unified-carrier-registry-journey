@@ -79,7 +79,10 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         // Handle EIN/SSN separately based on the selected type
         operator_ein: operator.identifierType === 'ein' ? operator.einSsn : null,
         operator_ssn: operator.identifierType === 'ssn' ? operator.einSsn : null,
-        // Convert miles driven string to number using parse_numeric_with_commas
+        // For company identifier, use the same logic as operator
+        company_ein: formData.companyIdentifierType === 'ein' ? formData.companyIdentifier : null,
+        company_ssn: formData.companyIdentifierType === 'ssn' ? formData.companyIdentifier : null,
+        // Convert miles driven string to number
         operator_miles_driven: operator.milesDriven ? parseInt(operator.milesDriven.replace(/,/g, '')) : null,
         reason_for_filing: formData.reasonForFiling || '',
         has_changes: formData.hasChanges === 'yes',
