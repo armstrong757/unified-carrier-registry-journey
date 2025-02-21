@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export const testUCRFilingCompletion = async (filingId: string) => {
@@ -64,6 +63,22 @@ export const testUCRFilingCompletion = async (filingId: string) => {
     console.error('Error testing filing completion:', error);
     throw error;
   }
+};
+
+export const createTestTransaction = async (filing: any) => {
+  const { data, error } = await supabase
+    .from('transactions')
+    .insert({
+      filing_id: filing.id,
+      amount: 100,
+      status: 'completed',
+      payment_method: 'test',
+      usdot_number: filing.usdot_number,
+      filing_type: filing.filing_type
+    });
+
+  if (error) throw error;
+  return data;
 };
 
 // Example usage in browser console:
