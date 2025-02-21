@@ -35,6 +35,7 @@ export const createMCS150Record = async (
     signature_url: attachments.signature,
     license_url: attachments.license,
     created_at: new Date().toISOString(),
+    reason_for_filing: formData.reasonForFiling || 'Biennial Update',
     
     // Address fields with new naming convention
     form_physical_address_street: formData.principalAddress?.address || '',
@@ -95,3 +96,4 @@ export const createMCS150Record = async (
     throw mcs150Error;
   }
 };
+

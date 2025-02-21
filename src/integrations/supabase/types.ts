@@ -213,7 +213,7 @@ export type Database = {
           principal_address_state: string | null
           principal_address_street: string | null
           principal_address_zip: string | null
-          reason_for_filing: string | null
+          reason_for_filing: string
           signature_url: string | null
           transaction_id: string | null
           usdot_number: string
@@ -311,7 +311,7 @@ export type Database = {
           principal_address_state?: string | null
           principal_address_street?: string | null
           principal_address_zip?: string | null
-          reason_for_filing?: string | null
+          reason_for_filing: string
           signature_url?: string | null
           transaction_id?: string | null
           usdot_number: string
@@ -409,7 +409,7 @@ export type Database = {
           principal_address_state?: string | null
           principal_address_street?: string | null
           principal_address_zip?: string | null
-          reason_for_filing?: string | null
+          reason_for_filing?: string
           signature_url?: string | null
           transaction_id?: string | null
           usdot_number?: string
@@ -462,7 +462,7 @@ export type Database = {
           {
             foreignKeyName: "transactions_filing_id_fkey"
             columns: ["filing_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "filings"
             referencedColumns: ["id"]
           },
