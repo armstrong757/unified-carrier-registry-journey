@@ -129,7 +129,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           const { error: upsertError } = await supabase
             .from('usdot_info')
             .upsert({
-              id: `${trimmedDOT}`, // Ensure ID is a string
+              usdot_number: trimmedDOT,
               legal_name: mappedData.legal_name,
               dba_name: mappedData.dba_name,
               api_dba_name: mappedData.api_dba_name,
