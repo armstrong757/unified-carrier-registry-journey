@@ -8,12 +8,12 @@ interface FilingAttachments {
 }
 
 // Define the mapping of form values to database values
-const reasonForFilingMap: Record<string, string> = {
-  'biennialUpdate': 'Biennial Update',
-  'reactivate': 'Reactivate',
-  'reapplication': 'Reapplication',
-  'outOfBusiness': 'Out of Business Notification'
-};
+const reasonForFilingMap = {
+  biennialUpdate: 'Biennial Update',
+  reactivate: 'Reactivate',
+  reapplication: 'Reapplication',
+  outOfBusiness: 'Out of Business Notification'
+} as const;
 
 export const createMCS150Record = async (
   filingId: string,
@@ -26,11 +26,13 @@ export const createMCS150Record = async (
   }
 
   // Map the reason for filing using our defined mapping
-  const mappedReasonForFiling = reasonForFilingMap[formData.reasonForFiling];
-  if (!mappedReasonForFiling) {
-    console.error('Invalid reason for filing:', formData.reasonForFiling);
+  const reasonForFiling = formData.reasonForFiling;
+  if (!reasonForFiling || !(reasonForFiling in reasonForFilingMap)) {
+    console.error('Invalid reason for filing:', reasonForFiling);
     throw new Error('Invalid reason for filing value');
   }
+
+  const mappedReasonForFiling = reasonForFilingMap[reasonForFiling as keyof typeof reasonForFilingMap];
 
   // Convert milesDriven from string to number, removing commas
   const milesDriven = parseInt(String(formData.operator?.milesDriven || '0').replace(/,/g, ''));
