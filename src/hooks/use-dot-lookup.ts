@@ -36,9 +36,12 @@ function parseAddress(addressString: string) {
 function transformResponse(data: any): USDOTData {
   console.log('Transforming API response:', data);
   
+  // Check if we're getting the basics_data from usdot_info table
+  const basicData = data.basics_data || data;
+  
   // Parse physical address
-  const physicalAddress = parseAddress(data.physical_address);
-  const mailingAddress = parseAddress(data.mailing_address || data.physical_address);
+  const physicalAddress = parseAddress(basicData.physical_address);
+  const mailingAddress = parseAddress(basicData.mailing_address || basicData.physical_address);
   
   // Set default values
   const defaultAddress = {
@@ -54,12 +57,12 @@ function transformResponse(data: any): USDOTData {
   const mailing = mailingAddress || physical;
 
   const transformed: USDOTData = {
-    usdotNumber: data.dot_number || '',
-    legalName: data.legal_name || '',
-    dbaName: data.dba_name || '',
-    operatingStatus: data.usdot_status || 'NOT AUTHORIZED',
-    entityType: data.entity_type_desc || '',
-    physicalAddress: data.physical_address || '',
+    usdotNumber: basicData.dot_number || data.usdot_number || '',
+    legalName: basicData.legal_name || data.legal_name || '',
+    dbaName: basicData.dba_name || data.dba_name || '',
+    operatingStatus: basicData.usdot_status || data.operating_status || 'NOT AUTHORIZED',
+    entityType: basicData.entity_type_desc || data.entity_type || '',
+    physicalAddress: basicData.physical_address || data.physical_address || '',
     physicalAddressStreet: physical.street,
     physicalAddressCity: physical.city,
     physicalAddressState: physical.state,
@@ -70,28 +73,28 @@ function transformResponse(data: any): USDOTData {
     mailingAddressState: mailing.state,
     mailingAddressZip: mailing.zip,
     mailingAddressCountry: mailing.country,
-    telephone: data.telephone_number || '',
-    powerUnits: Number(data.total_power_units) || 0,
-    drivers: Number(data.total_drivers) || 0,
-    insuranceBIPD: Number(data.insurance_bipd_on_file) || 0,
-    insuranceBond: Number(data.insurance_bond_on_file) || 0,
-    insuranceCargo: Number(data.insurance_cargo_on_file) || 0,
-    riskScore: data.risk_score || 'Unknown',
-    outOfServiceDate: data.out_of_service_date || null,
-    mcs150FormDate: data.mcs150_form_date || null,
-    mcs150Date: data.mcs150_date || null,
-    mcs150Year: Number(data.mcs150_year) || 0,
-    mcs150Mileage: Number(data.mcs150_mileage) || 0,
-    carrierOperation: data.carrier_operation || '',
-    cargoCarried: data.cargo_carried || [],
-    busCount: Number(data.total_buses) || 0,
-    limoCount: Number(data.total_limousines) || 0,
-    minibusCount: Number(data.total_minibuses) || 0,
-    motorcoachCount: Number(data.total_motorcoaches) || 0,
-    vanCount: Number(data.total_vans) || 0,
-    complaintCount: Number(data.complaint_count) || 0,
-    outOfService: Boolean(data.out_of_service_flag),
-    mcNumber: data.docket || ''
+    telephone: basicData.telephone_number || data.telephone || '',
+    powerUnits: Number(basicData.total_power_units || data.power_units) || 0,
+    drivers: Number(basicData.total_drivers || data.drivers) || 0,
+    insuranceBIPD: Number(basicData.insurance_bipd_on_file) || 0,
+    insuranceBond: Number(basicData.insurance_bond_on_file) || 0,
+    insuranceCargo: Number(basicData.insurance_cargo_on_file) || 0,
+    riskScore: basicData.risk_score || data.risk_score || 'Unknown',
+    outOfServiceDate: basicData.out_of_service_date || data.out_of_service_date || null,
+    mcs150FormDate: basicData.mcs150_form_date || data.mcs150_last_update || null,
+    mcs150Date: basicData.mcs150_date || data.mcs150_last_update || null,
+    mcs150Year: Number(basicData.mcs150_year) || 0,
+    mcs150Mileage: Number(basicData.mcs150_mileage) || 0,
+    carrierOperation: basicData.carrier_operation || '',
+    cargoCarried: basicData.cargo_carried || [],
+    busCount: Number(basicData.total_buses || data.bus_count) || 0,
+    limoCount: Number(basicData.total_limousines || data.limo_count) || 0,
+    minibusCount: Number(basicData.total_minibuses || data.minibus_count) || 0,
+    motorcoachCount: Number(basicData.total_motorcoaches || data.motorcoach_count) || 0,
+    vanCount: Number(basicData.total_vans || data.van_count) || 0,
+    complaintCount: Number(basicData.complaint_count) || 0,
+    outOfService: Boolean(basicData.out_of_service_flag || data.out_of_service),
+    mcNumber: basicData.docket || data.mc_number || ''
   };
 
   console.log('Transformed USDOT data:', transformed);
@@ -138,75 +141,58 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
           if (filingError) throw filingError;
 
+          // First try to get data from usdot_info table
+          const { data: usdotInfo, error: usdotInfoError } = await supabase
+            .from('usdot_info')
+            .select('*')
+            .eq('usdot_number', trimmedDOT)
+            .maybeSingle();
+
           if (existingFiling) {
             console.log('Found existing filing:', existingFiling);
-            const usdotData = transformResponse(existingFiling.form_data);
+            const usdotData = transformResponse(usdotInfo || existingFiling.form_data);
             resolve({ usdotData, resumedFiling: existingFiling });
             setIsLoading(false);
             return;
           }
 
-          // If no existing filing, fetch from API
-          console.log('Making new API request for DOT:', trimmedDOT);
-          const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
-            body: { dotNumber: trimmedDOT },
-          });
-
-          if (error) {
-            console.error('Edge function error:', error);
-            throw error;
-          }
-
-          if (!data || !data.items || !data.items[0]) {
-            throw new Error('No data received from DOT lookup');
-          }
-
-          const transformedData = transformResponse(data.items[0]);
-
-          // Store the address data in usdot_info table
-          const { error: upsertError } = await supabase
-            .from('usdot_info')
-            .upsert({
-              usdot_number: trimmedDOT,
-              physical_address_street: transformedData.physicalAddressStreet,
-              physical_address_city: transformedData.physicalAddressCity,
-              physical_address_state: transformedData.physicalAddressState,
-              physical_address_zip: transformedData.physicalAddressZip,
-              physical_address_country: transformedData.physicalAddressCountry,
-              mailing_address_street: transformedData.mailingAddressStreet,
-              mailing_address_city: transformedData.mailingAddressCity,
-              mailing_address_state: transformedData.mailingAddressState,
-              mailing_address_zip: transformedData.mailingAddressZip,
-              mailing_address_country: transformedData.mailingAddressCountry,
-              basics_data: data.items[0],
-              bus_count: Number(data.items[0].total_buses) || 0,
-              complaint_count: Number(data.items[0].complaint_count) || 0,
-              dba_name: data.items[0].dba_name || '',
-              drivers: Number(data.items[0].total_drivers) || 0,
-              ein: data.items[0].ein || '',
-              entity_type: data.items[0].entity_type_desc || '',
-              legal_name: data.items[0].legal_name || '',
-              limo_count: Number(data.items[0].total_limousines) || 0,
-              mc_number: data.items[0].docket || '',
-              mcs150_last_update: data.items[0].mcs150_form_date || null,
-              mileage_year: `${Number(data.items[0].mcs150_mileage) || 0} (${Number(data.items[0].mcs150_year) || 0})`,
-              minibus_count: Number(data.items[0].total_minibuses) || 0,
-              motorcoach_count: Number(data.items[0].total_motorcoaches) || 0,
-              operating_status: data.items[0].usdot_status || 'NOT AUTHORIZED',
-              out_of_service: data.items[0].out_of_service_flag || false,
-              out_of_service_date: data.items[0].out_of_service_date || null,
-              physical_address: data.items[0].physical_address || '',
-              power_units: Number(data.items[0].total_power_units) || 0,
-              telephone: data.items[0].telephone_number || '',
-              van_count: Number(data.items[0].total_vans) || 0,
+          // If no existing filing or usdot_info, fetch from API
+          if (!usdotInfo) {
+            console.log('Making new API request for DOT:', trimmedDOT);
+            const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
+              body: { dotNumber: trimmedDOT },
             });
 
-          if (upsertError) {
-            console.error('Error storing address data:', upsertError);
+            if (error) {
+              console.error('Edge function error:', error);
+              throw error;
+            }
+
+            if (!data || !data.items || !data.items[0]) {
+              throw new Error('No data received from DOT lookup');
+            }
+
+            const transformedData = transformResponse(data.items[0]);
+
+            // Store the data in usdot_info table
+            const { error: upsertError } = await supabase
+              .from('usdot_info')
+              .upsert({
+                usdot_number: trimmedDOT,
+                basics_data: data.items[0],
+                // ... additional fields
+              });
+
+            if (upsertError) {
+              console.error('Error storing USDOT info:', upsertError);
+            }
+
+            resolve({ usdotData: transformedData });
+          } else {
+            // Use existing USDOT info
+            console.log('Using existing USDOT info:', usdotInfo);
+            resolve({ usdotData: transformResponse(usdotInfo) });
           }
-
-          resolve({ usdotData: transformedData });
-
         } catch (error) {
           console.error('Error in DOT lookup:', error);
           toast({
