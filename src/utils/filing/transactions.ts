@@ -71,7 +71,6 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       mcNumber: usdotInfo?.mc_number || '',
       mcs150FormDate: usdotInfo?.mcs150_last_update || '',
       mcs150Date: usdotInfo?.mcs150_last_update || '',
-      // Default values for required fields not in database
       mcs150Year: 0,
       mcs150Mileage: 0,
       carrierOperation: '',
@@ -119,6 +118,12 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
       const mcs150FormData = filing.form_data as unknown as MCS150FormData;
+      console.log('MCS150 Form Data:', mcs150FormData); // Add this log
+
+      if (!mcs150FormData.reasonForFiling) {
+        mcs150FormData.reasonForFiling = 'Biennial Update'; // Set default if missing
+      }
+
       await createMCS150Record(
         filingId,
         mcs150FormData,
@@ -131,7 +136,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         filingId,
         ucrFormData,
         filing.usdot_number,
-        transformedUsdotInfo // Always pass the transformed USDOT info
+        transformedUsdotInfo
       );
     }
 
