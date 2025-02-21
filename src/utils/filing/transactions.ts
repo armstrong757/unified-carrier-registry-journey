@@ -9,10 +9,10 @@ import { calculateUCRFee } from "@/utils/ucrFeeCalculator";
 
 export const createTransaction = async (filingId: string, amount: number, paymentMethod: string) => {
   try {
-    // First check if the filing is still in draft and get all necessary data
+    // First check if the filing is still in draft and get the filing data
     const { data: filing, error: filingCheckError } = await supabase
       .from('filings')
-      .select('*, usdot_info(*)')  // Include USDOT info in the query
+      .select('*')
       .eq('id', filingId)
       .maybeSingle();
 
@@ -23,6 +23,18 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     
     if (!filing || filing.status !== 'draft') {
       throw new Error('Filing is not in draft status');
+    }
+
+    // Fetch USDOT info separately
+    const { data: usdotInfo, error: usdotError } = await supabase
+      .from('usdot_info')
+      .select('*')
+      .eq('usdot_number', filing.usdot_number)
+      .maybeSingle();
+
+    if (usdotError) {
+      console.error('Error fetching USDOT info:', usdotError);
+      // Don't throw here, we can proceed without USDOT info
     }
 
     // For UCR filings, calculate the fee based on total vehicles
@@ -72,7 +84,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         filingId,
         ucrFormData,
         filing.usdot_number,
-        filing.usdot_info  // Pass the USDOT info from the joined query
+        usdotInfo || undefined // Pass USDOT info if available, otherwise undefined
       );
     }
 
