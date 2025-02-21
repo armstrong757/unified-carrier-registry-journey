@@ -7,14 +7,6 @@ interface FilingAttachments {
   license?: string;
 }
 
-// Define the mapping of form values to database values
-const reasonForFilingMap = {
-  biennialUpdate: 'Biennial Update',
-  reactivate: 'Reactivate',
-  reapplication: 'Reapplication',
-  outOfBusiness: 'Out of Business Notification'
-} as const;
-
 export const createMCS150Record = async (
   filingId: string,
   formData: MCS150FormData,
@@ -25,14 +17,9 @@ export const createMCS150Record = async (
     throw new Error('Missing required attachments for MCS-150 filing');
   }
 
-  // Map the reason for filing using our defined mapping
-  const reasonForFiling = formData.reasonForFiling;
-  if (!reasonForFiling || !(reasonForFiling in reasonForFilingMap)) {
-    console.error('Invalid reason for filing:', reasonForFiling);
-    throw new Error('Invalid reason for filing value');
+  if (!formData.reasonForFiling) {
+    throw new Error('Reason for filing is required');
   }
-
-  const mappedReasonForFiling = reasonForFilingMap[reasonForFiling as keyof typeof reasonForFilingMap];
 
   // Convert milesDriven from string to number, removing commas
   const milesDriven = parseInt(String(formData.operator?.milesDriven || '0').replace(/,/g, ''));
@@ -52,57 +39,11 @@ export const createMCS150Record = async (
     signature_url: attachments.signature,
     license_url: attachments.license,
     created_at: new Date().toISOString(),
-    reason_for_filing: mappedReasonForFiling,
-
-    // Address fields with new naming convention
-    form_physical_address_street: formData.principalAddress?.address || '',
-    form_physical_address_city: formData.principalAddress?.city || '',
-    form_physical_address_state: formData.principalAddress?.state || '',
-    form_physical_address_zip: formData.principalAddress?.zip || '',
-    form_physical_address_country: formData.principalAddress?.country || 'USA',
-    form_mailing_address_street: formData.mailingAddress?.address || '',
-    form_mailing_address_city: formData.mailingAddress?.city || '',
-    form_mailing_address_state: formData.mailingAddress?.state || '',
-    form_mailing_address_zip: formData.mailingAddress?.zip || '',
-    form_mailing_address_country: formData.mailingAddress?.country || 'USA',
-    address_modified: formData.address_modified || false,
-
-    // Add required but unused fields with default values
-    cargo_agricultural: false,
-    cargo_beverages: false,
-    cargo_building_materials: false,
-    cargo_chemicals: false,
-    cargo_coal: false,
-    cargo_commodities_dry_bulk: false,
-    cargo_construction: false,
-    cargo_drive_away: false,
-    cargo_fresh_produce: false,
-    cargo_garbage: false,
-    cargo_general_freight: false,
-    cargo_grain: false,
-    cargo_household_goods: false,
-    cargo_intermodal_containers: false,
-    cargo_liquids_gases: false,
-    cargo_livestock: false,
-    cargo_logs: false,
-    cargo_machinery: false,
-    cargo_meat: false,
-    cargo_metal_sheets: false,
-    cargo_mobile_homes: false,
-    cargo_motor_vehicles: false,
-    cargo_oilfield_equipment: false,
-    cargo_other: false,
-    cargo_paper_products: false,
-    cargo_passengers: false,
-    cargo_refrigerated_food: false,
-    cargo_us_mail: false,
-    cargo_utilities: false,
-    cargo_water_well: false
+    reason_for_filing: formData.reasonForFiling // Pass through the value directly
   };
 
   console.log('Creating MCS-150 record:', mcs150Record);
 
-  // Use upsert instead of insert to handle potential duplicates
   const { error: mcs150Error } = await supabase
     .from('mcs150_airtable_records')
     .upsert(mcs150Record, {
