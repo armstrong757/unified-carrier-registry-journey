@@ -20,6 +20,10 @@ export const createMCS150Record = async (
   // Convert milesDriven from string to number, removing commas
   const milesDriven = parseInt(String(formData.operator?.milesDriven || '0').replace(/,/g, ''));
 
+  // Extract and format address data
+  const principalAddress = formData.principalAddress || {};
+  const mailingAddress = formData.mailingAddress || {};
+
   const mcs150Record = {
     filing_id: filingId,
     usdot_number: usdotNumber,
@@ -35,7 +39,37 @@ export const createMCS150Record = async (
     signature_url: attachments.signature,
     license_url: attachments.license,
     created_at: new Date().toISOString(),
-    reason_for_filing: formData.reasonForFiling || 'biennialUpdate' // Use default if not set
+    reason_for_filing: formData.reasonForFiling || 'biennialUpdate',
+    
+    // Principal address fields
+    principal_address_street: principalAddress.address || '',
+    principal_address_city: principalAddress.city || '',
+    principal_address_state: principalAddress.state || '',
+    principal_address_zip: principalAddress.zip || '',
+    principal_address_country: principalAddress.country || 'USA',
+    
+    // Mailing address fields
+    mailing_address_street: mailingAddress.address || '',
+    mailing_address_city: mailingAddress.city || '',
+    mailing_address_state: mailingAddress.state || '',
+    mailing_address_zip: mailingAddress.zip || '',
+    mailing_address_country: mailingAddress.country || 'USA',
+
+    // Form address fields (for tracking changes)
+    form_physical_address_street: principalAddress.address || '',
+    form_physical_address_city: principalAddress.city || '',
+    form_physical_address_state: principalAddress.state || '',
+    form_physical_address_zip: principalAddress.zip || '',
+    form_physical_address_country: principalAddress.country || 'USA',
+    
+    form_mailing_address_street: mailingAddress.address || '',
+    form_mailing_address_city: mailingAddress.city || '',
+    form_mailing_address_state: mailingAddress.state || '',
+    form_mailing_address_zip: mailingAddress.zip || '',
+    form_mailing_address_country: mailingAddress.country || 'USA',
+
+    // Track if address was modified
+    address_modified: formData.address_modified || false
   };
 
   console.log('Creating MCS-150 record:', mcs150Record);
