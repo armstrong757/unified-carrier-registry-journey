@@ -37,8 +37,6 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       // Don't throw here, we can proceed without USDOT info
     }
 
-    console.log('USDOT Info fetched:', usdotInfo);
-
     // Transform USDOT info to match USDOTData type
     const transformedUsdotInfo: USDOTData = {
       usdotNumber: filing.usdot_number,
@@ -81,8 +79,6 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       riskScore: ''
     };
 
-    console.log('Transformed USDOT Info:', transformedUsdotInfo);
-
     // For UCR filings, calculate the fee based on total vehicles
     let transactionAmount = amount;
     if (filing.filing_type === 'ucr') {
@@ -98,12 +94,6 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       transactionAmount = calculateUCRFee(totalVehicles);
     }
 
-    console.log('Creating transaction for filing:', {
-      filingId,
-      amount: transactionAmount,
-      paymentMethod
-    });
-
     // Create the transaction first
     const transactionData = await createTransactionRecord(
       filingId,
@@ -113,17 +103,9 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       filing.filing_type
     );
 
-    console.log('Transaction created successfully:', transactionData);
-
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
       const mcs150FormData = filing.form_data as unknown as MCS150FormData;
-      console.log('MCS150 Form Data:', mcs150FormData); // Add this log
-
-      if (!mcs150FormData.reasonForFiling) {
-        mcs150FormData.reasonForFiling = 'Biennial Update'; // Set default if missing
-      }
-
       await createMCS150Record(
         filingId,
         mcs150FormData,
@@ -141,7 +123,6 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     }
 
     // Only mark as completed if transaction and records are created successfully
-    console.log('Updating filing status to completed');
     await markFilingComplete(filingId);
 
     return transactionData;

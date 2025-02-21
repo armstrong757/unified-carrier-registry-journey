@@ -7,6 +7,14 @@ interface FilingAttachments {
   license?: string;
 }
 
+// Define the mapping of form values to database values
+const reasonForFilingMap: Record<string, string> = {
+  'biennialUpdate': 'Biennial Update',
+  'reactivate': 'Reactivate',
+  'reapplication': 'Reapplication',
+  'outOfBusiness': 'Out of Business Notification'
+};
+
 export const createMCS150Record = async (
   filingId: string,
   formData: MCS150FormData,
@@ -17,10 +25,11 @@ export const createMCS150Record = async (
     throw new Error('Missing required attachments for MCS-150 filing');
   }
 
-  // Ensure we have a valid reason for filing
-  if (!formData.reasonForFiling) {
-    console.error('Missing reason for filing:', formData);
-    throw new Error('Missing required field: reason for filing');
+  // Map the reason for filing using our defined mapping
+  const mappedReasonForFiling = reasonForFilingMap[formData.reasonForFiling];
+  if (!mappedReasonForFiling) {
+    console.error('Invalid reason for filing:', formData.reasonForFiling);
+    throw new Error('Invalid reason for filing value');
   }
 
   // Convert milesDriven from string to number, removing commas
@@ -41,7 +50,7 @@ export const createMCS150Record = async (
     signature_url: attachments.signature,
     license_url: attachments.license,
     created_at: new Date().toISOString(),
-    reason_for_filing: formData.reasonForFiling,
+    reason_for_filing: mappedReasonForFiling,
 
     // Address fields with new naming convention
     form_physical_address_street: formData.principalAddress?.address || '',
