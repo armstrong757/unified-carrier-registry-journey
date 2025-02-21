@@ -27,6 +27,11 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       throw new Error('Filing is not in draft status');
     }
 
+    if (!filing.usdot_info) {
+      console.error('Missing USDOT info in filing');
+      throw new Error('Missing USDOT information');
+    }
+
     // Create the transaction first
     const transactionData = await createTransactionRecord(
       filingId,
@@ -39,6 +44,10 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
       const formData = filing.form_data as unknown as MCS150FormData;
+      if (!formData) {
+        console.error('Missing form data in filing');
+        throw new Error('Missing form data');
+      }
       
       // Verify attachments exist and have the required properties
       const attachments = filing.attachments as Record<string, string> | null;

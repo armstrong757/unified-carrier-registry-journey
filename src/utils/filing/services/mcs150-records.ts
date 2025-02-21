@@ -7,24 +7,57 @@ interface FilingAttachments {
   license?: string;
 }
 
+interface USDOTInfoType {
+  api_physical_address_street?: string;
+  api_physical_address_city?: string;
+  api_physical_address_state?: string;
+  api_physical_address_zip?: string;
+  api_physical_address_country?: string;
+  api_mailing_address_street?: string;
+  api_mailing_address_city?: string;
+  api_mailing_address_state?: string;
+  api_mailing_address_zip?: string;
+  api_mailing_address_country?: string;
+}
+
 export const createMCS150Record = async (
   filingId: string,
   formData: MCS150FormData,
   attachments: FilingAttachments,
   usdotNumber: string,
   transactionId: string,
-  usdotInfo: any // Use the USDOT info passed from the transaction
+  usdotInfo: USDOTInfoType
 ) => {
+  // Validate required parameters
+  if (!filingId || !formData || !usdotNumber || !transactionId) {
+    console.error('Missing required parameters:', { filingId, formData, usdotNumber, transactionId });
+    throw new Error('Missing required parameters for MCS-150 record creation');
+  }
+
+  // Validate attachments
   if (!attachments?.signature || !attachments?.license) {
+    console.error('Missing required attachments:', attachments);
     throw new Error('Missing required attachments for MCS-150 filing');
+  }
+
+  // Validate operator data
+  if (!formData.operator) {
+    console.error('Missing operator data in form data');
+    throw new Error('Missing operator information for MCS-150 filing');
   }
 
   // Convert milesDriven from string to number, removing commas
   const milesDriven = parseInt(String(formData.operator?.milesDriven || '0').replace(/,/g, ''));
 
-  // Extract and format address data
+  // Extract and format address data with proper null checks
   const principalAddress = formData.principalAddress || {};
   const mailingAddress = formData.mailingAddress || {};
+
+  // Validate USDOT info
+  if (!usdotInfo) {
+    console.error('Missing USDOT info');
+    throw new Error('Missing USDOT information for MCS-150 filing');
+  }
 
   const mcs150Record = {
     filing_id: filingId,
@@ -35,7 +68,6 @@ export const createMCS150Record = async (
     operator_email: formData.operator?.email || '',
     operator_phone: formData.operator?.phone || '',
     operator_title: formData.operator?.title || '',
-    // Store both SSN and EIN correctly based on operator's identifier type
     operator_ssn: formData.operator?.identifierType === 'ssn' ? formData.operator.einSsn : '',
     operator_ein: formData.operator?.identifierType === 'ein' ? formData.operator.einSsn : '',
     operator_miles_driven: milesDriven,
@@ -46,17 +78,17 @@ export const createMCS150Record = async (
     transaction_id: transactionId,
     
     // Store original API address data
-    api_physical_address_street: usdotInfo?.api_physical_address_street || '',
-    api_physical_address_city: usdotInfo?.api_physical_address_city || '',
-    api_physical_address_state: usdotInfo?.api_physical_address_state || '',
-    api_physical_address_zip: usdotInfo?.api_physical_address_zip || '',
-    api_physical_address_country: usdotInfo?.api_physical_address_country || 'USA',
+    api_physical_address_street: usdotInfo.api_physical_address_street || '',
+    api_physical_address_city: usdotInfo.api_physical_address_city || '',
+    api_physical_address_state: usdotInfo.api_physical_address_state || '',
+    api_physical_address_zip: usdotInfo.api_physical_address_zip || '',
+    api_physical_address_country: usdotInfo.api_physical_address_country || 'USA',
     
-    api_mailing_address_street: usdotInfo?.api_mailing_address_street || '',
-    api_mailing_address_city: usdotInfo?.api_mailing_address_city || '',
-    api_mailing_address_state: usdotInfo?.api_mailing_address_state || '',
-    api_mailing_address_zip: usdotInfo?.api_mailing_address_zip || '',
-    api_mailing_address_country: usdotInfo?.api_mailing_address_country || 'USA',
+    api_mailing_address_street: usdotInfo.api_mailing_address_street || '',
+    api_mailing_address_city: usdotInfo.api_mailing_address_city || '',
+    api_mailing_address_state: usdotInfo.api_mailing_address_state || '',
+    api_mailing_address_zip: usdotInfo.api_mailing_address_zip || '',
+    api_mailing_address_country: usdotInfo.api_mailing_address_country || 'USA',
 
     // Store form-submitted address data only if modified
     form_physical_address_street: formData.address_modified ? principalAddress.address || '' : '',
