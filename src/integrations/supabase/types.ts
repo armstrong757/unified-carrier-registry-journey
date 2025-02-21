@@ -396,28 +396,34 @@ export type Database = {
           amount: number
           created_at: string | null
           filing_id: string
+          filing_type: Database["public"]["Enums"]["filing_type"]
           id: string
           payment_method: string | null
           status: string
           updated_at: string | null
+          usdot_number: string
         }
         Insert: {
           amount: number
           created_at?: string | null
           filing_id: string
+          filing_type: Database["public"]["Enums"]["filing_type"]
           id?: string
           payment_method?: string | null
           status: string
           updated_at?: string | null
+          usdot_number: string
         }
         Update: {
           amount?: number
           created_at?: string | null
           filing_id?: string
+          filing_type?: Database["public"]["Enums"]["filing_type"]
           id?: string
           payment_method?: string | null
           status?: string
           updated_at?: string | null
+          usdot_number?: string
         }
         Relationships: [
           {

@@ -39,7 +39,9 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         filing_id: filingId,
         amount,
         status: 'completed',
-        payment_method: paymentMethod
+        payment_method: paymentMethod,
+        usdot_number: filing.usdot_number,
+        filing_type: filing.filing_type
       })
       .select('*')
       .single();
