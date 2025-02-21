@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
@@ -11,12 +10,17 @@ function transformResponse(data: any): USDOTData {
   console.log('Transforming API response:', data);
   
   const transformed: USDOTData = {
-    usdotNumber: data.dot_number || data.usdot_number || '',
-    legalName: data.legal_name || 'Unknown',
+    usdotNumber: data.dot_number || '',
+    legalName: data.legal_name || '',
     dbaName: data.dba_name || '',
     operatingStatus: data.usdot_status || 'NOT AUTHORIZED',
-    entityType: data.entity_type_desc || 'CARRIER',
-    physicalAddress: data.physical_address || '',
+    entityType: data.entity_type_desc || '',
+    physicalAddress: [
+      data.physical_address_street,
+      data.physical_address_city,
+      data.physical_address_state,
+      data.physical_address_zip_code
+    ].filter(Boolean).join(', ') || '',
     telephone: data.telephone_number || '',
     powerUnits: Number(data.total_power_units) || 0,
     drivers: Number(data.total_drivers) || 0,
@@ -26,7 +30,6 @@ function transformResponse(data: any): USDOTData {
     riskScore: data.risk_score || 'Unknown',
     outOfServiceDate: data.out_of_service_date || null,
     mcs150FormDate: data.mcs150_form_date || null,
-    // Use mcs150_date directly from the API response
     mcs150Date: data.mcs150_date || null,
     mcs150Year: Number(data.mcs150_year) || 0,
     mcs150Mileage: Number(data.mcs150_mileage) || 0,
@@ -38,7 +41,7 @@ function transformResponse(data: any): USDOTData {
     motorcoachCount: 0,
     vanCount: 0,
     complaintCount: 0,
-    outOfService: false,
+    outOfService: data.out_of_service_flag || false,
     mcNumber: data.docket || ''
   };
 
