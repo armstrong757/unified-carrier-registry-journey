@@ -1,4 +1,3 @@
-
 export type FilingType = 'ucr' | 'mcs150';
 
 export interface MCS150FormData {
@@ -55,6 +54,7 @@ export interface MCS150FormData {
     zip?: string;
     country?: string;
   };
+  address_modified?: boolean;
 }
 
 export interface UCRFormData {
