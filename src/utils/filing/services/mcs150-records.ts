@@ -37,16 +37,16 @@ export const createMCS150Record = async (
     created_at: new Date().toISOString(),
     
     // Address fields with new naming convention
-    api_physical_address_street: formData.principalAddress?.address || '',
-    api_physical_address_city: formData.principalAddress?.city || '',
-    api_physical_address_state: formData.principalAddress?.state || '',
-    api_physical_address_zip: formData.principalAddress?.zip || '',
-    api_physical_address_country: formData.principalAddress?.country || 'USA',
-    api_mailing_address_street: formData.mailingAddress?.address || '',
-    api_mailing_address_city: formData.mailingAddress?.city || '',
-    api_mailing_address_state: formData.mailingAddress?.state || '',
-    api_mailing_address_zip: formData.mailingAddress?.zip || '',
-    api_mailing_address_country: formData.mailingAddress?.country || 'USA',
+    form_physical_address_street: formData.principalAddress?.address || '',
+    form_physical_address_city: formData.principalAddress?.city || '',
+    form_physical_address_state: formData.principalAddress?.state || '',
+    form_physical_address_zip: formData.principalAddress?.zip || '',
+    form_physical_address_country: formData.principalAddress?.country || 'USA',
+    form_mailing_address_street: formData.mailingAddress?.address || '',
+    form_mailing_address_city: formData.mailingAddress?.city || '',
+    form_mailing_address_state: formData.mailingAddress?.state || '',
+    form_mailing_address_zip: formData.mailingAddress?.zip || '',
+    form_mailing_address_country: formData.mailingAddress?.country || 'USA',
     address_modified: formData.address_modified || false,
 
     // Add required but unused fields with default values
@@ -82,9 +82,13 @@ export const createMCS150Record = async (
     cargo_water_well: false
   };
 
+  // Use upsert instead of insert to handle potential duplicates
   const { error: mcs150Error } = await supabase
     .from('mcs150_airtable_records')
-    .insert(mcs150Record);
+    .upsert(mcs150Record, {
+      onConflict: 'filing_id',
+      ignoreDuplicates: false
+    });
 
   if (mcs150Error) {
     console.error('Error creating MCS-150 record:', mcs150Error);
