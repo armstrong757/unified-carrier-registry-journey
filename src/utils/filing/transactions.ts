@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { MCS150FormData, UCRFormData } from "@/types/filing";
 import { toast } from "@/components/ui/use-toast";
@@ -46,56 +47,39 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
-      // Ensure attachments are properly typed and present
+      // Ensure we're working with MCS150 data
+      const formData = filing.form_data as MCS150FormData;
       const attachments = filing.attachments as FilingAttachments;
-      console.log('Current attachments:', attachments);
-
-      // Verify attachments exist for MCS-150 filings
-      if (filing.filing_type === 'mcs150') {
-        if (!attachments?.signature || !attachments?.license) {
-          console.error('Missing attachments:', { attachments });
-          throw new Error('Missing required attachments for MCS-150 filing');
-        }
+      
+      if (!attachments?.signature || !attachments?.license) {
+        throw new Error('Missing required attachments for MCS-150 filing');
       }
 
-      console.log('Processing MCS-150 attachments:', attachments);
-      
-      const formData = filing.form_data as unknown as MCS150FormData;
-      const operator = formData.operator || {};
-      
-      // Convert the form data to match the table structure
-      const record = {
-        filing_type: filing.filing_type,
+      const mcs150Record = {
+        filing_id: filingId,
         usdot_number: filing.usdot_number,
-        full_name: formData.representative || '',
-        email: formData.email || '',
-        phone: formData.phone || '',
-        registration_year: formData.registrationYear?.toString() || '',
-        needs_vehicle_changes: formData.needsVehicleChanges || 'no',
-        vehicles_straight_trucks: parseInt(String(formData.straightTrucks || '0').replace(/,/g, '')),
-        vehicles_power_units: parseInt(String(formData.straightTrucks || '0').replace(/,/g, '')),
-        vehicles_passenger_vehicles: parseInt(String(formData.passengerVehicles || '0').replace(/,/g, '')),
-        vehicles_add_vehicles: parseInt(String(formData.addVehicles || '0').replace(/,/g, '')),
-        vehicles_exclude_vehicles: parseInt(String(formData.excludeVehicles || '0').replace(/,/g, '')),
-        vehicles_total: parseInt(String(formData.straightTrucks || '0').replace(/,/g, '')) + parseInt(String(formData.passengerVehicles || '0').replace(/,/g, '')) + parseInt(String(formData.addVehicles || '0').replace(/,/g, '')) - parseInt(String(formData.excludeVehicles || '0').replace(/,/g, '')),
-        classification_motor_carrier: formData.classifications?.motorCarrier || false,
-        classification_motor_private: formData.classifications?.motorPrivate || false,
-        classification_freight_forwarder: formData.classifications?.freightForwarder || false,
-        classification_broker: formData.classifications?.broker || false,
-        classification_leasing_company: formData.classifications?.leasingCompany || false,
+        operator_first_name: formData.operator?.firstName || '',
+        operator_last_name: formData.operator?.lastName || '',
+        operator_email: formData.operator?.email || '',
+        operator_phone: formData.operator?.phone || '',
+        operator_title: formData.operator?.title || '',
+        operator_ssn: formData.operator?.identifierType === 'ssn' ? formData.operator.einSsn : null,
+        operator_ein: formData.operator?.identifierType === 'ein' ? formData.operator.einSsn : null,
+        operator_miles_driven: formData.operator?.milesDriven || '',
+        signature_url: attachments.signature,
+        license_url: attachments.license,
         created_at: new Date().toISOString()
       };
 
-      console.log('Creating airtable record:', record);
-
-      const { error: airtableError } = await supabase
+      const { error: mcs150Error } = await supabase
         .from('mcs150_airtable_records')
-        .insert(record);
+        .insert(mcs150Record);
 
-      if (airtableError) {
-        console.error('Error creating airtable record:', airtableError);
-        throw airtableError;
+      if (mcs150Error) {
+        console.error('Error creating MCS-150 record:', mcs150Error);
+        throw mcs150Error;
       }
+      
     } else if (filing.filing_type === 'ucr') {
       console.log('Processing UCR filing:', filing);
       
@@ -111,10 +95,10 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       
       const totalVehicles = straightTrucks + passengerVehicles + addVehicles - excludeVehicles;
 
-      // Convert the form data to match the table structure
-      const record = {
-        filing_type: filing.filing_type,
+      // Create record matching the exact table schema
+      const ucrRecord = {
         usdot_number: filing.usdot_number,
+        filing_type: filing.filing_type as 'ucr',
         full_name: formData.representative || '',
         email: formData.email || '',
         phone: formData.phone || '',
@@ -131,18 +115,23 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         classification_freight_forwarder: formData.classifications?.freightForwarder || false,
         classification_broker: formData.classifications?.broker || false,
         classification_leasing_company: formData.classifications?.leasingCompany || false,
+        physical_address_street: '',  // Required by schema
+        physical_address_city: '',    // Required by schema
+        physical_address_state: '',   // Required by schema
+        physical_address_zip: '',     // Required by schema
+        physical_address_country: 'USA', // Required by schema
         created_at: new Date().toISOString()
       };
 
-      console.log('Creating UCR airtable record:', record);
+      console.log('Creating UCR airtable record:', ucrRecord);
 
-      const { error: airtableError } = await supabase
+      const { error: ucrError } = await supabase
         .from('ucr_airtable_records')
-        .insert(record);
+        .insert(ucrRecord);
 
-      if (airtableError) {
-        console.error('Error creating UCR airtable record:', airtableError);
-        throw airtableError;
+      if (ucrError) {
+        console.error('Error creating UCR airtable record:', ucrError);
+        throw ucrError;
       }
     }
 
