@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { MCS150FormData, UCRFormData } from "@/types/filing";
 import { toast } from "@/components/ui/use-toast";
@@ -12,7 +13,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     // First check if the filing is still in draft and get all necessary data
     const { data: filing, error: filingCheckError } = await supabase
       .from('filings')
-      .select('status, form_data, attachments, filing_type, usdot_number')
+      .select('*, id')  // Added id to the selection
       .eq('id', filingId)
       .maybeSingle();
 
@@ -152,7 +153,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
       // Convert the form data to match the table structure
       const record = {
-        id: filing.id,
+        filing_id: filing.id, // Changed from id to filing_id
         filing_type: filing.filing_type,
         usdot_number: filing.usdot_number,
         full_name: formData.representative || '',

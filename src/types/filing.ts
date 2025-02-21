@@ -1,4 +1,3 @@
-
 export type FilingType = 'ucr' | 'mcs150';
 
 export interface MCS150FormData {
@@ -54,7 +53,23 @@ export interface MCS150FormData {
 export interface UCRFormData {
   representative?: string;
   phone?: string;
-  // Add other form fields as needed
+  email?: string;
+  registrationYear?: number;
+  needsVehicleChanges?: 'yes' | 'no';
+  straightTrucks?: string | number;
+  powerUnits?: string | number;
+  passengerVehicles?: string | number;
+  addVehicles?: string | number;
+  excludeVehicles?: string | number;
+  classifications?: {
+    motorCarrier?: boolean;
+    motorPrivate?: boolean;
+    freightForwarder?: boolean;
+    broker?: boolean;
+    leasingCompany?: boolean;
+  };
+  cardType?: string;
+  termsAccepted?: boolean;
 }
 
 export interface USDOTData {
