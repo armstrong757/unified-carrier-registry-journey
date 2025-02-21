@@ -12,7 +12,8 @@ export const createMCS150Record = async (
   formData: MCS150FormData,
   attachments: FilingAttachments,
   usdotNumber: string,
-  transactionId: string
+  transactionId: string,
+  usdotInfo: any // Use the USDOT info passed from the transaction
 ) => {
   if (!attachments?.signature || !attachments?.license) {
     throw new Error('Missing required attachments for MCS-150 filing');
@@ -24,13 +25,6 @@ export const createMCS150Record = async (
   // Extract and format address data
   const principalAddress = formData.principalAddress || {};
   const mailingAddress = formData.mailingAddress || {};
-
-  // Get the API data for addresses first
-  const { data: usdotInfo } = await supabase
-    .from('usdot_info')
-    .select('*')
-    .eq('usdot_number', usdotNumber)
-    .single();
 
   const mcs150Record = {
     filing_id: filingId,

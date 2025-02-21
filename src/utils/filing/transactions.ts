@@ -1,3 +1,4 @@
+
 import { MCS150FormData, UCRFormData, USDOTData } from "@/types/filing";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,7 +55,8 @@ export const createTransaction = async (filingId: string, amount: number, paymen
           license: attachments.license
         },
         filing.usdot_number,
-        transactionData.id
+        transactionData.id,
+        filing.usdot_info // Pass the USDOT info that we already have
       );
     } else if (filing.filing_type === 'ucr') {
       // Type cast UCR form data with validation
