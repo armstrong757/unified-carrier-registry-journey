@@ -572,6 +572,8 @@ export type Database = {
       }
       usdot_info: {
         Row: {
+          api_dba_flag: boolean | null
+          api_dba_name: string | null
           api_mailing_address_city: string | null
           api_mailing_address_country: string | null
           api_mailing_address_state: string | null
@@ -609,6 +611,8 @@ export type Database = {
           van_count: number | null
         }
         Insert: {
+          api_dba_flag?: boolean | null
+          api_dba_name?: string | null
           api_mailing_address_city?: string | null
           api_mailing_address_country?: string | null
           api_mailing_address_state?: string | null
@@ -646,6 +650,8 @@ export type Database = {
           van_count?: number | null
         }
         Update: {
+          api_dba_flag?: boolean | null
+          api_dba_name?: string | null
           api_mailing_address_city?: string | null
           api_mailing_address_country?: string | null
           api_mailing_address_state?: string | null
