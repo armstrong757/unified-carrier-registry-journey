@@ -79,6 +79,7 @@ export type Database = {
           resume_token_expires_at: string | null
           status: string
           updated_at: string | null
+          usdot_info_id: string | null
           usdot_number: string
         }
         Insert: {
@@ -97,6 +98,7 @@ export type Database = {
           resume_token_expires_at?: string | null
           status?: string
           updated_at?: string | null
+          usdot_info_id?: string | null
           usdot_number: string
         }
         Update: {
@@ -115,9 +117,18 @@ export type Database = {
           resume_token_expires_at?: string | null
           status?: string
           updated_at?: string | null
+          usdot_info_id?: string | null
           usdot_number?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "filings_usdot_info_id_fkey"
+            columns: ["usdot_info_id"]
+            isOneToOne: false
+            referencedRelation: "usdot_info"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mcs150_airtable_records: {
         Row: {

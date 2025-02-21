@@ -12,7 +12,41 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     // First check if the filing is still in draft and get the filing data
     const { data: filing, error: filingCheckError } = await supabase
       .from('filings')
-      .select('*, usdot_info(*)')
+      .select(`
+        *,
+        usdot_info (
+          id,
+          legal_name,
+          dba_name,
+          operating_status,
+          entity_type,
+          physical_address,
+          api_physical_address_street,
+          api_physical_address_city,
+          api_physical_address_state,
+          api_physical_address_zip,
+          api_physical_address_country,
+          api_mailing_address_street,
+          api_mailing_address_city,
+          api_mailing_address_state,
+          api_mailing_address_zip,
+          api_mailing_address_country,
+          telephone,
+          power_units,
+          drivers,
+          bus_count,
+          limo_count,
+          minibus_count,
+          motorcoach_count,
+          van_count,
+          complaint_count,
+          out_of_service,
+          out_of_service_date,
+          mc_number,
+          mileage_year,
+          basics_data
+        )
+      `)
       .eq('id', filingId)
       .maybeSingle();
 
@@ -36,10 +70,13 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
-      // Properly type cast the form_data
-      const mcs150FormData = filing.form_data as MCS150FormData;
-      console.log('MCS150 form data:', mcs150FormData); // Debug log
+      // Properly type cast the form_data with validation
+      const formData = filing.form_data;
+      if (!formData || typeof formData !== 'object') {
+        throw new Error('Invalid form data format');
+      }
       
+      const mcs150FormData = formData as MCS150FormData;
       if (!mcs150FormData.reasonForFiling) {
         throw new Error('Missing reason for filing in form data');
       }
@@ -51,46 +88,59 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         filing.usdot_number
       );
     } else if (filing.filing_type === 'ucr') {
-      const ucrFormData = filing.form_data as UCRFormData;
+      // Type cast UCR form data with validation
+      const formData = filing.form_data;
+      if (!formData || typeof formData !== 'object') {
+        throw new Error('Invalid form data format');
+      }
+      
+      const ucrFormData = formData as UCRFormData;
+      
+      // Create USDOTData object with null checks
+      const usdotInfo = filing.usdot_info;
+      if (!usdotInfo) {
+        throw new Error('USDOT information not found');
+      }
+
       const usdotData: USDOTData = {
         usdotNumber: filing.usdot_number,
-        legalName: filing.usdot_info?.legal_name || '',
-        dbaName: filing.usdot_info?.dba_name,
-        operatingStatus: filing.usdot_info?.operating_status,
-        entityType: filing.usdot_info?.entity_type,
-        physicalAddress: filing.usdot_info?.physical_address,
-        physicalAddressStreet: filing.usdot_info?.api_physical_address_street,
-        physicalAddressCity: filing.usdot_info?.api_physical_address_city,
-        physicalAddressState: filing.usdot_info?.api_physical_address_state,
-        physicalAddressZip: filing.usdot_info?.api_physical_address_zip,
-        physicalAddressCountry: filing.usdot_info?.api_physical_address_country || 'USA',
-        mailingAddressStreet: filing.usdot_info?.api_mailing_address_street,
-        mailingAddressCity: filing.usdot_info?.api_mailing_address_city,
-        mailingAddressState: filing.usdot_info?.api_mailing_address_state,
-        mailingAddressZip: filing.usdot_info?.api_mailing_address_zip,
-        mailingAddressCountry: filing.usdot_info?.api_mailing_address_country || 'USA',
-        telephone: filing.usdot_info?.telephone,
-        powerUnits: filing.usdot_info?.power_units,
-        drivers: filing.usdot_info?.drivers,
-        busCount: filing.usdot_info?.bus_count,
-        limoCount: filing.usdot_info?.limo_count,
-        minibusCount: filing.usdot_info?.minibus_count,
-        motorcoachCount: filing.usdot_info?.motorcoach_count,
-        vanCount: filing.usdot_info?.van_count,
-        complaintCount: filing.usdot_info?.complaint_count,
-        outOfService: filing.usdot_info?.out_of_service || false,
-        outOfServiceDate: filing.usdot_info?.out_of_service_date || null,
-        mcNumber: filing.usdot_info?.mc_number,
-        mcs150FormDate: null, // These fields aren't in usdot_info table
+        legalName: usdotInfo.legal_name || '',
+        dbaName: usdotInfo.dba_name,
+        operatingStatus: usdotInfo.operating_status,
+        entityType: usdotInfo.entity_type,
+        physicalAddress: usdotInfo.physical_address,
+        physicalAddressStreet: usdotInfo.api_physical_address_street,
+        physicalAddressCity: usdotInfo.api_physical_address_city,
+        physicalAddressState: usdotInfo.api_physical_address_state,
+        physicalAddressZip: usdotInfo.api_physical_address_zip,
+        physicalAddressCountry: usdotInfo.api_physical_address_country || 'USA',
+        mailingAddressStreet: usdotInfo.api_mailing_address_street,
+        mailingAddressCity: usdotInfo.api_mailing_address_city,
+        mailingAddressState: usdotInfo.api_mailing_address_state,
+        mailingAddressZip: usdotInfo.api_mailing_address_zip,
+        mailingAddressCountry: usdotInfo.api_mailing_address_country || 'USA',
+        telephone: usdotInfo.telephone,
+        powerUnits: usdotInfo.power_units,
+        drivers: usdotInfo.drivers,
+        busCount: usdotInfo.bus_count,
+        limoCount: usdotInfo.limo_count,
+        minibusCount: usdotInfo.minibus_count,
+        motorcoachCount: usdotInfo.motorcoach_count,
+        vanCount: usdotInfo.van_count,
+        complaintCount: usdotInfo.complaint_count,
+        outOfService: usdotInfo.out_of_service || false,
+        outOfServiceDate: usdotInfo.out_of_service_date || null,
+        mcNumber: usdotInfo.mc_number,
+        mcs150FormDate: null,
         mcs150Date: null,
-        mcs150Year: filing.usdot_info?.mileage_year ? parseInt(filing.usdot_info.mileage_year) : undefined,
+        mcs150Year: usdotInfo.mileage_year ? parseInt(usdotInfo.mileage_year) : undefined,
         mcs150Mileage: 0,
         carrierOperation: '',
         cargoCarried: [],
         insuranceBIPD: 0,
         insuranceBond: 0,
         insuranceCargo: 0,
-        riskScore: filing.usdot_info?.basics_data?.risk_score || ''
+        riskScore: usdotInfo.basics_data?.risk_score || ''
       };
       
       await createUCRRecord(
