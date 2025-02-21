@@ -224,7 +224,7 @@ export type Database = {
           principal_address_state: string | null
           principal_address_street: string | null
           principal_address_zip: string | null
-          reason_for_filing: string
+          reason_for_filing: string | null
           signature_url: string | null
           transaction_id: string | null
           usdot_number: string
@@ -322,7 +322,7 @@ export type Database = {
           principal_address_state?: string | null
           principal_address_street?: string | null
           principal_address_zip?: string | null
-          reason_for_filing: string
+          reason_for_filing?: string | null
           signature_url?: string | null
           transaction_id?: string | null
           usdot_number: string
@@ -420,7 +420,7 @@ export type Database = {
           principal_address_state?: string | null
           principal_address_street?: string | null
           principal_address_zip?: string | null
-          reason_for_filing?: string
+          reason_for_filing?: string | null
           signature_url?: string | null
           transaction_id?: string | null
           usdot_number?: string
