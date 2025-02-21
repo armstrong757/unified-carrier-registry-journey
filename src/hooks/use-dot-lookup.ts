@@ -154,57 +154,61 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
           if (filingError) throw filingError;
 
-          // First try to get data from usdot_info table
-          const { data: usdotInfo, error: usdotInfoError } = await supabase
+          // Always make a fresh API call to get the latest data
+          console.log('Making API request for DOT:', trimmedDOT);
+          const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
+            body: { dotNumber: trimmedDOT },
+          });
+
+          if (error) {
+            console.error('Edge function error:', error);
+            throw error;
+          }
+
+          if (!data || !data.items || !data.items[0]) {
+            throw new Error('No data received from DOT lookup');
+          }
+
+          const transformedData = transformResponse(data.items[0]);
+
+          // Store or update the data in usdot_info table
+          const { error: upsertError } = await supabase
             .from('usdot_info')
-            .select('*')
-            .eq('usdot_number', trimmedDOT)
-            .maybeSingle();
+            .upsert({
+              usdot_number: trimmedDOT,
+              basics_data: data.items[0],
+              legal_name: transformedData.legalName,
+              dba_name: transformedData.dbaName,
+              operating_status: transformedData.operatingStatus,
+              entity_type: transformedData.entityType,
+              physical_address: transformedData.physicalAddress,
+              telephone: transformedData.telephone,
+              power_units: transformedData.powerUnits,
+              drivers: transformedData.drivers,
+              mcs150_last_update: transformedData.mcs150Date,
+              out_of_service: transformedData.outOfService,
+              out_of_service_date: transformedData.outOfServiceDate,
+              api_physical_address_street: transformedData.physicalAddressStreet,
+              api_physical_address_city: transformedData.physicalAddressCity,
+              api_physical_address_state: transformedData.physicalAddressState,
+              api_physical_address_zip: transformedData.physicalAddressZip,
+              api_physical_address_country: transformedData.physicalAddressCountry,
+              api_mailing_address_street: transformedData.mailingAddressStreet,
+              api_mailing_address_city: transformedData.mailingAddressCity,
+              api_mailing_address_state: transformedData.mailingAddressState,
+              api_mailing_address_zip: transformedData.mailingAddressZip,
+              api_mailing_address_country: transformedData.mailingAddressCountry,
+            });
+
+          if (upsertError) {
+            console.error('Error storing USDOT info:', upsertError);
+          }
 
           if (existingFiling) {
             console.log('Found existing filing:', existingFiling);
-            const usdotData = transformResponse(usdotInfo || existingFiling.form_data);
-            resolve({ usdotData, resumedFiling: existingFiling });
-            setIsLoading(false);
-            return;
-          }
-
-          // If no existing filing or usdot_info, fetch from API
-          if (!usdotInfo) {
-            console.log('Making new API request for DOT:', trimmedDOT);
-            const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
-              body: { dotNumber: trimmedDOT },
-            });
-
-            if (error) {
-              console.error('Edge function error:', error);
-              throw error;
-            }
-
-            if (!data || !data.items || !data.items[0]) {
-              throw new Error('No data received from DOT lookup');
-            }
-
-            const transformedData = transformResponse(data.items[0]);
-
-            // Store the data in usdot_info table
-            const { error: upsertError } = await supabase
-              .from('usdot_info')
-              .upsert({
-                usdot_number: trimmedDOT,
-                basics_data: data.items[0],
-                // ... additional fields
-              });
-
-            if (upsertError) {
-              console.error('Error storing USDOT info:', upsertError);
-            }
-
-            resolve({ usdotData: transformedData });
+            resolve({ usdotData: transformedData, resumedFiling: existingFiling });
           } else {
-            // Use existing USDOT info
-            console.log('Using existing USDOT info:', usdotInfo);
-            resolve({ usdotData: transformResponse(usdotInfo) });
+            resolve({ usdotData: transformedData });
           }
         } catch (error) {
           console.error('Error in DOT lookup:', error);
