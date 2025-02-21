@@ -13,6 +13,11 @@ interface USDOTInfoType {
   api_physical_address_state?: string;
   api_physical_address_zip?: string;
   api_physical_address_country?: string;
+  api_mailing_address_street?: string;
+  api_mailing_address_city?: string;
+  api_mailing_address_state?: string;
+  api_mailing_address_zip?: string;
+  api_mailing_address_country?: string;
   physical_address?: string;
 }
 
@@ -45,11 +50,15 @@ export const createMCS150Record = async (
   // Convert milesDriven from string to number, removing commas
   const milesDriven = parseInt(String(formData.operator?.milesDriven || '0').replace(/,/g, ''));
 
-  // Extract identifier type and value
+  // Extract and validate identifier information
   const identifierType = formData.operator?.identifierType;
   const identifierValue = formData.operator?.einSsn;
 
-  console.log('Processing identifier:', { identifierType, identifierValue });
+  console.log('Creating MCS-150 record with operator data:', {
+    identifierType,
+    identifierValue,
+    operatorData: formData.operator
+  });
 
   const mcs150Record = {
     filing_id: filingId,
@@ -60,9 +69,9 @@ export const createMCS150Record = async (
     operator_email: formData.operator?.email || '',
     operator_phone: formData.operator?.phone || '',
     operator_title: formData.operator?.title || '',
-    // Map SSN/EIN based on identifier type
-    operator_ssn: identifierType === 'ssn' ? identifierValue : '',
-    operator_ein: identifierType === 'ein' ? identifierValue : '',
+    // Map SSN/EIN based on identifier type with explicit validation
+    operator_ssn: identifierType === 'ssn' ? identifierValue || '' : '',
+    operator_ein: identifierType === 'ein' ? identifierValue || '' : '',
     operator_miles_driven: milesDriven,
     signature_url: attachments.signature,
     license_url: attachments.license,
@@ -70,12 +79,17 @@ export const createMCS150Record = async (
     reason_for_filing: formData.reasonForFiling || 'biennialUpdate',
     transaction_id: transactionId,
     
-    // Store original physical address data
-    principal_address_street: usdotInfo.api_physical_address_street || '',
-    principal_address_city: usdotInfo.api_physical_address_city || '',
-    principal_address_state: usdotInfo.api_physical_address_state || '',
-    principal_address_zip: usdotInfo.api_physical_address_zip || '',
-    principal_address_country: usdotInfo.api_physical_address_country || 'USA',
+    // Store API address data
+    api_physical_address_street: usdotInfo.api_physical_address_street || '',
+    api_physical_address_city: usdotInfo.api_physical_address_city || '',
+    api_physical_address_state: usdotInfo.api_physical_address_state || '',
+    api_physical_address_zip: usdotInfo.api_physical_address_zip || '',
+    api_physical_address_country: usdotInfo.api_physical_address_country || 'USA',
+    api_mailing_address_street: usdotInfo.api_mailing_address_street || '',
+    api_mailing_address_city: usdotInfo.api_mailing_address_city || '',
+    api_mailing_address_state: usdotInfo.api_mailing_address_state || '',
+    api_mailing_address_zip: usdotInfo.api_mailing_address_zip || '',
+    api_mailing_address_country: usdotInfo.api_mailing_address_country || 'USA',
 
     // Store form-submitted address data
     form_physical_address_street: formData.address_modified ? formData.principalAddress?.address || '' : '',
@@ -88,7 +102,7 @@ export const createMCS150Record = async (
     address_modified: formData.address_modified || false
   };
 
-  console.log('Creating MCS-150 record:', mcs150Record);
+  console.log('Final MCS-150 record being created:', mcs150Record);
 
   const { error: mcs150Error } = await supabase
     .from('mcs150_airtable_records')

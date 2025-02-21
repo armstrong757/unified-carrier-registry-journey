@@ -133,6 +133,16 @@ export type Database = {
       mcs150_airtable_records: {
         Row: {
           address_modified: boolean | null
+          api_mailing_address_city: string | null
+          api_mailing_address_country: string | null
+          api_mailing_address_state: string | null
+          api_mailing_address_street: string | null
+          api_mailing_address_zip: string | null
+          api_physical_address_city: string | null
+          api_physical_address_country: string | null
+          api_physical_address_state: string | null
+          api_physical_address_street: string | null
+          api_physical_address_zip: string | null
           cargo_agricultural: boolean | null
           cargo_beverages: boolean | null
           cargo_building_materials: boolean | null
@@ -219,11 +229,6 @@ export type Database = {
           payment_amount: number | null
           payment_method: string | null
           payment_status: string | null
-          principal_address_city: string | null
-          principal_address_country: string | null
-          principal_address_state: string | null
-          principal_address_street: string | null
-          principal_address_zip: string | null
           reason_for_filing: string | null
           signature_url: string | null
           transaction_id: string | null
@@ -231,6 +236,16 @@ export type Database = {
         }
         Insert: {
           address_modified?: boolean | null
+          api_mailing_address_city?: string | null
+          api_mailing_address_country?: string | null
+          api_mailing_address_state?: string | null
+          api_mailing_address_street?: string | null
+          api_mailing_address_zip?: string | null
+          api_physical_address_city?: string | null
+          api_physical_address_country?: string | null
+          api_physical_address_state?: string | null
+          api_physical_address_street?: string | null
+          api_physical_address_zip?: string | null
           cargo_agricultural?: boolean | null
           cargo_beverages?: boolean | null
           cargo_building_materials?: boolean | null
@@ -317,11 +332,6 @@ export type Database = {
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
-          principal_address_city?: string | null
-          principal_address_country?: string | null
-          principal_address_state?: string | null
-          principal_address_street?: string | null
-          principal_address_zip?: string | null
           reason_for_filing?: string | null
           signature_url?: string | null
           transaction_id?: string | null
@@ -329,6 +339,16 @@ export type Database = {
         }
         Update: {
           address_modified?: boolean | null
+          api_mailing_address_city?: string | null
+          api_mailing_address_country?: string | null
+          api_mailing_address_state?: string | null
+          api_mailing_address_street?: string | null
+          api_mailing_address_zip?: string | null
+          api_physical_address_city?: string | null
+          api_physical_address_country?: string | null
+          api_physical_address_state?: string | null
+          api_physical_address_street?: string | null
+          api_physical_address_zip?: string | null
           cargo_agricultural?: boolean | null
           cargo_beverages?: boolean | null
           cargo_building_materials?: boolean | null
@@ -415,11 +435,6 @@ export type Database = {
           payment_amount?: number | null
           payment_method?: string | null
           payment_status?: string | null
-          principal_address_city?: string | null
-          principal_address_country?: string | null
-          principal_address_state?: string | null
-          principal_address_street?: string | null
-          principal_address_zip?: string | null
           reason_for_filing?: string | null
           signature_url?: string | null
           transaction_id?: string | null
