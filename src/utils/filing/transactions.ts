@@ -70,8 +70,8 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
-      // Properly type cast the form_data with validation
-      const formData = filing.form_data;
+      // First cast to unknown, then to MCS150FormData
+      const formData = filing.form_data as unknown;
       if (!formData || typeof formData !== 'object') {
         throw new Error('Invalid form data format');
       }
@@ -89,7 +89,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       );
     } else if (filing.filing_type === 'ucr') {
       // Type cast UCR form data with validation
-      const formData = filing.form_data;
+      const formData = filing.form_data as unknown;
       if (!formData || typeof formData !== 'object') {
         throw new Error('Invalid form data format');
       }
@@ -101,6 +101,9 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       if (!usdotInfo) {
         throw new Error('USDOT information not found');
       }
+
+      // Safe type casting for basics_data
+      const basicsData = usdotInfo.basics_data as { risk_score?: string } | null;
 
       const usdotData: USDOTData = {
         usdotNumber: filing.usdot_number,
@@ -140,7 +143,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         insuranceBIPD: 0,
         insuranceBond: 0,
         insuranceCargo: 0,
-        riskScore: usdotInfo.basics_data?.risk_score || ''
+        riskScore: basicsData?.risk_score || ''
       };
       
       await createUCRRecord(
