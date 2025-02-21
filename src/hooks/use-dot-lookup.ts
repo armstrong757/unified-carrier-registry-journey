@@ -124,9 +124,9 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           // Transform to USDOTData format
           const transformedData = transformToUSDOTData(mappedData);
 
-          // Ensure numeric values are properly typed
-          const powerUnits = mappedData.power_units ? Number(mappedData.power_units) : null;
-          const drivers = mappedData.drivers ? Number(mappedData.drivers) : null;
+          // Ensure numeric values are kept as strings
+          const powerUnits = mappedData.power_units ? String(mappedData.power_units) : null;
+          const drivers = mappedData.drivers ? String(mappedData.drivers) : null;
 
           // Store or update the data in usdot_info table
           const usdotInfo: USDOTInfo = {
