@@ -1,5 +1,5 @@
 
-import { MCS150FormData, UCRFormData } from "@/types/filing";
+import { MCS150FormData, UCRFormData, USDOTData } from "@/types/filing";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { createMCS150Record } from "./services/mcs150-records";
@@ -36,6 +36,48 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       console.error('Error fetching USDOT info:', usdotError);
       // Don't throw here, we can proceed without USDOT info
     }
+
+    // Transform USDOT info to match USDOTData type
+    const transformedUsdotInfo: USDOTData | undefined = usdotInfo ? {
+      usdotNumber: usdotInfo.usdot_number,
+      legalName: usdotInfo.legal_name || '',
+      dbaName: usdotInfo.dba_name,
+      operatingStatus: usdotInfo.operating_status,
+      entityType: usdotInfo.entity_type,
+      physicalAddress: usdotInfo.physical_address,
+      physicalAddressStreet: usdotInfo.api_physical_address_street,
+      physicalAddressCity: usdotInfo.api_physical_address_city,
+      physicalAddressState: usdotInfo.api_physical_address_state,
+      physicalAddressZip: usdotInfo.api_physical_address_zip,
+      physicalAddressCountry: usdotInfo.api_physical_address_country,
+      mailingAddressStreet: usdotInfo.api_mailing_address_street,
+      mailingAddressCity: usdotInfo.api_mailing_address_city,
+      mailingAddressState: usdotInfo.api_mailing_address_state,
+      mailingAddressZip: usdotInfo.api_mailing_address_zip,
+      mailingAddressCountry: usdotInfo.api_mailing_address_country,
+      telephone: usdotInfo.telephone,
+      powerUnits: usdotInfo.power_units,
+      drivers: usdotInfo.drivers,
+      busCount: usdotInfo.bus_count,
+      limoCount: usdotInfo.limo_count,
+      minibusCount: usdotInfo.minibus_count,
+      motorcoachCount: usdotInfo.motorcoach_count,
+      vanCount: usdotInfo.van_count,
+      complaintCount: usdotInfo.complaint_count,
+      outOfService: usdotInfo.out_of_service,
+      outOfServiceDate: usdotInfo.out_of_service_date,
+      mcNumber: usdotInfo.mc_number,
+      mcs150FormDate: usdotInfo.mcs150_last_update,
+      mcs150Date: usdotInfo.mcs150_last_update,
+      mcs150Year: usdotInfo.mcs150_year,
+      mcs150Mileage: usdotInfo.mileage_year ? parseInt(usdotInfo.mileage_year) : undefined,
+      carrierOperation: '',
+      cargoCarried: [],
+      insuranceBIPD: 0,
+      insuranceBond: 0,
+      insuranceCargo: 0,
+      riskScore: usdotInfo.risk_score || ''
+    } : undefined;
 
     // For UCR filings, calculate the fee based on total vehicles
     let transactionAmount = amount;
@@ -84,7 +126,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         filingId,
         ucrFormData,
         filing.usdot_number,
-        usdotInfo || undefined // Pass USDOT info if available, otherwise undefined
+        transformedUsdotInfo // Pass the transformed USDOT info
       );
     }
 
