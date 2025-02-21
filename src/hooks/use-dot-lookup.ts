@@ -36,8 +36,8 @@ function parseAddress(addressString: string) {
 function transformResponse(data: any): USDOTData {
   console.log('Transforming API response:', data);
   
-  // Check if we're getting the basics_data from usdot_info table
-  const basicData = data.basics_data || data;
+  // If basics_data is empty, use the root data
+  const basicData = (data.basics_data && Object.keys(data.basics_data).length > 0) ? data.basics_data : data;
   
   // Parse physical address
   const physicalAddress = parseAddress(basicData.physical_address);
@@ -54,28 +54,28 @@ function transformResponse(data: any): USDOTData {
 
   // Use parsed addresses or defaults
   const physical = physicalAddress || {
-    street: basicData.physical_address_street || basicData.api_physical_address_street || defaultAddress.street,
-    city: basicData.physical_address_city || basicData.api_physical_address_city || defaultAddress.city,
-    state: basicData.physical_address_state || basicData.api_physical_address_state || defaultAddress.state,
-    zip: basicData.physical_address_zip_code || basicData.api_physical_address_zip || defaultAddress.zip,
-    country: basicData.physical_address_country || basicData.api_physical_address_country || defaultAddress.country
+    street: data.api_physical_address_street || basicData.physical_address_street || defaultAddress.street,
+    city: data.api_physical_address_city || basicData.physical_address_city || defaultAddress.city,
+    state: data.api_physical_address_state || basicData.physical_address_state || defaultAddress.state,
+    zip: data.api_physical_address_zip || basicData.physical_address_zip_code || defaultAddress.zip,
+    country: data.api_physical_address_country || basicData.physical_address_country || defaultAddress.country
   };
 
   const mailing = mailingAddress || {
-    street: basicData.mailing_address_street || basicData.api_mailing_address_street || physical.street,
-    city: basicData.mailing_address_city || basicData.api_mailing_address_city || physical.city,
-    state: basicData.mailing_address_state || basicData.api_mailing_address_state || physical.state,
-    zip: basicData.mailing_address_zip_code || basicData.api_mailing_address_zip || physical.zip,
-    country: basicData.mailing_address_country || basicData.api_mailing_address_country || physical.country
+    street: data.api_mailing_address_street || basicData.mailing_address_street || physical.street,
+    city: data.api_mailing_address_city || basicData.mailing_address_city || physical.city,
+    state: data.api_mailing_address_state || basicData.mailing_address_state || physical.state,
+    zip: data.api_mailing_address_zip || basicData.mailing_address_zip_code || physical.zip,
+    country: data.api_mailing_address_country || basicData.mailing_address_country || physical.country
   };
 
   const transformed: USDOTData = {
-    usdotNumber: basicData.dot_number || basicData.usdot_number || data.usdot_number || '',
-    legalName: basicData.legal_name || data.legal_name || '',
-    dbaName: basicData.dba_name || data.dba_name || '',
-    operatingStatus: basicData.usdot_status || data.operating_status || 'NOT AUTHORIZED',
-    entityType: basicData.entity_type_desc || data.entity_type || '',
-    physicalAddress: basicData.physical_address || data.physical_address || '',
+    usdotNumber: data.usdot_number || basicData.dot_number || '',
+    legalName: data.legal_name || basicData.legal_name || '',
+    dbaName: data.dba_name || basicData.dba_name || '',
+    operatingStatus: data.operating_status || basicData.usdot_status || 'NOT AUTHORIZED',
+    entityType: data.entity_type || basicData.entity_type_desc || '',
+    physicalAddress: data.physical_address || basicData.physical_address || '',
     physicalAddressStreet: physical.street,
     physicalAddressCity: physical.city,
     physicalAddressState: physical.state,
@@ -86,28 +86,28 @@ function transformResponse(data: any): USDOTData {
     mailingAddressState: mailing.state,
     mailingAddressZip: mailing.zip,
     mailingAddressCountry: mailing.country,
-    telephone: basicData.telephone_number || data.telephone || '',
-    powerUnits: Number(basicData.total_power_units || data.power_units) || 0,
-    drivers: Number(basicData.total_drivers || data.drivers) || 0,
+    telephone: data.telephone || basicData.telephone_number || '',
+    powerUnits: Number(data.power_units || basicData.total_power_units) || 0,
+    drivers: Number(data.drivers || basicData.total_drivers) || 0,
     insuranceBIPD: Number(basicData.insurance_bipd_on_file) || 0,
     insuranceBond: Number(basicData.insurance_bond_on_file) || 0,
     insuranceCargo: Number(basicData.insurance_cargo_on_file) || 0,
-    riskScore: basicData.risk_score || data.risk_score || 'Unknown',
-    outOfServiceDate: basicData.out_of_service_date || data.out_of_service_date || null,
-    mcs150FormDate: basicData.mcs150_form_date || data.mcs150_last_update || null,
-    mcs150Date: basicData.mcs150_date || data.mcs150_last_update || null,
-    mcs150Year: Number(basicData.mcs150_year) || 0,
-    mcs150Mileage: Number(basicData.mcs150_mileage) || 0,
-    carrierOperation: basicData.carrier_operation || '',
-    cargoCarried: basicData.cargo_carried || [],
-    busCount: Number(basicData.total_buses || data.bus_count) || 0,
-    limoCount: Number(basicData.total_limousines || data.limo_count) || 0,
-    minibusCount: Number(basicData.total_minibuses || data.minibus_count) || 0,
-    motorcoachCount: Number(basicData.total_motorcoaches || data.motorcoach_count) || 0,
-    vanCount: Number(basicData.total_vans || data.van_count) || 0,
-    complaintCount: Number(basicData.complaint_count) || 0,
-    outOfService: Boolean(basicData.out_of_service_flag || data.out_of_service),
-    mcNumber: basicData.docket || data.mc_number || ''
+    riskScore: data.risk_score || basicData.risk_score || 'Unknown',
+    outOfServiceDate: data.out_of_service_date || basicData.out_of_service_date || null,
+    mcs150FormDate: data.mcs150_last_update || basicData.mcs150_form_date || null,
+    mcs150Date: data.mcs150_last_update || basicData.mcs150_date || null,
+    mcs150Year: Number(data.mcs150_year || basicData.mcs150_year) || 0,
+    mcs150Mileage: Number(data.mcs150_mileage || basicData.mcs150_mileage) || 0,
+    carrierOperation: data.carrier_operation || basicData.carrier_operation || '',
+    cargoCarried: data.cargo_carried || basicData.cargo_carried || [],
+    busCount: Number(data.bus_count || basicData.total_buses) || 0,
+    limoCount: Number(data.limo_count || basicData.total_limousines) || 0,
+    minibusCount: Number(data.minibus_count || basicData.total_minibuses) || 0,
+    motorcoachCount: Number(data.motorcoach_count || basicData.total_motorcoaches) || 0,
+    vanCount: Number(data.van_count || basicData.total_vans) || 0,
+    complaintCount: Number(data.complaint_count || basicData.complaint_count) || 0,
+    outOfService: Boolean(data.out_of_service || basicData.out_of_service_flag),
+    mcNumber: data.mc_number || basicData.docket || ''
   };
 
   console.log('Transformed USDOT data:', transformed);
