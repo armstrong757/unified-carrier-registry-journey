@@ -36,11 +36,11 @@ export const createUCRRecord = async (
     classification_freight_forwarder: formData.classifications?.freightForwarder || false,
     classification_broker: formData.classifications?.broker || false,
     classification_leasing_company: formData.classifications?.leasingCompany || false,
-    physical_address_street: '',  // Required by schema
-    physical_address_city: '',    // Required by schema
-    physical_address_state: '',   // Required by schema
-    physical_address_zip: '',     // Required by schema
-    physical_address_country: 'USA', // Required by schema
+    api_physical_address_street: '',  // Updated column name
+    api_physical_address_city: '',    // Updated column name
+    api_physical_address_state: '',   // Updated column name
+    api_physical_address_zip: '',     // Updated column name
+    api_physical_address_country: 'USA', // Updated column name
     created_at: new Date().toISOString()
   };
 

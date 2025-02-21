@@ -470,6 +470,16 @@ export type Database = {
       }
       ucr_airtable_records: {
         Row: {
+          api_mailing_address_city: string | null
+          api_mailing_address_country: string | null
+          api_mailing_address_state: string | null
+          api_mailing_address_street: string | null
+          api_mailing_address_zip: string | null
+          api_physical_address_city: string | null
+          api_physical_address_country: string | null
+          api_physical_address_state: string | null
+          api_physical_address_street: string | null
+          api_physical_address_zip: string | null
           classification_broker: boolean | null
           classification_freight_forwarder: boolean | null
           classification_leasing_company: boolean | null
@@ -481,18 +491,8 @@ export type Database = {
           filing_type: string
           full_name: string | null
           id: string
-          mailing_address_city: string | null
-          mailing_address_country: string | null
-          mailing_address_state: string | null
-          mailing_address_street: string | null
-          mailing_address_zip: string | null
           needs_vehicle_changes: string | null
           phone: string | null
-          physical_address_city: string | null
-          physical_address_country: string | null
-          physical_address_state: string | null
-          physical_address_street: string | null
-          physical_address_zip: string | null
           registration_year: string | null
           usdot_number: string
           vehicles_add_vehicles: number | null
@@ -503,6 +503,16 @@ export type Database = {
           vehicles_total: number | null
         }
         Insert: {
+          api_mailing_address_city?: string | null
+          api_mailing_address_country?: string | null
+          api_mailing_address_state?: string | null
+          api_mailing_address_street?: string | null
+          api_mailing_address_zip?: string | null
+          api_physical_address_city?: string | null
+          api_physical_address_country?: string | null
+          api_physical_address_state?: string | null
+          api_physical_address_street?: string | null
+          api_physical_address_zip?: string | null
           classification_broker?: boolean | null
           classification_freight_forwarder?: boolean | null
           classification_leasing_company?: boolean | null
@@ -514,18 +524,8 @@ export type Database = {
           filing_type: string
           full_name?: string | null
           id?: string
-          mailing_address_city?: string | null
-          mailing_address_country?: string | null
-          mailing_address_state?: string | null
-          mailing_address_street?: string | null
-          mailing_address_zip?: string | null
           needs_vehicle_changes?: string | null
           phone?: string | null
-          physical_address_city?: string | null
-          physical_address_country?: string | null
-          physical_address_state?: string | null
-          physical_address_street?: string | null
-          physical_address_zip?: string | null
           registration_year?: string | null
           usdot_number: string
           vehicles_add_vehicles?: number | null
@@ -536,6 +536,16 @@ export type Database = {
           vehicles_total?: number | null
         }
         Update: {
+          api_mailing_address_city?: string | null
+          api_mailing_address_country?: string | null
+          api_mailing_address_state?: string | null
+          api_mailing_address_street?: string | null
+          api_mailing_address_zip?: string | null
+          api_physical_address_city?: string | null
+          api_physical_address_country?: string | null
+          api_physical_address_state?: string | null
+          api_physical_address_street?: string | null
+          api_physical_address_zip?: string | null
           classification_broker?: boolean | null
           classification_freight_forwarder?: boolean | null
           classification_leasing_company?: boolean | null
@@ -547,18 +557,8 @@ export type Database = {
           filing_type?: string
           full_name?: string | null
           id?: string
-          mailing_address_city?: string | null
-          mailing_address_country?: string | null
-          mailing_address_state?: string | null
-          mailing_address_street?: string | null
-          mailing_address_zip?: string | null
           needs_vehicle_changes?: string | null
           phone?: string | null
-          physical_address_city?: string | null
-          physical_address_country?: string | null
-          physical_address_state?: string | null
-          physical_address_street?: string | null
-          physical_address_zip?: string | null
           registration_year?: string | null
           usdot_number?: string
           vehicles_add_vehicles?: number | null
@@ -572,6 +572,16 @@ export type Database = {
       }
       usdot_info: {
         Row: {
+          api_mailing_address_city: string | null
+          api_mailing_address_country: string | null
+          api_mailing_address_state: string | null
+          api_mailing_address_street: string | null
+          api_mailing_address_zip: string | null
+          api_physical_address_city: string | null
+          api_physical_address_country: string | null
+          api_physical_address_state: string | null
+          api_physical_address_street: string | null
+          api_physical_address_zip: string | null
           basics_data: Json | null
           bus_count: number | null
           complaint_count: number | null
@@ -583,11 +593,6 @@ export type Database = {
           id: string
           legal_name: string | null
           limo_count: number | null
-          mailing_address_city: string | null
-          mailing_address_country: string | null
-          mailing_address_state: string | null
-          mailing_address_street: string | null
-          mailing_address_zip: string | null
           mc_number: string | null
           mcs150_last_update: string | null
           mileage_year: string | null
@@ -597,11 +602,6 @@ export type Database = {
           out_of_service: boolean | null
           out_of_service_date: string | null
           physical_address: string | null
-          physical_address_city: string | null
-          physical_address_country: string | null
-          physical_address_state: string | null
-          physical_address_street: string | null
-          physical_address_zip: string | null
           power_units: number | null
           telephone: string | null
           updated_at: string | null
@@ -609,6 +609,16 @@ export type Database = {
           van_count: number | null
         }
         Insert: {
+          api_mailing_address_city?: string | null
+          api_mailing_address_country?: string | null
+          api_mailing_address_state?: string | null
+          api_mailing_address_street?: string | null
+          api_mailing_address_zip?: string | null
+          api_physical_address_city?: string | null
+          api_physical_address_country?: string | null
+          api_physical_address_state?: string | null
+          api_physical_address_street?: string | null
+          api_physical_address_zip?: string | null
           basics_data?: Json | null
           bus_count?: number | null
           complaint_count?: number | null
@@ -620,11 +630,6 @@ export type Database = {
           id?: string
           legal_name?: string | null
           limo_count?: number | null
-          mailing_address_city?: string | null
-          mailing_address_country?: string | null
-          mailing_address_state?: string | null
-          mailing_address_street?: string | null
-          mailing_address_zip?: string | null
           mc_number?: string | null
           mcs150_last_update?: string | null
           mileage_year?: string | null
@@ -634,11 +639,6 @@ export type Database = {
           out_of_service?: boolean | null
           out_of_service_date?: string | null
           physical_address?: string | null
-          physical_address_city?: string | null
-          physical_address_country?: string | null
-          physical_address_state?: string | null
-          physical_address_street?: string | null
-          physical_address_zip?: string | null
           power_units?: number | null
           telephone?: string | null
           updated_at?: string | null
@@ -646,6 +646,16 @@ export type Database = {
           van_count?: number | null
         }
         Update: {
+          api_mailing_address_city?: string | null
+          api_mailing_address_country?: string | null
+          api_mailing_address_state?: string | null
+          api_mailing_address_street?: string | null
+          api_mailing_address_zip?: string | null
+          api_physical_address_city?: string | null
+          api_physical_address_country?: string | null
+          api_physical_address_state?: string | null
+          api_physical_address_street?: string | null
+          api_physical_address_zip?: string | null
           basics_data?: Json | null
           bus_count?: number | null
           complaint_count?: number | null
@@ -657,11 +667,6 @@ export type Database = {
           id?: string
           legal_name?: string | null
           limo_count?: number | null
-          mailing_address_city?: string | null
-          mailing_address_country?: string | null
-          mailing_address_state?: string | null
-          mailing_address_street?: string | null
-          mailing_address_zip?: string | null
           mc_number?: string | null
           mcs150_last_update?: string | null
           mileage_year?: string | null
@@ -671,11 +676,6 @@ export type Database = {
           out_of_service?: boolean | null
           out_of_service_date?: string | null
           physical_address?: string | null
-          physical_address_city?: string | null
-          physical_address_country?: string | null
-          physical_address_state?: string | null
-          physical_address_street?: string | null
-          physical_address_zip?: string | null
           power_units?: number | null
           telephone?: string | null
           updated_at?: string | null

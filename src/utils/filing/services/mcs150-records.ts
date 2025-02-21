@@ -35,6 +35,20 @@ export const createMCS150Record = async (
     signature_url: attachments.signature,
     license_url: attachments.license,
     created_at: new Date().toISOString(),
+    
+    // Address fields with new naming convention
+    api_physical_address_street: formData.principalAddress?.address || '',
+    api_physical_address_city: formData.principalAddress?.city || '',
+    api_physical_address_state: formData.principalAddress?.state || '',
+    api_physical_address_zip: formData.principalAddress?.zip || '',
+    api_physical_address_country: formData.principalAddress?.country || 'USA',
+    api_mailing_address_street: formData.mailingAddress?.address || '',
+    api_mailing_address_city: formData.mailingAddress?.city || '',
+    api_mailing_address_state: formData.mailingAddress?.state || '',
+    api_mailing_address_zip: formData.mailingAddress?.zip || '',
+    api_mailing_address_country: formData.mailingAddress?.country || 'USA',
+    address_modified: formData.address_modified || false,
+
     // Add required but unused fields with default values
     cargo_agricultural: false,
     cargo_beverages: false,
