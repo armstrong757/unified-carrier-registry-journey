@@ -6,8 +6,36 @@ import { useToast } from "@/components/ui/use-toast";
 const DEBOUNCE_TIMEOUT = 300;
 let debounceTimer: NodeJS.Timeout;
 
+function parseAddress(addressString: string) {
+  // Expected format: "street, city, state zipcode"
+  const parts = addressString.split(',').map(part => part.trim());
+  
+  if (parts.length >= 3) {
+    const street = parts[0];
+    const city = parts[1];
+    // Last part contains state and zip
+    const stateZip = parts[parts.length - 1].split(' ');
+    const state = stateZip[0];
+    const zip = stateZip[1];
+
+    return {
+      street,
+      city,
+      state,
+      zip,
+      country: 'USA'
+    };
+  }
+  
+  return null;
+}
+
 function transformResponse(data: any): USDOTData {
   console.log('Transforming API response:', data);
+  
+  // Parse physical address
+  const physicalAddress = parseAddress(data.physical_address || '');
+  const mailingAddress = parseAddress(data.mailing_address || data.physical_address || '');
   
   const transformed: USDOTData = {
     usdotNumber: data.dot_number || '',
@@ -15,12 +43,17 @@ function transformResponse(data: any): USDOTData {
     dbaName: data.dba_name || '',
     operatingStatus: data.usdot_status || 'NOT AUTHORIZED',
     entityType: data.entity_type_desc || '',
-    physicalAddress: [
-      data.physical_address_street,
-      data.physical_address_city,
-      data.physical_address_state,
-      data.physical_address_zip_code
-    ].filter(Boolean).join(', ') || '',
+    physicalAddress: data.physical_address || '',
+    physicalAddressStreet: physicalAddress?.street || '',
+    physicalAddressCity: physicalAddress?.city || '',
+    physicalAddressState: physicalAddress?.state || '',
+    physicalAddressZip: physicalAddress?.zip || '',
+    physicalAddressCountry: physicalAddress?.country || 'USA',
+    mailingAddressStreet: mailingAddress?.street || '',
+    mailingAddressCity: mailingAddress?.city || '',
+    mailingAddressState: mailingAddress?.state || '',
+    mailingAddressZip: mailingAddress?.zip || '',
+    mailingAddressCountry: mailingAddress?.country || 'USA',
     telephone: data.telephone_number || '',
     powerUnits: Number(data.total_power_units) || 0,
     drivers: Number(data.total_drivers) || 0,
@@ -113,6 +146,49 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           }
 
           const transformedData = transformResponse(data.items[0]);
+
+          // Store the address data in usdot_info table
+          const { error: upsertError } = await supabase
+            .from('usdot_info')
+            .upsert({
+              usdot_number: trimmedDOT,
+              physical_address_street: transformedData.physicalAddressStreet,
+              physical_address_city: transformedData.physicalAddressCity,
+              physical_address_state: transformedData.physicalAddressState,
+              physical_address_zip: transformedData.physicalAddressZip,
+              physical_address_country: transformedData.physicalAddressCountry,
+              mailing_address_street: transformedData.mailingAddressStreet,
+              mailing_address_city: transformedData.mailingAddressCity,
+              mailing_address_state: transformedData.mailingAddressState,
+              mailing_address_zip: transformedData.mailingAddressZip,
+              mailing_address_country: transformedData.mailingAddressCountry,
+              basics_data: data.items[0],
+              bus_count: Number(data.items[0].total_buses) || 0,
+              complaint_count: Number(data.items[0].complaint_count) || 0,
+              dba_name: data.items[0].dba_name || '',
+              drivers: Number(data.items[0].total_drivers) || 0,
+              ein: data.items[0].ein || '',
+              entity_type: data.items[0].entity_type_desc || '',
+              legal_name: data.items[0].legal_name || '',
+              limo_count: Number(data.items[0].total_limousines) || 0,
+              mc_number: data.items[0].docket || '',
+              mcs150_last_update: data.items[0].mcs150_form_date || null,
+              mileage_year: `${Number(data.items[0].mcs150_mileage) || 0} (${Number(data.items[0].mcs150_year) || 0})`,
+              minibus_count: Number(data.items[0].total_minibuses) || 0,
+              motorcoach_count: Number(data.items[0].total_motorcoaches) || 0,
+              operating_status: data.items[0].usdot_status || 'NOT AUTHORIZED',
+              out_of_service: data.items[0].out_of_service_flag || false,
+              out_of_service_date: data.items[0].out_of_service_date || null,
+              physical_address: data.items[0].physical_address || '',
+              power_units: Number(data.items[0].total_power_units) || 0,
+              telephone: data.items[0].telephone_number || '',
+              van_count: Number(data.items[0].total_vans) || 0,
+            });
+
+          if (upsertError) {
+            console.error('Error storing address data:', upsertError);
+          }
+
           resolve({ usdotData: transformedData });
 
         } catch (error) {

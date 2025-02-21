@@ -1,3 +1,4 @@
+
 export type FilingType = 'ucr' | 'mcs150';
 
 export interface MCS150FormData {
@@ -38,10 +39,16 @@ export interface MCS150FormData {
   };
   companyIdentifierType?: 'ein' | 'ssn';
   companyIdentifier?: string;
-  // Company Information fields
   companyName?: string;
   businessPhone?: string;
   principalAddress?: {
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    country?: string;
+  };
+  mailingAddress?: {
     address?: string;
     city?: string;
     state?: string;
@@ -79,6 +86,16 @@ export interface USDOTData {
   operatingStatus?: string;
   entityType?: string;
   physicalAddress?: string;
+  physicalAddressStreet?: string;
+  physicalAddressCity?: string;
+  physicalAddressState?: string;
+  physicalAddressZip?: string;
+  physicalAddressCountry?: string;
+  mailingAddressStreet?: string;
+  mailingAddressCity?: string;
+  mailingAddressState?: string;
+  mailingAddressZip?: string;
+  mailingAddressCountry?: string;
   telephone?: string;
   powerUnits?: number;
   drivers?: number;
