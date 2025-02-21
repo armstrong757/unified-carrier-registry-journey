@@ -15,6 +15,11 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
     });
   };
 
+  // Ensure we have a default value for reasonForFiling
+  if (!formData.reasonForFiling) {
+    updateReasonForFiling('biennialUpdate');
+  }
+
   return (
     <div className="space-y-8 animate-fadeIn">
       <h2 className="text-2xl font-bold text-primary">Reason For Filing</h2>
@@ -24,31 +29,32 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           Select your reason for filing <span className="text-red-500">*</span>
         </Label>
         <RadioGroup
-          value={formData.reasonForFiling}
+          defaultValue="biennialUpdate"
+          value={formData.reasonForFiling || 'biennialUpdate'}
           onValueChange={updateReasonForFiling}
           className="space-y-1.5"
         >
           <div className="flex items-start space-x-2">
             <RadioGroupItem value="biennialUpdate" id="biennialUpdate" className="mt-0.5" />
-            <Label htmlFor="biennialUpdate" className="text-sm">
+            <Label htmlFor="biennialUpdate" className="text-sm font-normal cursor-pointer">
               Biennial Update or Changes
             </Label>
           </div>
           <div className="flex items-start space-x-2">
             <RadioGroupItem value="reactivate" id="reactivate" className="mt-0.5" />
-            <Label htmlFor="reactivate" className="text-sm">
+            <Label htmlFor="reactivate" className="text-sm font-normal cursor-pointer">
               Reactivate
             </Label>
           </div>
           <div className="flex items-start space-x-2">
             <RadioGroupItem value="reapplication" id="reapplication" className="mt-0.5" />
-            <Label htmlFor="reapplication" className="text-sm">
+            <Label htmlFor="reapplication" className="text-sm font-normal cursor-pointer">
               Reapplication (after revocation of new entrant)
             </Label>
           </div>
           <div className="flex items-start space-x-2">
             <RadioGroupItem value="outOfBusiness" id="outOfBusiness" className="mt-0.5" />
-            <Label htmlFor="outOfBusiness" className="text-sm">
+            <Label htmlFor="outOfBusiness" className="text-sm font-normal cursor-pointer">
               Out of Business Notification
             </Label>
           </div>
