@@ -39,16 +39,17 @@ export const createUCRRecord = async (
     classification_freight_forwarder: formData.classifications?.freightForwarder || false,
     classification_broker: formData.classifications?.broker || false,
     classification_leasing_company: formData.classifications?.leasingCompany || false,
-    // Include address data from USDOT info
-    api_physical_address_street: usdotData.physicalAddressStreet,
-    api_physical_address_city: usdotData.physicalAddressCity,
-    api_physical_address_state: usdotData.physicalAddressState,
-    api_physical_address_zip: usdotData.physicalAddressZip,
-    api_physical_address_country: usdotData.physicalAddressCountry,
-    api_mailing_address_street: usdotData.mailingAddressStreet || usdotData.physicalAddressStreet,
-    api_mailing_address_city: usdotData.mailingAddressCity || usdotData.physicalAddressCity,
-    api_mailing_address_state: usdotData.mailingAddressState || usdotData.physicalAddressState,
-    api_mailing_address_zip: usdotData.mailingAddressZip || usdotData.physicalAddressZip,
+    
+    // Include address data from USDOT info with defaults
+    api_physical_address_street: usdotData.physicalAddressStreet || '',
+    api_physical_address_city: usdotData.physicalAddressCity || '',
+    api_physical_address_state: usdotData.physicalAddressState || '',
+    api_physical_address_zip: usdotData.physicalAddressZip || '',
+    api_physical_address_country: usdotData.physicalAddressCountry || 'USA',
+    api_mailing_address_street: usdotData.mailingAddressStreet || usdotData.physicalAddressStreet || '',
+    api_mailing_address_city: usdotData.mailingAddressCity || usdotData.physicalAddressCity || '',
+    api_mailing_address_state: usdotData.mailingAddressState || usdotData.physicalAddressState || '',
+    api_mailing_address_zip: usdotData.mailingAddressZip || usdotData.physicalAddressZip || '',
     api_mailing_address_country: usdotData.mailingAddressCountry || 'USA',
     created_at: new Date().toISOString()
   };
@@ -69,15 +70,15 @@ export const createUCRRecord = async (
     .from('usdot_info')
     .upsert({
       usdot_number: usdotNumber,
-      api_physical_address_street: usdotData.physicalAddressStreet,
-      api_physical_address_city: usdotData.physicalAddressCity,
-      api_physical_address_state: usdotData.physicalAddressState,
-      api_physical_address_zip: usdotData.physicalAddressZip,
-      api_physical_address_country: usdotData.physicalAddressCountry,
-      api_mailing_address_street: usdotData.mailingAddressStreet || usdotData.physicalAddressStreet,
-      api_mailing_address_city: usdotData.mailingAddressCity || usdotData.physicalAddressCity,
-      api_mailing_address_state: usdotData.mailingAddressState || usdotData.physicalAddressState,
-      api_mailing_address_zip: usdotData.mailingAddressZip || usdotData.physicalAddressZip,
+      api_physical_address_street: usdotData.physicalAddressStreet || '',
+      api_physical_address_city: usdotData.physicalAddressCity || '',
+      api_physical_address_state: usdotData.physicalAddressState || '',
+      api_physical_address_zip: usdotData.physicalAddressZip || '',
+      api_physical_address_country: usdotData.physicalAddressCountry || 'USA',
+      api_mailing_address_street: usdotData.mailingAddressStreet || usdotData.physicalAddressStreet || '',
+      api_mailing_address_city: usdotData.mailingAddressCity || usdotData.physicalAddressCity || '',
+      api_mailing_address_state: usdotData.mailingAddressState || usdotData.physicalAddressState || '',
+      api_mailing_address_zip: usdotData.mailingAddressZip || usdotData.physicalAddressZip || '',
       api_mailing_address_country: usdotData.mailingAddressCountry || 'USA',
       updated_at: new Date().toISOString()
     }, {
@@ -89,3 +90,4 @@ export const createUCRRecord = async (
     // Don't throw here as the UCR record was created successfully
   }
 };
+

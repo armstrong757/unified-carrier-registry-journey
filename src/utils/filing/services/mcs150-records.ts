@@ -11,7 +11,8 @@ export const createMCS150Record = async (
   filingId: string,
   formData: MCS150FormData,
   attachments: FilingAttachments,
-  usdotNumber: string
+  usdotNumber: string,
+  transactionId?: string
 ) => {
   if (!attachments?.signature || !attachments?.license) {
     throw new Error('Missing required attachments for MCS-150 filing');
@@ -33,22 +34,23 @@ export const createMCS150Record = async (
     operator_email: formData.operator?.email || '',
     operator_phone: formData.operator?.phone || '',
     operator_title: formData.operator?.title || '',
-    operator_ssn: formData.operator?.identifierType === 'ssn' ? formData.operator.einSsn : null,
-    operator_ein: formData.operator?.identifierType === 'ein' ? formData.operator.einSsn : null,
+    operator_ssn: formData.operator?.identifierType === 'ssn' ? formData.operator.einSsn : '',
+    operator_ein: formData.operator?.identifierType === 'ein' ? formData.operator.einSsn : '',
     operator_miles_driven: milesDriven,
     signature_url: attachments.signature,
     license_url: attachments.license,
     created_at: new Date().toISOString(),
     reason_for_filing: formData.reasonForFiling || 'biennialUpdate',
+    transaction_id: transactionId,  // Link to transaction
     
-    // Principal address fields
+    // Principal address fields with defaults
     principal_address_street: principalAddress.address || '',
     principal_address_city: principalAddress.city || '',
     principal_address_state: principalAddress.state || '',
     principal_address_zip: principalAddress.zip || '',
     principal_address_country: principalAddress.country || 'USA',
     
-    // Mailing address fields
+    // Mailing address fields with defaults
     mailing_address_street: mailingAddress.address || '',
     mailing_address_city: mailingAddress.city || '',
     mailing_address_state: mailingAddress.state || '',
@@ -86,3 +88,4 @@ export const createMCS150Record = async (
     throw mcs150Error;
   }
 };
+

@@ -9,6 +9,14 @@ export const createTransactionRecord = async (
   usdotNumber: string,
   filingType: FilingType
 ) => {
+  console.log('Creating transaction record:', {
+    filingId,
+    amount,
+    paymentMethod,
+    usdotNumber,
+    filingType
+  });
+
   const { data: transactionData, error: transactionError } = await supabase
     .from('transactions')
     .insert({
@@ -45,3 +53,4 @@ export const markFilingComplete = async (filingId: string) => {
     throw filingError;
   }
 };
+

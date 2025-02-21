@@ -427,6 +427,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_transaction"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "mcs150_airtable_records_filing_id_fkey"
             columns: ["filing_id"]
             isOneToOne: true
