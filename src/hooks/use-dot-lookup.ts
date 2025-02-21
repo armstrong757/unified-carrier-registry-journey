@@ -3,79 +3,23 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
 import { useToast } from "@/components/ui/use-toast";
+import { validateDOTData } from "@/utils/dot-data-validation";
+import { mapAPIResponse } from "@/utils/dot-api-mapper";
 
 const DEBOUNCE_TIMEOUT = 300;
 let debounceTimer: NodeJS.Timeout;
 
-function parseAddress(addressString: string) {
-  if (!addressString) return null;
-  
-  // Expected format: "street, city, state zipcode"
-  const parts = addressString.split(',').map(part => part.trim());
-  
-  if (parts.length >= 3) {
-    const street = parts[0];
-    const city = parts[1];
-    // Last part contains state and zip
-    const stateZip = parts[parts.length - 1].split(' ');
-    const state = stateZip[0];
-    const zip = stateZip[1];
+function transformToUSDOTData(mappedData: any): USDOTData {
+  const physical = mappedData.physical_address_parsed;
+  const mailing = mappedData.mailing_address_parsed;
 
-    return {
-      street,
-      city,
-      state,
-      zip,
-      country: 'USA'
-    };
-  }
-  
-  return null;
-}
-
-function transformResponse(data: any): USDOTData {
-  console.log('Transforming API response:', data);
-  
-  // If basics_data is empty, use the root data
-  const basicData = (data.basics_data && Object.keys(data.basics_data).length > 0) ? data.basics_data : data;
-  
-  // Parse physical address
-  const physicalAddress = parseAddress(basicData.physical_address);
-  const mailingAddress = parseAddress(basicData.mailing_address || basicData.physical_address);
-  
-  // Set default values
-  const defaultAddress = {
-    street: '',
-    city: '',
-    state: '',
-    zip: '',
-    country: 'USA'
-  };
-
-  // Use parsed addresses or defaults
-  const physical = physicalAddress || {
-    street: data.api_physical_address_street || basicData.physical_address_street || defaultAddress.street,
-    city: data.api_physical_address_city || basicData.physical_address_city || defaultAddress.city,
-    state: data.api_physical_address_state || basicData.physical_address_state || defaultAddress.state,
-    zip: data.api_physical_address_zip || basicData.physical_address_zip_code || defaultAddress.zip,
-    country: data.api_physical_address_country || basicData.physical_address_country || defaultAddress.country
-  };
-
-  const mailing = mailingAddress || {
-    street: data.api_mailing_address_street || basicData.mailing_address_street || physical.street,
-    city: data.api_mailing_address_city || basicData.mailing_address_city || physical.city,
-    state: data.api_mailing_address_state || basicData.mailing_address_state || physical.state,
-    zip: data.api_mailing_address_zip || basicData.mailing_address_zip_code || physical.zip,
-    country: data.api_mailing_address_country || basicData.mailing_address_country || physical.country
-  };
-
-  const transformed: USDOTData = {
-    usdotNumber: data.usdot_number || basicData.dot_number || '',
-    legalName: data.legal_name || basicData.legal_name || '',
-    dbaName: data.dba_name || basicData.dba_name || '',
-    operatingStatus: data.operating_status || basicData.usdot_status || 'NOT AUTHORIZED',
-    entityType: data.entity_type || basicData.entity_type_desc || '',
-    physicalAddress: data.physical_address || basicData.physical_address || '',
+  return {
+    usdotNumber: mappedData.usdot_number,
+    legalName: mappedData.legal_name,
+    dbaName: mappedData.dba_name,
+    operatingStatus: mappedData.operating_status,
+    entityType: mappedData.entity_type,
+    physicalAddress: mappedData.physical_address,
     physicalAddressStreet: physical.street,
     physicalAddressCity: physical.city,
     physicalAddressState: physical.state,
@@ -86,32 +30,29 @@ function transformResponse(data: any): USDOTData {
     mailingAddressState: mailing.state,
     mailingAddressZip: mailing.zip,
     mailingAddressCountry: mailing.country,
-    telephone: data.telephone || basicData.telephone_number || '',
-    powerUnits: Number(data.power_units || basicData.total_power_units) || 0,
-    drivers: Number(data.drivers || basicData.total_drivers) || 0,
-    insuranceBIPD: Number(basicData.insurance_bipd_on_file) || 0,
-    insuranceBond: Number(basicData.insurance_bond_on_file) || 0,
-    insuranceCargo: Number(basicData.insurance_cargo_on_file) || 0,
-    riskScore: data.risk_score || basicData.risk_score || 'Unknown',
-    outOfServiceDate: data.out_of_service_date || basicData.out_of_service_date || null,
-    mcs150FormDate: data.mcs150_last_update || basicData.mcs150_form_date || null,
-    mcs150Date: data.mcs150_last_update || basicData.mcs150_date || null,
-    mcs150Year: Number(data.mcs150_year || basicData.mcs150_year) || 0,
-    mcs150Mileage: Number(data.mcs150_mileage || basicData.mcs150_mileage) || 0,
-    carrierOperation: data.carrier_operation || basicData.carrier_operation || '',
-    cargoCarried: data.cargo_carried || basicData.cargo_carried || [],
-    busCount: Number(data.bus_count || basicData.total_buses) || 0,
-    limoCount: Number(data.limo_count || basicData.total_limousines) || 0,
-    minibusCount: Number(data.minibus_count || basicData.total_minibuses) || 0,
-    motorcoachCount: Number(data.motorcoach_count || basicData.total_motorcoaches) || 0,
-    vanCount: Number(data.van_count || basicData.total_vans) || 0,
-    complaintCount: Number(data.complaint_count || basicData.complaint_count) || 0,
-    outOfService: Boolean(data.out_of_service || basicData.out_of_service_flag),
-    mcNumber: data.mc_number || basicData.docket || ''
+    telephone: mappedData.telephone || '',
+    powerUnits: mappedData.power_units,
+    drivers: mappedData.drivers,
+    insuranceBIPD: 0, // These will be populated from basics_data
+    insuranceBond: 0,
+    insuranceCargo: 0,
+    riskScore: 'Unknown',
+    outOfServiceDate: mappedData.out_of_service_date,
+    mcs150FormDate: mappedData.mcs150_last_update,
+    mcs150Date: mappedData.mcs150_last_update,
+    mcs150Year: 0, // Will be populated from basics_data
+    mcs150Mileage: 0,
+    carrierOperation: '',
+    cargoCarried: [],
+    busCount: 0,
+    limoCount: 0,
+    minibusCount: 0,
+    motorcoachCount: 0,
+    vanCount: 0,
+    complaintCount: 0,
+    outOfService: mappedData.out_of_service,
+    mcNumber: ''
   };
-
-  console.log('Transformed USDOT data:', transformed);
-  return transformed;
 }
 
 export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
@@ -142,7 +83,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
         setIsLoading(true);
         
         try {
-          // Check for existing draft filing first
+          // Check for existing draft filing
           const { data: existingFiling, error: filingError } = await supabase
             .from('filings')
             .select('*')
@@ -154,7 +95,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
           if (filingError) throw filingError;
 
-          // Always make a fresh API call to get the latest data
+          // Always make a fresh API call
           console.log('Making API request for DOT:', trimmedDOT);
           const { data, error } = await supabase.functions.invoke('fetch-usdot-info', {
             body: { dotNumber: trimmedDOT },
@@ -169,35 +110,45 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             throw new Error('No data received from DOT lookup');
           }
 
-          const transformedData = transformResponse(data.items[0]);
+          // Map and validate the API response
+          const mappedData = mapAPIResponse(data.items[0]);
+          const validatedData = validateDOTData(mappedData);
+
+          if (!validatedData) {
+            throw new Error('Invalid data received from API');
+          }
+
+          // Transform to USDOTData format
+          const transformedData = transformToUSDOTData(mappedData);
 
           // Store or update the data in usdot_info table
           const { error: upsertError } = await supabase
             .from('usdot_info')
             .upsert({
               usdot_number: trimmedDOT,
-              basics_data: data.items[0],
-              legal_name: transformedData.legalName,
-              dba_name: transformedData.dbaName,
-              operating_status: transformedData.operatingStatus,
-              entity_type: transformedData.entityType,
-              physical_address: transformedData.physicalAddress,
-              telephone: transformedData.telephone,
-              power_units: transformedData.powerUnits,
-              drivers: transformedData.drivers,
-              mcs150_last_update: transformedData.mcs150Date,
-              out_of_service: transformedData.outOfService,
-              out_of_service_date: transformedData.outOfServiceDate,
-              api_physical_address_street: transformedData.physicalAddressStreet,
-              api_physical_address_city: transformedData.physicalAddressCity,
-              api_physical_address_state: transformedData.physicalAddressState,
-              api_physical_address_zip: transformedData.physicalAddressZip,
-              api_physical_address_country: transformedData.physicalAddressCountry,
-              api_mailing_address_street: transformedData.mailingAddressStreet,
-              api_mailing_address_city: transformedData.mailingAddressCity,
-              api_mailing_address_state: transformedData.mailingAddressState,
-              api_mailing_address_zip: transformedData.mailingAddressZip,
-              api_mailing_address_country: transformedData.mailingAddressCountry,
+              basics_data: data.items[0], // Store original response
+              legal_name: mappedData.legal_name,
+              dba_name: mappedData.dba_name,
+              operating_status: mappedData.operating_status,
+              entity_type: mappedData.entity_type,
+              physical_address: mappedData.physical_address,
+              telephone: mappedData.telephone,
+              power_units: mappedData.power_units,
+              drivers: mappedData.drivers,
+              mcs150_last_update: mappedData.mcs150_last_update,
+              out_of_service: mappedData.out_of_service,
+              out_of_service_date: mappedData.out_of_service_date,
+              api_physical_address_street: mappedData.physical_address_parsed.street,
+              api_physical_address_city: mappedData.physical_address_parsed.city,
+              api_physical_address_state: mappedData.physical_address_parsed.state,
+              api_physical_address_zip: mappedData.physical_address_parsed.zip,
+              api_physical_address_country: mappedData.physical_address_parsed.country,
+              api_mailing_address_street: mappedData.mailing_address_parsed.street,
+              api_mailing_address_city: mappedData.mailing_address_parsed.city,
+              api_mailing_address_state: mappedData.mailing_address_parsed.state,
+              api_mailing_address_zip: mappedData.mailing_address_parsed.zip,
+              api_mailing_address_country: mappedData.mailing_address_parsed.country,
+              updated_at: new Date().toISOString()
             });
 
           if (upsertError) {
