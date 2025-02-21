@@ -17,9 +17,34 @@ const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) 
     
     setFormData({
       ...formData,
-      operator: { ...formData.operator, einSsn: formattedValue },
+      operator: { 
+        ...formData.operator, 
+        einSsn: formattedValue 
+      },
     });
   };
+
+  const handleTypeChange = (value: 'ein' | 'ssn') => {
+    setFormData({
+      ...formData,
+      operator: { 
+        ...formData.operator, 
+        identifierType: value,
+        einSsn: '' // Clear when changing types
+      },
+    });
+  };
+
+  // Initialize operator data if it doesn't exist
+  if (!formData.operator) {
+    setFormData({
+      ...formData,
+      operator: {
+        identifierType: 'ssn',
+        einSsn: '',
+      }
+    });
+  }
 
   return (
     <div className="space-y-4">
@@ -30,16 +55,7 @@ const OperatorIdentifier = ({ formData, setFormData }: OperatorIdentifierProps) 
           </Label>
           <RadioGroup
             value={formData.operator?.identifierType || 'ssn'}
-            onValueChange={(value) =>
-              setFormData({
-                ...formData,
-                operator: { 
-                  ...formData.operator, 
-                  identifierType: value,
-                  einSsn: '' // Clear the value when switching types
-                },
-              })
-            }
+            onValueChange={handleTypeChange}
             className="flex space-x-4"
           >
             <div className="flex items-center space-x-2">

@@ -45,8 +45,7 @@ export const markFilingComplete = async (filingId: string) => {
       status: 'completed',
       completed_at: new Date().toISOString()
     })
-    .eq('id', filingId)
-    .eq('status', 'draft');
+    .eq('id', filingId); // Removed the status='draft' check
 
   if (filingError) {
     console.error('Error updating filing:', filingError);
