@@ -8,17 +8,20 @@ interface StepOneProps {
 }
 
 const StepOne = ({ formData, setFormData }: StepOneProps) => {
+  // Set default value on mount if not already set
+  if (!formData.reasonForFiling) {
+    setFormData({
+      ...formData,
+      reasonForFiling: 'biennialUpdate'
+    });
+  }
+
   const updateReasonForFiling = (value: string) => {
     setFormData({
       ...formData,
       reasonForFiling: value,
     });
   };
-
-  // Ensure we have a default value for reasonForFiling
-  if (!formData.reasonForFiling) {
-    updateReasonForFiling('biennialUpdate');
-  }
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -30,7 +33,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
         </Label>
         <RadioGroup
           defaultValue="biennialUpdate"
-          value={formData.reasonForFiling || 'biennialUpdate'}
+          value={formData.reasonForFiling}
           onValueChange={updateReasonForFiling}
           className="space-y-1.5"
         >
