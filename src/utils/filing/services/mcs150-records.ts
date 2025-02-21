@@ -17,6 +17,12 @@ export const createMCS150Record = async (
     throw new Error('Missing required attachments for MCS-150 filing');
   }
 
+  // Ensure we have a valid reason for filing
+  if (!formData.reasonForFiling) {
+    console.error('Missing reason for filing:', formData);
+    throw new Error('Missing required field: reason for filing');
+  }
+
   // Convert milesDriven from string to number, removing commas
   const milesDriven = parseInt(String(formData.operator?.milesDriven || '0').replace(/,/g, ''));
 
@@ -35,8 +41,8 @@ export const createMCS150Record = async (
     signature_url: attachments.signature,
     license_url: attachments.license,
     created_at: new Date().toISOString(),
-    reason_for_filing: formData.reasonForFiling || 'Biennial Update',
-    
+    reason_for_filing: formData.reasonForFiling,
+
     // Address fields with new naming convention
     form_physical_address_street: formData.principalAddress?.address || '',
     form_physical_address_city: formData.principalAddress?.city || '',
@@ -83,6 +89,8 @@ export const createMCS150Record = async (
     cargo_water_well: false
   };
 
+  console.log('Creating MCS-150 record:', mcs150Record);
+
   // Use upsert instead of insert to handle potential duplicates
   const { error: mcs150Error } = await supabase
     .from('mcs150_airtable_records')
@@ -96,4 +104,3 @@ export const createMCS150Record = async (
     throw mcs150Error;
   }
 };
-
