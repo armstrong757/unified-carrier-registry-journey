@@ -45,15 +45,11 @@ export const createMCS150Record = async (
   // Convert milesDriven from string to number, removing commas
   const milesDriven = parseInt(String(formData.operator?.milesDriven || '0').replace(/,/g, ''));
 
-  // Extract and format address data with proper null checks
-  const principalAddress = formData.principalAddress || {};
-  const mailingAddress = formData.mailingAddress || {};
+  // Extract identifier type and value
+  const identifierType = formData.operator?.identifierType;
+  const identifierValue = formData.operator?.einSsn;
 
-  // Validate USDOT info
-  if (!usdotInfo) {
-    console.error('Missing USDOT info');
-    throw new Error('Missing USDOT information for MCS-150 filing');
-  }
+  console.log('Processing identifier:', { identifierType, identifierValue });
 
   const mcs150Record = {
     filing_id: filingId,
@@ -64,8 +60,9 @@ export const createMCS150Record = async (
     operator_email: formData.operator?.email || '',
     operator_phone: formData.operator?.phone || '',
     operator_title: formData.operator?.title || '',
-    operator_ssn: formData.operator?.identifierType === 'ssn' ? formData.operator.einSsn : '',
-    operator_ein: formData.operator?.identifierType === 'ein' ? formData.operator.einSsn : '',
+    // Map SSN/EIN based on identifier type
+    operator_ssn: identifierType === 'ssn' ? identifierValue : '',
+    operator_ein: identifierType === 'ein' ? identifierValue : '',
     operator_miles_driven: milesDriven,
     signature_url: attachments.signature,
     license_url: attachments.license,
@@ -81,11 +78,11 @@ export const createMCS150Record = async (
     principal_address_country: usdotInfo.api_physical_address_country || 'USA',
 
     // Store form-submitted address data
-    form_physical_address_street: formData.address_modified ? principalAddress.address || '' : '',
-    form_physical_address_city: formData.address_modified ? principalAddress.city || '' : '',
-    form_physical_address_state: formData.address_modified ? principalAddress.state || '' : '',
-    form_physical_address_zip: formData.address_modified ? principalAddress.zip || '' : '',
-    form_physical_address_country: formData.address_modified ? (principalAddress.country || 'USA') : '',
+    form_physical_address_street: formData.address_modified ? formData.principalAddress?.address || '' : '',
+    form_physical_address_city: formData.address_modified ? formData.principalAddress?.city || '' : '',
+    form_physical_address_state: formData.address_modified ? formData.principalAddress?.state || '' : '',
+    form_physical_address_zip: formData.address_modified ? formData.principalAddress?.zip || '' : '',
+    form_physical_address_country: formData.address_modified ? formData.principalAddress?.country || 'USA' : '',
 
     // Track if address was modified
     address_modified: formData.address_modified || false
