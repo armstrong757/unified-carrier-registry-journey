@@ -16,7 +16,7 @@ function transformToUSDOTData(mappedData: any): USDOTData {
   return {
     usdotNumber: mappedData.usdot_number,
     legalName: mappedData.legal_name,
-    dbaName: mappedData.api_dba_name,
+    dbaName: mappedData.dba_name,
     operatingStatus: mappedData.operating_status,
     entityType: mappedData.entity_type,
     physicalAddress: mappedData.physical_address,
@@ -40,7 +40,7 @@ function transformToUSDOTData(mappedData: any): USDOTData {
     outOfServiceDate: mappedData.out_of_service_date,
     mcs150FormDate: mappedData.mcs150_last_update,
     mcs150Date: mappedData.mcs150_last_update,
-    mcs150Year: mappedData.mcs150_year || 0,
+    mcs150Year: mappedData.mcs150_year ? parseInt(mappedData.mcs150_year) : undefined,
     mcs150Mileage: mappedData.mcs150_mileage || 0,
     carrierOperation: '',
     cargoCarried: [],
@@ -140,6 +140,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
               mcs150_last_update: mappedData.mcs150_last_update,
               out_of_service: mappedData.out_of_service,
               out_of_service_date: mappedData.out_of_service_date,
+              mileage_year: mappedData.mcs150_year,
               api_physical_address_street: mappedData.physical_address_parsed.street,
               api_physical_address_city: mappedData.physical_address_parsed.city,
               api_physical_address_state: mappedData.physical_address_parsed.state,
@@ -155,6 +156,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
           if (upsertError) {
             console.error('Error storing USDOT info:', upsertError);
+            throw upsertError;
           }
 
           if (existingFiling) {
