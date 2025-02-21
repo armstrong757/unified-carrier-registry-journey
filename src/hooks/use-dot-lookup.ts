@@ -121,12 +121,15 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           // Transform to USDOTData format
           const transformedData = transformToUSDOTData(mappedData);
 
+          // Ensure numeric values are converted to strings where needed
+          const powerUnits = mappedData.power_units ? String(mappedData.power_units) : null;
+          const drivers = mappedData.drivers ? String(mappedData.drivers) : null;
+
           // Store or update the data in usdot_info table
           const { error: upsertError } = await supabase
             .from('usdot_info')
             .upsert({
-              usdot_number: trimmedDOT,
-              basics_data: data.items[0],
+              id: `${trimmedDOT}`, // Ensure ID is a string
               legal_name: mappedData.legal_name,
               dba_name: mappedData.dba_name,
               api_dba_name: mappedData.api_dba_name,
@@ -135,8 +138,8 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
               entity_type: mappedData.entity_type,
               physical_address: mappedData.physical_address,
               telephone: mappedData.telephone,
-              power_units: mappedData.power_units,
-              drivers: mappedData.drivers,
+              power_units: powerUnits,
+              drivers: drivers,
               mcs150_last_update: mappedData.mcs150_last_update,
               out_of_service: mappedData.out_of_service,
               out_of_service_date: mappedData.out_of_service_date,
