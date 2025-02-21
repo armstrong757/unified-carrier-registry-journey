@@ -47,8 +47,8 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
-      // Ensure we're working with MCS150 data
-      const formData = filing.form_data as MCS150FormData;
+      // Explicitly cast form_data to any first, then to MCS150FormData
+      const formData = (filing.form_data as any) as MCS150FormData;
       const attachments = filing.attachments as FilingAttachments;
       
       if (!attachments?.signature || !attachments?.license) {
@@ -58,6 +58,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       const mcs150Record = {
         filing_id: filingId,
         usdot_number: filing.usdot_number,
+        filing_type: filing.filing_type,
         operator_first_name: formData.operator?.firstName || '',
         operator_last_name: formData.operator?.lastName || '',
         operator_email: formData.operator?.email || '',
@@ -68,7 +69,38 @@ export const createTransaction = async (filingId: string, amount: number, paymen
         operator_miles_driven: formData.operator?.milesDriven || '',
         signature_url: attachments.signature,
         license_url: attachments.license,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        // Add required but unused fields with default values
+        cargo_agricultural: false,
+        cargo_beverages: false,
+        cargo_building_materials: false,
+        cargo_chemicals: false,
+        cargo_coal: false,
+        cargo_commodities_dry_bulk: false,
+        cargo_construction: false,
+        cargo_drive_away: false,
+        cargo_fresh_produce: false,
+        cargo_garbage: false,
+        cargo_general_freight: false,
+        cargo_grain: false,
+        cargo_household_goods: false,
+        cargo_intermodal_containers: false,
+        cargo_liquids_gases: false,
+        cargo_livestock: false,
+        cargo_logs: false,
+        cargo_machinery: false,
+        cargo_meat: false,
+        cargo_metal_sheets: false,
+        cargo_mobile_homes: false,
+        cargo_motor_vehicles: false,
+        cargo_oilfield_equipment: false,
+        cargo_other: false,
+        cargo_paper_products: false,
+        cargo_passengers: false,
+        cargo_refrigerated_food: false,
+        cargo_us_mail: false,
+        cargo_utilities: false,
+        cargo_water_well: false
       };
 
       const { error: mcs150Error } = await supabase
@@ -83,7 +115,8 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     } else if (filing.filing_type === 'ucr') {
       console.log('Processing UCR filing:', filing);
       
-      const formData = filing.form_data as UCRFormData;
+      // Explicitly cast form_data to any first, then to UCRFormData
+      const formData = (filing.form_data as any) as UCRFormData;
       
       // Calculate total vehicles
       const straightTrucks = parseInt(String(formData.straightTrucks || '0').replace(/,/g, ''));
