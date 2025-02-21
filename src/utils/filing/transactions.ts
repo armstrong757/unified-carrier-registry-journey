@@ -69,14 +69,15 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       mcNumber: usdotInfo.mc_number,
       mcs150FormDate: usdotInfo.mcs150_last_update,
       mcs150Date: usdotInfo.mcs150_last_update,
-      mcs150Year: usdotInfo.mcs150_year,
-      mcs150Mileage: usdotInfo.mileage_year ? parseInt(usdotInfo.mileage_year) : undefined,
+      // For fields not in the database, provide default values
+      mcs150Year: 0,
+      mcs150Mileage: 0,
       carrierOperation: '',
       cargoCarried: [],
       insuranceBIPD: 0,
       insuranceBond: 0,
       insuranceCargo: 0,
-      riskScore: usdotInfo.risk_score || ''
+      riskScore: ''
     } : undefined;
 
     // For UCR filings, calculate the fee based on total vehicles
