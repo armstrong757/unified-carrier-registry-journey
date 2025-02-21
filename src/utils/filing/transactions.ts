@@ -1,3 +1,4 @@
+
 import { MCS150FormData, UCRFormData, USDOTData } from "@/types/filing";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -69,11 +70,21 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
       const formData = filing.form_data as unknown as MCS150FormData;
+      
+      // Verify attachments exist and have the required properties
+      const attachments = filing.attachments as Record<string, string> | null;
+      if (!attachments || !attachments.signature || !attachments.license) {
+        console.error('Missing required attachments:', attachments);
+        throw new Error('Missing required attachments for MCS-150 filing');
+      }
 
       await createMCS150Record(
         filingId,
         formData,
-        filing.attachments as { signature?: string; license?: string },
+        {
+          signature: attachments.signature,
+          license: attachments.license
+        },
         filing.usdot_number
       );
     } else if (filing.filing_type === 'ucr') {
