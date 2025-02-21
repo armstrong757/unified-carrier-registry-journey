@@ -1,31 +1,47 @@
+
 import { supabase } from "@/integrations/supabase/client";
+import { FilingType } from "@/types/filing";
+
+interface Filing {
+  id: string;
+  usdot_number: string;
+  filing_type: FilingType;
+}
 
 export const testUCRFilingCompletion = async (filingId: string) => {
   try {
-    // First update the filing status to completed
-    const { data: filing, error: filingError } = await supabase
+    // First get the filing data
+    const { data: filing, error: getFilingError } = await supabase
+      .from('filings')
+      .select('*')
+      .eq('id', filingId)
+      .single();
+
+    if (getFilingError) throw getFilingError;
+    if (!filing) throw new Error('Filing not found');
+
+    // Update filing status to completed
+    const { error: filingError } = await supabase
       .from('filings')
       .update({
         status: 'completed',
         completed_at: new Date().toISOString()
       })
-      .eq('id', filingId)
-      .select()
-      .single();
+      .eq('id', filingId);
 
     if (filingError) throw filingError;
 
-    // Create a test transaction without payment processing
+    // Create a test transaction with all required fields
     const { data: transaction, error: transactionError } = await supabase
       .from('transactions')
-      .insert([
-        {
-          filing_id: filingId,
-          amount: 149, // Standard UCR fee
-          status: 'completed',
-          payment_method: 'test'
-        }
-      ])
+      .insert({
+        filing_id: filingId,
+        amount: 149,
+        status: 'completed',
+        payment_method: 'test',
+        usdot_number: filing.usdot_number,
+        filing_type: filing.filing_type
+      })
       .select()
       .single();
 
@@ -65,7 +81,7 @@ export const testUCRFilingCompletion = async (filingId: string) => {
   }
 };
 
-export const createTestTransaction = async (filing: any) => {
+export const createTestTransaction = async (filing: Filing) => {
   const { data, error } = await supabase
     .from('transactions')
     .insert({
@@ -75,12 +91,10 @@ export const createTestTransaction = async (filing: any) => {
       payment_method: 'test',
       usdot_number: filing.usdot_number,
       filing_type: filing.filing_type
-    });
+    })
+    .select()
+    .single();
 
   if (error) throw error;
   return data;
 };
-
-// Example usage in browser console:
-// import { testUCRFilingCompletion } from '@/utils/testUtils';
-// testUCRFilingCompletion('your-filing-id').then(console.log).catch(console.error);

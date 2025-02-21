@@ -43,16 +43,18 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
+      const mcs150FormData = filing.form_data as unknown as MCS150FormData;
       await createMCS150Record(
         filingId,
-        filing.form_data as MCS150FormData,
+        mcs150FormData,
         filing.attachments as { signature?: string; license?: string },
         filing.usdot_number
       );
     } else if (filing.filing_type === 'ucr') {
+      const ucrFormData = filing.form_data as unknown as UCRFormData;
       await createUCRRecord(
         filingId,
-        filing.form_data as UCRFormData,
+        ucrFormData,
         filing.usdot_number
       );
     }
