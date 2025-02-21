@@ -17,10 +17,6 @@ export const createMCS150Record = async (
     throw new Error('Missing required attachments for MCS-150 filing');
   }
 
-  if (!formData.reasonForFiling) {
-    throw new Error('Reason for filing is required');
-  }
-
   // Convert milesDriven from string to number, removing commas
   const milesDriven = parseInt(String(formData.operator?.milesDriven || '0').replace(/,/g, ''));
 
@@ -39,7 +35,7 @@ export const createMCS150Record = async (
     signature_url: attachments.signature,
     license_url: attachments.license,
     created_at: new Date().toISOString(),
-    reason_for_filing: formData.reasonForFiling // Pass through the value directly
+    reason_for_filing: formData.reasonForFiling || 'biennialUpdate' // Use default if not set
   };
 
   console.log('Creating MCS-150 record:', mcs150Record);
