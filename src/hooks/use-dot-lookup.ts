@@ -53,11 +53,24 @@ function transformResponse(data: any): USDOTData {
   };
 
   // Use parsed addresses or defaults
-  const physical = physicalAddress || defaultAddress;
-  const mailing = mailingAddress || physical;
+  const physical = physicalAddress || {
+    street: basicData.physical_address_street || basicData.api_physical_address_street || defaultAddress.street,
+    city: basicData.physical_address_city || basicData.api_physical_address_city || defaultAddress.city,
+    state: basicData.physical_address_state || basicData.api_physical_address_state || defaultAddress.state,
+    zip: basicData.physical_address_zip_code || basicData.api_physical_address_zip || defaultAddress.zip,
+    country: basicData.physical_address_country || basicData.api_physical_address_country || defaultAddress.country
+  };
+
+  const mailing = mailingAddress || {
+    street: basicData.mailing_address_street || basicData.api_mailing_address_street || physical.street,
+    city: basicData.mailing_address_city || basicData.api_mailing_address_city || physical.city,
+    state: basicData.mailing_address_state || basicData.api_mailing_address_state || physical.state,
+    zip: basicData.mailing_address_zip_code || basicData.api_mailing_address_zip || physical.zip,
+    country: basicData.mailing_address_country || basicData.api_mailing_address_country || physical.country
+  };
 
   const transformed: USDOTData = {
-    usdotNumber: basicData.dot_number || data.usdot_number || '',
+    usdotNumber: basicData.dot_number || basicData.usdot_number || data.usdot_number || '',
     legalName: basicData.legal_name || data.legal_name || '',
     dbaName: basicData.dba_name || data.dba_name || '',
     operatingStatus: basicData.usdot_status || data.operating_status || 'NOT AUTHORIZED',
