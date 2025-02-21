@@ -14,6 +14,8 @@ const dotDataSchema = z.object({
   usdot_number: z.string(),
   legal_name: z.string(),
   dba_name: z.string().optional(),
+  api_dba_name: z.string().optional(),
+  api_dba_flag: z.boolean(),
   operating_status: z.string(),
   entity_type: z.string().optional(),
   physical_address: z.string().optional(),

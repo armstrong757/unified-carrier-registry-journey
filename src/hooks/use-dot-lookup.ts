@@ -16,7 +16,7 @@ function transformToUSDOTData(mappedData: any): USDOTData {
   return {
     usdotNumber: mappedData.usdot_number,
     legalName: mappedData.legal_name,
-    dbaName: mappedData.dba_name,
+    dbaName: mappedData.api_dba_name,
     operatingStatus: mappedData.operating_status,
     entityType: mappedData.entity_type,
     physicalAddress: mappedData.physical_address,
@@ -126,9 +126,11 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             .from('usdot_info')
             .upsert({
               usdot_number: trimmedDOT,
-              basics_data: data.items[0], // Store original response
+              basics_data: data.items[0],
               legal_name: mappedData.legal_name,
               dba_name: mappedData.dba_name,
+              api_dba_name: mappedData.api_dba_name,
+              api_dba_flag: mappedData.api_dba_flag,
               operating_status: mappedData.operating_status,
               entity_type: mappedData.entity_type,
               physical_address: mappedData.physical_address,

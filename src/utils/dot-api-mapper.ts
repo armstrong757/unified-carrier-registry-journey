@@ -35,6 +35,8 @@ export function mapAPIResponse(apiResponse: any) {
     usdot_number: data.usdot_number || data.dot_number || '',
     legal_name: data.legal_name || '',
     dba_name: data.dba_name || '',
+    api_dba_name: data.dba_name || '',
+    api_dba_flag: Boolean(data.dba_flag),
     operating_status: data.operating_status || data.usdot_status || 'NOT AUTHORIZED',
     entity_type: data.entity_type || data.entity_type_desc || '',
     physical_address: data.physical_address || '',
