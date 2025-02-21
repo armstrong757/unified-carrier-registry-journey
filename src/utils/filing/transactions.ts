@@ -1,11 +1,9 @@
-
 import { MCS150FormData, UCRFormData, USDOTData } from "@/types/filing";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { createMCS150Record } from "./services/mcs150-records";
 import { createUCRRecord } from "./services/ucr-records";
 import { createTransactionRecord, markFilingComplete } from "./services/transaction-service";
-import { calculateUCRFee } from "@/utils/ucrFeeCalculator";
 
 export const createTransaction = async (filingId: string, amount: number, paymentMethod: string) => {
   try {
@@ -70,20 +68,11 @@ export const createTransaction = async (filingId: string, amount: number, paymen
 
     // Handle different filing types
     if (filing.filing_type === 'mcs150') {
-      // First cast to unknown, then to MCS150FormData
-      const formData = filing.form_data as unknown;
-      if (!formData || typeof formData !== 'object') {
-        throw new Error('Invalid form data format');
-      }
-      
-      const mcs150FormData = formData as MCS150FormData;
-      if (!mcs150FormData.reasonForFiling) {
-        throw new Error('Missing reason for filing in form data');
-      }
+      const formData = filing.form_data as unknown as MCS150FormData;
 
       await createMCS150Record(
         filingId,
-        mcs150FormData,
+        formData,
         filing.attachments as { signature?: string; license?: string },
         filing.usdot_number
       );
