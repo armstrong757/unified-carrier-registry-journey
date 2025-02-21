@@ -29,12 +29,70 @@ export const getNextStep = (currentStep: number, formData: any) => {
     return 5;
   }
 
-  // For other cases, always move one step at a time
-  // The database trigger will enforce step validation
-  return currentStep + 1;
+  // Handle skipping steps based on form data
+  if (currentStep === 2) {
+    // If user selected "no changes", skip to step 5
+    if (formData.hasChanges === "no") {
+      console.log('No changes selected - skipping to step 5');
+      return 5;
+    }
+    // If both steps should be skipped, go to step 5
+    if (shouldSkipStep3(formData) && shouldSkipStep4(formData)) {
+      console.log('Both steps 3 and 4 should be skipped - going to step 5');
+      return 5;
+    }
+    // If only step 3 should be skipped, go to step 4
+    if (shouldSkipStep3(formData)) {
+      console.log('Step 3 should be skipped - going to step 4');
+      return 4;
+    }
+    console.log('No skips needed - going to step 3');
+    return 3;
+  }
+
+  if (currentStep === 3) {
+    if (shouldSkipStep4(formData)) {
+      console.log('Step 4 should be skipped - going to step 5');
+      return 5;
+    }
+    console.log('No skips needed - going to step 4');
+    return 4;
+  }
+
+  // For all other cases, move to the next step
+  return Math.min(currentStep + 1, 6);
 };
 
 export const getPreviousStep = (currentStep: number, formData: any) => {
+  console.log('Getting previous step. Current step:', currentStep);
+  console.log('Form data:', formData);
+
+  if (currentStep === 5) {
+    if (formData.reasonForFiling === "outOfBusiness") {
+      console.log('Out of business case - returning to step 1');
+      return 1;
+    }
+    if (formData.hasChanges === "no") {
+      console.log('No changes case - returning to step 2');
+      return 2;
+    }
+    if (shouldSkipStep3(formData) && shouldSkipStep4(formData)) {
+      console.log('Both steps were skipped - returning to step 2');
+      return 2;
+    }
+    if (shouldSkipStep4(formData)) {
+      console.log('Step 4 was skipped - returning to step 3');
+      return 3;
+    }
+    console.log('No skips - returning to step 4');
+    return 4;
+  }
+
+  if (currentStep === 4 && shouldSkipStep3(formData)) {
+    console.log('Step 3 was skipped - returning to step 2');
+    return 2;
+  }
+
   return Math.max(currentStep - 1, 1); // Never go below step 1
 };
 
