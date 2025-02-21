@@ -12,7 +12,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
     // First check if the filing is still in draft and get all necessary data
     const { data: filing, error: filingCheckError } = await supabase
       .from('filings')
-      .select('*, id')
+      .select('*, usdot_info(*)')  // Include USDOT info in the query
       .eq('id', filingId)
       .maybeSingle();
 
@@ -71,7 +71,8 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       await createUCRRecord(
         filingId,
         ucrFormData,
-        filing.usdot_number
+        filing.usdot_number,
+        filing.usdot_info  // Pass the USDOT info from the joined query
       );
     }
 
