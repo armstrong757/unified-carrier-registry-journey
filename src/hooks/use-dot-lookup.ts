@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
@@ -7,6 +8,8 @@ const DEBOUNCE_TIMEOUT = 300;
 let debounceTimer: NodeJS.Timeout;
 
 function parseAddress(addressString: string) {
+  if (!addressString) return null;
+  
   // Expected format: "street, city, state zipcode"
   const parts = addressString.split(',').map(part => part.trim());
   
@@ -34,9 +37,22 @@ function transformResponse(data: any): USDOTData {
   console.log('Transforming API response:', data);
   
   // Parse physical address
-  const physicalAddress = parseAddress(data.physical_address || '');
-  const mailingAddress = parseAddress(data.mailing_address || data.physical_address || '');
+  const physicalAddress = parseAddress(data.physical_address);
+  const mailingAddress = parseAddress(data.mailing_address || data.physical_address);
   
+  // Set default values
+  const defaultAddress = {
+    street: '',
+    city: '',
+    state: '',
+    zip: '',
+    country: 'USA'
+  };
+
+  // Use parsed addresses or defaults
+  const physical = physicalAddress || defaultAddress;
+  const mailing = mailingAddress || physical;
+
   const transformed: USDOTData = {
     usdotNumber: data.dot_number || '',
     legalName: data.legal_name || '',
@@ -44,16 +60,16 @@ function transformResponse(data: any): USDOTData {
     operatingStatus: data.usdot_status || 'NOT AUTHORIZED',
     entityType: data.entity_type_desc || '',
     physicalAddress: data.physical_address || '',
-    physicalAddressStreet: physicalAddress?.street || '',
-    physicalAddressCity: physicalAddress?.city || '',
-    physicalAddressState: physicalAddress?.state || '',
-    physicalAddressZip: physicalAddress?.zip || '',
-    physicalAddressCountry: physicalAddress?.country || 'USA',
-    mailingAddressStreet: mailingAddress?.street || '',
-    mailingAddressCity: mailingAddress?.city || '',
-    mailingAddressState: mailingAddress?.state || '',
-    mailingAddressZip: mailingAddress?.zip || '',
-    mailingAddressCountry: mailingAddress?.country || 'USA',
+    physicalAddressStreet: physical.street,
+    physicalAddressCity: physical.city,
+    physicalAddressState: physical.state,
+    physicalAddressZip: physical.zip,
+    physicalAddressCountry: physical.country,
+    mailingAddressStreet: mailing.street,
+    mailingAddressCity: mailing.city,
+    mailingAddressState: mailing.state,
+    mailingAddressZip: mailing.zip,
+    mailingAddressCountry: mailing.country,
     telephone: data.telephone_number || '',
     powerUnits: Number(data.total_power_units) || 0,
     drivers: Number(data.total_drivers) || 0,
@@ -67,14 +83,14 @@ function transformResponse(data: any): USDOTData {
     mcs150Year: Number(data.mcs150_year) || 0,
     mcs150Mileage: Number(data.mcs150_mileage) || 0,
     carrierOperation: data.carrier_operation || '',
-    cargoCarried: [],
-    busCount: 0,
-    limoCount: 0,
-    minibusCount: 0,
-    motorcoachCount: 0,
-    vanCount: 0,
-    complaintCount: 0,
-    outOfService: data.out_of_service_flag || false,
+    cargoCarried: data.cargo_carried || [],
+    busCount: Number(data.total_buses) || 0,
+    limoCount: Number(data.total_limousines) || 0,
+    minibusCount: Number(data.total_minibuses) || 0,
+    motorcoachCount: Number(data.total_motorcoaches) || 0,
+    vanCount: Number(data.total_vans) || 0,
+    complaintCount: Number(data.complaint_count) || 0,
+    outOfService: Boolean(data.out_of_service_flag),
     mcNumber: data.docket || ''
   };
 
