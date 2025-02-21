@@ -26,7 +26,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       throw new Error('Filing is not in draft status');
     }
 
-    // Create the transaction with completed status
+    // Create the transaction first
     const { data: transactionData, error: transactionError } = await supabase
       .from('transactions')
       .insert([
@@ -171,7 +171,7 @@ export const createTransaction = async (filingId: string, amount: number, paymen
       }
     }
 
-    // Only mark as completed if transaction is created successfully
+    // Only mark as completed if transaction and records are created successfully
     const { error: filingError } = await supabase
       .from('filings')
       .update({
