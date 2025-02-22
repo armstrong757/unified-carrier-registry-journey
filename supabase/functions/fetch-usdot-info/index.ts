@@ -1,69 +1,79 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { fetchAndValidateData } from "./api-client.ts";
+import { createClient } from '@supabase/supabase-js';
+import { corsHeaders } from '../_shared/cors';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const CARRIER_OK_API_URL = 'https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite';
 
-serve(async (req) => {
+interface RequestData {
+  dotNumber: string;
+}
+
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
-    if (!apiKey) {
-      throw new Error('CARRIER_OK_API_KEY environment variable is not set');
-    }
-
     // Parse request body
-    const { dotNumber } = await req.json();
+    const requestData: RequestData = await req.json();
+    const { dotNumber } = requestData;
+
     if (!dotNumber) {
-      throw new Error('DOT number is required');
+      return new Response(
+        JSON.stringify({ error: 'DOT number is required' }),
+        { status: 400, headers: corsHeaders }
+      );
     }
 
     console.log('Fetching data for DOT:', dotNumber);
+    
+    // Get the API key from environment variable
+    const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
+    if (!apiKey) {
+      throw new Error('CARRIER_OK_API_KEY not configured');
+    }
 
-    const response = await fetch(
-      `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile?dot=${dotNumber}`,
-      {
-        method: 'GET',
-        headers: {
-          'X-Api-Key': apiKey,
-          'Content-Type': 'application/json',
-        },
+    // Make request to CarrierOK API
+    const response = await fetch(`${CARRIER_OK_API_URL}?dot=${dotNumber}`, {
+      method: 'GET',
+      headers: {
+        'X-Api-Key': apiKey,
+        'Content-Type': 'application/json'
       }
-    );
+    });
+
+    console.log('CarrierOK API response status:', response.status);
 
     if (!response.ok) {
-      console.error('CarrierOK API error:', response.status, await response.text());
-      throw new Error(`CarrierOK API returned status ${response.status}`);
+      const errorText = await response.text();
+      console.error('CarrierOK API error:', errorText);
+      throw new Error(`CarrierOK API error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('CarrierOK API parsed response:', JSON.stringify(data, null, 2));
+    console.log('CarrierOK API response data:', JSON.stringify(data));
 
-    // Validate and clean the response
-    const validatedData = await fetchAndValidateData(data);
+    if (!data.items?.[0]) {
+      return new Response(
+        JSON.stringify({ error: 'No data found for this DOT number' }),
+        { status: 404, headers: corsHeaders }
+      );
+    }
 
-    return new Response(JSON.stringify(validatedData), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify(data),
+      { status: 200, headers: corsHeaders }
+    );
+
   } catch (error) {
     console.error('Error in fetch-usdot-info:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        details: 'Failed to fetch USDOT information'
+      JSON.stringify({
+        error: error.message || 'An error occurred while fetching USDOT information',
+        details: error.toString()
       }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      { status: 500, headers: corsHeaders }
     );
   }
 });
