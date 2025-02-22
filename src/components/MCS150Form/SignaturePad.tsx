@@ -36,19 +36,9 @@ const SignaturePad = ({
     pencilBrush.color = "#000000";
     canvas.freeDrawingBrush = pencilBrush;
 
-    // Update signature data whenever a stroke is completed
+    // Handle both mouse and touch events with 'mouse:up'
+    // This event works for both mouse and touch in Fabric.js v6
     canvas.on('mouse:up', () => {
-      if (!canvas.isEmpty()) {
-        onChange(canvas.toDataURL({
-          format: 'png',
-          quality: 1,
-          multiplier: 1
-        }));
-      }
-    });
-
-    // For touch devices
-    canvas.on('touch:end', () => {
       if (!canvas.isEmpty()) {
         onChange(canvas.toDataURL({
           format: 'png',
