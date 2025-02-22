@@ -19,7 +19,7 @@ const dotDataSchema = z.object({
   operating_status: z.string(),
   entity_type: z.string().optional(),
   physical_address: z.string().optional(),
-  telephone: z.string().nullable().optional(),
+  telephone: z.string().optional(),
   power_units: z.number().nonnegative(),
   drivers: z.number().nonnegative(),
   mcs150_last_update: z.string().nullable(),
@@ -38,10 +38,10 @@ export function validateDOTData(data: unknown) {
   }
 }
 
-export function cleanPhoneNumber(phone: string | null | undefined): string {
-  if (!phone) return '';
+export function cleanPhoneNumber(phone: string | null | undefined): string | null {
+  if (!phone) return null;
   const cleaned = phone.replace(/\D/g, '');
-  return cleaned.length >= 10 ? cleaned : '';
+  return cleaned.length >= 10 ? cleaned : null;
 }
 
 export function parseNumericValue(value: string | number | null | undefined): number {
