@@ -24,69 +24,46 @@ const SignaturePad = ({
       fabricRef.current.dispose();
     }
 
-    // Create new canvas with proper dimensions
     const canvas = new Canvas(canvasRef.current, {
+      isDrawingMode: true,
       width: isMobile ? 300 : 400,
       height: 150,
-      backgroundColor: 'white',
-      isDrawingMode: true
+      backgroundColor: 'white'
     });
 
-    // Configure the brush for smooth drawing
-    const brush = new PencilBrush(canvas);
-    brush.color = '#000000';
-    brush.width = 2;
-    canvas.freeDrawingBrush = brush;
+    // Initialize the brush with smoother settings
+    const pencilBrush = new PencilBrush(canvas);
+    pencilBrush.width = 2;
+    pencilBrush.color = "#000000";
+    pencilBrush.strokeLineCap = 'round';
+    pencilBrush.strokeLineJoin = 'round';
+    canvas.freeDrawingBrush = pencilBrush;
 
-    // Force an initial render
-    canvas.renderAll();
-
-    // Update signature whenever the canvas changes
-    const updateSignature = () => {
-      if (canvas.isEmpty()) {
-        onChange('');
-        return;
-      }
-      const dataUrl = canvas.toDataURL({
-        format: 'png',
-        quality: 1,
-        multiplier: 1,
-        enableRetinaScaling: true
-      });
-      onChange(dataUrl);
-    };
-
-    const handleMouseUp = () => {
-      setIsDrawing(false);
-      updateSignature();
-    };
-
-    const handleMouseDown = () => {
+    // Track drawing state and update signature
+    canvas.on('mouse:down', () => {
       setIsDrawing(true);
-    };
+    });
 
-    const handleMouseMove = () => {
-      if (isDrawing) {
-        canvas.renderAll();
+    canvas.on('mouse:up', () => {
+      setIsDrawing(false);
+      // Only update signature if canvas has content
+      if (!canvas.isEmpty()) {
+        const dataUrl = canvas.toDataURL({
+          format: 'png',
+          quality: 1,
+          multiplier: 1
+        });
+        onChange(dataUrl);
       }
-    };
-
-    // Listen to all relevant events
-    canvas.on('mouse:up', handleMouseUp);
-    canvas.on('mouse:down', handleMouseDown);
-    canvas.on('mouse:move', handleMouseMove);
-    canvas.on('path:created', updateSignature);
+    });
 
     fabricRef.current = canvas;
 
+    // Clean up
     return () => {
-      // Remove event listeners
-      canvas.off('mouse:up', handleMouseUp);
-      canvas.off('mouse:down', handleMouseDown);
-      canvas.off('mouse:move', handleMouseMove);
       canvas.dispose();
     };
-  }, [onChange, isMobile]); // Removed isDrawing from dependencies
+  }, [onChange, isMobile]);
 
   const handleClear = () => {
     if (fabricRef.current) {
@@ -100,7 +77,7 @@ const SignaturePad = ({
   return (
     <div className="space-y-2">
       <div className="border rounded-md p-2 bg-white">
-        <canvas ref={canvasRef} />
+        <canvas ref={canvasRef} className="touch-none" />
       </div>
       <div className="flex items-center justify-between">
         <span className="text-sm text-gray-500">Draw your signature (mouse or finger)</span>
