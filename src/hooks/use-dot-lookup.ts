@@ -29,7 +29,7 @@ function transformToUSDOTData(mappedData: any): USDOTData {
     mailingAddressCity: mailing.city || '',
     mailingAddressState: mailing.state || '',
     mailingAddressZip: mailing.zip || '',
-    mailingAddressCountry: 'USA',
+    mailingAddressCountry: mailing.country || 'USA',
     telephone: mappedData.telephone || mappedData.telephone_number || '',
     powerUnits: parseInt(mappedData.power_units || mappedData.total_power_units || '0'),
     drivers: parseInt(mappedData.drivers || mappedData.total_drivers || '0'),
@@ -95,6 +95,9 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
           if (filingError) throw filingError;
 
+          let dotData;
+          let useCachedData = false;
+
           // Try getting cached data first
           const { data: cachedData } = await supabase
             .from('usdot_info')
@@ -102,12 +105,13 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             .eq('usdot_number', trimmedDOT)
             .maybeSingle();
 
-          let dotData;
-          
           if (cachedData && cachedData.basics_data) {
             console.log('Using cached DOT data');
             dotData = cachedData.basics_data;
-          } else {
+            useCachedData = true;
+          }
+
+          if (!useCachedData) {
             // Make API call if no cached data
             console.log('Making API request for DOT:', trimmedDOT);
             const { data: apiData, error: apiError } = await supabase.functions.invoke('fetch-usdot-info', {
@@ -136,8 +140,15 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           // Transform to USDOTData format
           const transformedData = transformToUSDOTData(mappedData);
 
-          // Store or update the data in usdot_info table
-          if (!cachedData) {
+          if (existingFiling) {
+            console.log('Found existing filing:', existingFiling);
+            resolve({ usdotData: transformedData, resumedFiling: existingFiling });
+          } else {
+            resolve({ usdotData: transformedData });
+          }
+
+          // Store or update the data in usdot_info table if it was from API
+          if (!useCachedData) {
             const { error: upsertError } = await supabase
               .from('usdot_info')
               .upsert({
@@ -173,16 +184,9 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
               console.error('Error storing USDOT info:', upsertError);
             }
           }
-
-          if (existingFiling) {
-            console.log('Found existing filing:', existingFiling);
-            resolve({ usdotData: transformedData, resumedFiling: existingFiling });
-          } else {
-            resolve({ usdotData: transformedData });
-          }
         } catch (error) {
           console.error('Error in DOT lookup:', error);
-          // Return some basic data even if the API call fails
+          // Return basic data even if API fails
           const basicData: USDOTData = {
             usdotNumber: trimmedDOT,
             legalName: '',
