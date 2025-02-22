@@ -34,8 +34,8 @@ function transformToUSDOTData(mappedData: any): USDOTData {
     mailingAddressZip: mailing.zip,
     mailingAddressCountry: mailing.country,
     telephone: mappedData.telephone || '',
-    powerUnits: mappedData.power_units ? String(parseInt(mappedData.power_units)) : '0',
-    drivers: mappedData.drivers ? String(parseInt(mappedData.drivers)) : '0',
+    powerUnits: mappedData.power_units ? parseInt(String(mappedData.power_units)) : 0,
+    drivers: mappedData.drivers ? parseInt(String(mappedData.drivers)) : 0,
     insuranceBIPD: 0,
     insuranceBond: 0,
     insuranceCargo: 0,
@@ -124,9 +124,9 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           // Transform to USDOTData format
           const transformedData = transformToUSDOTData(mappedData);
 
-          // Parse numeric values and convert to strings for database
-          const powerUnits = mappedData.power_units ? String(parseInt(String(mappedData.power_units))) : null;
-          const drivers = mappedData.drivers ? String(parseInt(String(mappedData.drivers))) : null;
+          // Parse numeric values as integers
+          const powerUnits = mappedData.power_units ? parseInt(String(mappedData.power_units)) : null;
+          const drivers = mappedData.drivers ? parseInt(String(mappedData.drivers)) : null;
 
           // Store or update the data in usdot_info table
           const usdotInfo: USDOTInfo = {
