@@ -13,7 +13,7 @@ const SignaturePad = ({
 }: SignaturePadProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricRef = useRef<Canvas | null>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const drawingRef = useRef(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -41,11 +41,11 @@ const SignaturePad = ({
 
     // Track drawing state and update signature
     canvas.on('mouse:down', () => {
-      setIsDrawing(true);
+      drawingRef.current = true;
     });
 
     canvas.on('mouse:up', () => {
-      setIsDrawing(false);
+      drawingRef.current = false;
       // Only update signature if canvas has content
       if (!canvas.isEmpty()) {
         const dataUrl = canvas.toDataURL({
