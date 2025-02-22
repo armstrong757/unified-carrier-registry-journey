@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { USDOTData } from "@/types/filing";
@@ -181,55 +182,12 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           }
         } catch (error) {
           console.error('Error in DOT lookup:', error);
-          // Return some basic data even if the API call fails
-          const basicData: USDOTData = {
-            usdotNumber: trimmedDOT,
-            legalName: '',
-            dbaName: '',
-            operatingStatus: '',
-            entityType: '',
-            physicalAddress: '',
-            physicalAddressStreet: '',
-            physicalAddressCity: '',
-            physicalAddressState: '',
-            physicalAddressZip: '',
-            physicalAddressCountry: 'USA',
-            mailingAddressStreet: '',
-            mailingAddressCity: '',
-            mailingAddressState: '',
-            mailingAddressZip: '',
-            mailingAddressCountry: 'USA',
-            telephone: '',
-            powerUnits: 0,
-            drivers: 0,
-            insuranceBIPD: 0,
-            insuranceBond: 0,
-            insuranceCargo: 0,
-            riskScore: 'Unknown',
-            outOfServiceDate: null,
-            mcs150FormDate: null,
-            mcs150Date: null,
-            mcs150Year: 0,
-            mcs150Mileage: 0,
-            carrierOperation: '',
-            cargoCarried: [],
-            busCount: 0,
-            limoCount: 0,
-            minibusCount: 0,
-            motorcoachCount: 0,
-            vanCount: 0,
-            complaintCount: 0,
-            outOfService: false,
-            mcNumber: ''
-          };
-          
           toast({
-            title: "Warning",
-            description: "Could not fetch complete DOT information. You may continue with basic information.",
+            title: "Error",
+            description: "Could not fetch DOT information. Please try again.",
             variant: "destructive"
           });
-          
-          resolve({ usdotData: basicData });
+          resolve(null);
         } finally {
           setIsLoading(false);
         }
