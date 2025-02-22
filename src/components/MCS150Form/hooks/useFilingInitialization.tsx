@@ -35,9 +35,8 @@ export const useFilingInitialization = ({
           setFormData(resumedFiling.form_data);
           setCurrentStep(resumedFiling.last_step_completed || 1);
           
-          // For resumed filings, get USDOT data from form_data
           if (resumedFiling.form_data?.usdotData) {
-            console.log('Setting USDOT data from resumed filing');
+            console.log('Setting USDOT data from resumed filing:', resumedFiling.form_data.usdotData);
             setUsdotData(resumedFiling.form_data.usdotData);
           }
           setIsInitialized(true);
@@ -45,17 +44,14 @@ export const useFilingInitialization = ({
         }
 
         console.log('Creating new filing with data:', data);
-        // For new filings, ensure we're using the proper USDOT data structure
-        const usdotDataToUse = data.usdotData || data;
-        
-        const filing = await createFiling(usdotDataToUse.usdotNumber, 'mcs150', {
+        const filing = await createFiling(data.usdotNumber, 'mcs150', {
           ...formData,
-          usdotData: usdotDataToUse // Store the USDOT data in the same structure
+          usdotData: data
         });
 
         if (filing) {
           setFilingId(filing.id);
-          setUsdotData(usdotDataToUse); // Use the properly structured data
+          setUsdotData(data); // Restore original working flow
           setIsInitialized(true);
         } else {
           throw new Error('Failed to create filing');
