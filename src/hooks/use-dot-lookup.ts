@@ -79,7 +79,38 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
         setIsLoading(true);
         
         try {
-          // Check for existing draft filing first
+          // Make API call first - don't use cache
+          console.log('Making API request for DOT:', trimmedDOT);
+          const { data: apiData, error: apiError } = await supabase.functions.invoke('fetch-usdot-info', {
+            body: { dotNumber: trimmedDOT }
+          });
+
+          if (apiError) {
+            console.error('API Error:', apiError);
+            throw apiError;
+          }
+
+          if (!apiData?.items?.[0]) {
+            throw new Error('No data received from DOT lookup');
+          }
+
+          const dotData = apiData.items[0];
+          console.log('Received DOT data:', dotData);
+
+          // Store the raw data in the database
+          const { error: upsertError } = await supabase
+            .from('usdot_info')
+            .upsert({
+              usdot_number: trimmedDOT,
+              basics_data: dotData,
+              updated_at: new Date().toISOString()
+            });
+
+          if (upsertError) {
+            console.error('Error storing USDOT info:', upsertError);
+          }
+
+          // Check for existing draft filing
           const { data: existingFiling, error: filingError } = await supabase
             .from('filings')
             .select('*')
@@ -91,71 +122,18 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
           if (filingError) throw filingError;
 
-          // Try getting cached data first
-          const { data: cachedData, error: cacheError } = await supabase
-            .from('usdot_info')
-            .select('basics_data, updated_at')
-            .eq('usdot_number', trimmedDOT)
-            .maybeSingle();
-
-          if (cacheError) throw cacheError;
-
-          let dotData;
-          
-          // Check if cache is valid (less than 24 hours old)
-          const isCacheValid = cachedData?.updated_at && 
-            (new Date().getTime() - new Date(cachedData.updated_at).getTime()) < 24 * 60 * 60 * 1000;
-
-          if (cachedData?.basics_data && isCacheValid) {
-            console.log('Using cached DOT data');
-            dotData = cachedData.basics_data;
-          } else {
-            // Make API call if no valid cached data
-            console.log('Making API request for DOT:', trimmedDOT);
-            const { data: apiData, error: apiError } = await supabase.functions.invoke('fetch-usdot-info', {
-              body: { dotNumber: trimmedDOT }
-            });
-
-            if (apiError) {
-              console.error('API Error:', apiError);
-              throw apiError;
-            }
-
-            if (!apiData?.items?.[0]) {
-              throw new Error('No data received from DOT lookup');
-            }
-
-            dotData = apiData.items[0];
-
-            // Store the raw data in the database
-            const { error: upsertError } = await supabase
-              .from('usdot_info')
-              .upsert({
-                usdot_number: trimmedDOT,
-                basics_data: dotData,
-                updated_at: new Date().toISOString()
-              });
-
-            if (upsertError) {
-              console.error('Error storing USDOT info:', upsertError);
-              // Don't throw here, just log the error since we have the data
-            }
-          }
-
-          if (!dotData) {
-            throw new Error('Failed to get DOT data from either cache or API');
-          }
-
           // Map and validate the data
           const mappedData = mapAPIResponse(dotData);
+          console.log('Mapped data:', mappedData);
+          
           const validatedData = validateDOTData(mappedData);
-
           if (!validatedData) {
             throw new Error('Invalid data received from API');
           }
 
           // Transform to USDOTData format
           const transformedData = transformToUSDOTData(validatedData);
+          console.log('Transformed data:', transformedData);
 
           if (existingFiling) {
             console.log('Found existing filing:', existingFiling);
@@ -166,14 +144,11 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
         } catch (error: any) {
           console.error('Error in DOT lookup:', error);
-          
-          // Don't silently fail - show error and reject
           toast({
             title: "Error",
             description: "Failed to fetch DOT information. Please try again.",
             variant: "destructive"
           });
-          
           reject(error);
         } finally {
           setIsLoading(false);
