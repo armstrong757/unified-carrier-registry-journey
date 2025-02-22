@@ -34,23 +34,28 @@ export const useFilingInitialization = ({
           setFilingId(resumedFiling.id);
           setFormData(resumedFiling.form_data);
           setCurrentStep(resumedFiling.last_step_completed || 1);
-          // Set the USDOT data from the form_data
-          if (resumedFiling.form_data.usdotData) {
+          
+          // For resumed filings, get USDOT data from form_data
+          if (resumedFiling.form_data?.usdotData) {
+            console.log('Setting USDOT data from resumed filing');
             setUsdotData(resumedFiling.form_data.usdotData);
           }
           setIsInitialized(true);
           return;
         }
 
-        console.log('Creating new filing');
-        const filing = await createFiling(data.usdotNumber, 'mcs150', {
+        console.log('Creating new filing with data:', data);
+        // For new filings, ensure we're using the proper USDOT data structure
+        const usdotDataToUse = data.usdotData || data;
+        
+        const filing = await createFiling(usdotDataToUse.usdotNumber, 'mcs150', {
           ...formData,
-          usdotData: data
+          usdotData: usdotDataToUse // Store the USDOT data in the same structure
         });
 
         if (filing) {
           setFilingId(filing.id);
-          setUsdotData(data);
+          setUsdotData(usdotDataToUse); // Use the properly structured data
           setIsInitialized(true);
         } else {
           throw new Error('Failed to create filing');
@@ -70,7 +75,7 @@ export const useFilingInitialization = ({
     // First try to get data from location state
     const stateData = location.state?.usdotData;
     if (stateData) {
-      console.log('Using state data');
+      console.log('Using state data:', stateData);
       setUsdotData(stateData);
       sessionStorage.setItem('usdotData', JSON.stringify(stateData));
       initializeFiling(stateData);
@@ -95,7 +100,7 @@ export const useFilingInitialization = ({
       if (!parsedData.usdotNumber) {
         throw new Error('Invalid USDOT data');
       }
-      console.log('Using stored data');
+      console.log('Using stored data:', parsedData);
       setUsdotData(parsedData);
       initializeFiling(parsedData);
     } catch (error) {
