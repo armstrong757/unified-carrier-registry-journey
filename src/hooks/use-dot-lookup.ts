@@ -74,7 +74,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
       clearTimeout(debounceTimer);
     }
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       debounceTimer = setTimeout(async () => {
         setIsLoading(true);
         
@@ -91,32 +91,37 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
           if (filingError) throw filingError;
 
-          let dotData;
-          let useCachedData = false;
-
           // Try getting cached data first
-          const { data: cachedData } = await supabase
+          const { data: cachedData, error: cacheError } = await supabase
             .from('usdot_info')
-            .select('*')
+            .select('basics_data, updated_at')
             .eq('usdot_number', trimmedDOT)
             .maybeSingle();
 
-          if (cachedData && cachedData.basics_data) {
+          if (cacheError) throw cacheError;
+
+          let dotData;
+          
+          // Check if cache is valid (less than 24 hours old)
+          const isCacheValid = cachedData?.updated_at && 
+            (new Date().getTime() - new Date(cachedData.updated_at).getTime()) < 24 * 60 * 60 * 1000;
+
+          if (cachedData?.basics_data && isCacheValid) {
             console.log('Using cached DOT data');
             dotData = cachedData.basics_data;
-            useCachedData = true;
-          }
-
-          if (!useCachedData) {
-            // Make API call if no cached data
+          } else {
+            // Make API call if no valid cached data
             console.log('Making API request for DOT:', trimmedDOT);
             const { data: apiData, error: apiError } = await supabase.functions.invoke('fetch-usdot-info', {
               body: { dotNumber: trimmedDOT }
             });
 
-            if (apiError) throw apiError;
+            if (apiError) {
+              console.error('API Error:', apiError);
+              throw apiError;
+            }
 
-            if (!apiData || !apiData.items || !apiData.items[0]) {
+            if (!apiData?.items?.[0]) {
               throw new Error('No data received from DOT lookup');
             }
 
@@ -133,8 +138,12 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
             if (upsertError) {
               console.error('Error storing USDOT info:', upsertError);
-              throw upsertError;
+              // Don't throw here, just log the error since we have the data
             }
+          }
+
+          if (!dotData) {
+            throw new Error('Failed to get DOT data from either cache or API');
           }
 
           // Map and validate the data
@@ -146,7 +155,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           }
 
           // Transform to USDOTData format
-          const transformedData = transformToUSDOTData(mappedData);
+          const transformedData = transformToUSDOTData(validatedData);
 
           if (existingFiling) {
             console.log('Found existing filing:', existingFiling);
@@ -155,57 +164,17 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             resolve({ usdotData: transformedData });
           }
 
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error in DOT lookup:', error);
-          // Return basic data even if API fails
-          const basicData: USDOTData = {
-            usdotNumber: trimmedDOT,
-            legalName: '',
-            dbaName: '',
-            operatingStatus: '',
-            entityType: '',
-            physicalAddress: '',
-            physicalAddressStreet: '',
-            physicalAddressCity: '',
-            physicalAddressState: '',
-            physicalAddressZip: '',
-            physicalAddressCountry: 'USA',
-            mailingAddressStreet: '',
-            mailingAddressCity: '',
-            mailingAddressState: '',
-            mailingAddressZip: '',
-            mailingAddressCountry: 'USA',
-            telephone: '',
-            powerUnits: 0,
-            drivers: 0,
-            insuranceBIPD: 0,
-            insuranceBond: 0,
-            insuranceCargo: 0,
-            riskScore: 'Unknown',
-            outOfServiceDate: null,
-            mcs150FormDate: null,
-            mcs150Date: null,
-            mcs150Year: 0,
-            mcs150Mileage: 0,
-            carrierOperation: '',
-            cargoCarried: [],
-            busCount: 0,
-            limoCount: 0,
-            minibusCount: 0,
-            motorcoachCount: 0,
-            vanCount: 0,
-            complaintCount: 0,
-            outOfService: false,
-            mcNumber: ''
-          };
           
+          // Don't silently fail - show error and reject
           toast({
-            title: "Warning",
-            description: "Could not fetch complete DOT information. You may continue with basic information.",
+            title: "Error",
+            description: "Failed to fetch DOT information. Please try again.",
             variant: "destructive"
           });
           
-          resolve({ usdotData: basicData });
+          reject(error);
         } finally {
           setIsLoading(false);
         }
