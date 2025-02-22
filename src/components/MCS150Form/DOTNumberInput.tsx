@@ -13,29 +13,33 @@ export const DOTNumberInput = () => {
   const { honeypot, setHoneypot, checkBotAttempt } = useBotProtection();
   const { lookupDOT, isLoading } = useDOTLookup('mcs150');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Ensure this is called immediately
     
     if (checkBotAttempt()) return;
 
-    const result = await lookupDOT(dotNumber);
-    if (result) {
-      // Store the data in session storage for persistence
-      sessionStorage.setItem('usdotData', JSON.stringify(result.usdotData));
-      
-      navigate("/mcs150", {
-        state: {
-          usdotData: result.usdotData,
-          resumedFiling: result.resumedFiling
-        },
-        replace: true // Use replace to prevent back navigation issues
-      });
+    try {
+      const result = await lookupDOT(dotNumber);
+      if (result?.usdotData) {
+        const usdotDataString = JSON.stringify(result.usdotData);
+        sessionStorage.setItem('usdotData', usdotDataString);
+        
+        navigate("/mcs150", {
+          state: {
+            usdotData: result.usdotData,
+            resumedFiling: result.resumedFiling
+          },
+          replace: true
+        });
+      }
+    } catch (error) {
+      console.error('Error in DOT lookup:', error);
     }
   };
 
   return (
     <Card className="max-w-md mx-auto p-8 bg-white shadow-lg border-0">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         <h2 className="text-xl font-semibold text-center mb-6">Enter DOT Number To Start</h2>
         <Input 
           type="text" 
