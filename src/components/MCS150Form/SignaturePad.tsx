@@ -56,34 +56,37 @@ const SignaturePad = ({
       onChange(dataUrl);
     };
 
-    // Listen to all relevant events
-    canvas.on('mouse:up', () => {
+    const handleMouseUp = () => {
       setIsDrawing(false);
       updateSignature();
-    });
+    };
 
-    canvas.on('mouse:down', () => {
+    const handleMouseDown = () => {
       setIsDrawing(true);
-      canvas.renderAll();
-    });
+    };
 
-    canvas.on('mouse:move', () => {
+    const handleMouseMove = () => {
       if (isDrawing) {
         canvas.renderAll();
       }
-    });
+    };
 
+    // Listen to all relevant events
+    canvas.on('mouse:up', handleMouseUp);
+    canvas.on('mouse:down', handleMouseDown);
+    canvas.on('mouse:move', handleMouseMove);
     canvas.on('path:created', updateSignature);
 
     fabricRef.current = canvas;
 
-    // Initial render
-    canvas.renderAll();
-
     return () => {
+      // Remove event listeners
+      canvas.off('mouse:up', handleMouseUp);
+      canvas.off('mouse:down', handleMouseDown);
+      canvas.off('mouse:move', handleMouseMove);
       canvas.dispose();
     };
-  }, [onChange, isMobile, isDrawing]);
+  }, [onChange, isMobile]); // Removed isDrawing from dependencies
 
   const handleClear = () => {
     if (fabricRef.current) {
