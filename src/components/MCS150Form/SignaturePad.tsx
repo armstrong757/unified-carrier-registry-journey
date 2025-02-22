@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas, PencilBrush } from "fabric";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -13,6 +13,7 @@ const SignaturePad = ({
 }: SignaturePadProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricRef = useRef<Canvas | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -30,21 +31,29 @@ const SignaturePad = ({
       backgroundColor: 'white'
     });
 
-    // Initialize the brush
+    // Initialize the brush with smoother settings
     const pencilBrush = new PencilBrush(canvas);
     pencilBrush.width = 2;
     pencilBrush.color = "#000000";
+    pencilBrush.strokeLineCap = 'round';
+    pencilBrush.strokeLineJoin = 'round';
     canvas.freeDrawingBrush = pencilBrush;
 
-    // Handle both mouse and touch events with 'mouse:up'
-    // This event works for both mouse and touch in Fabric.js v6
+    // Track drawing state and update signature
+    canvas.on('mouse:down', () => {
+      setIsDrawing(true);
+    });
+
     canvas.on('mouse:up', () => {
+      setIsDrawing(false);
+      // Only update signature if canvas has content
       if (!canvas.isEmpty()) {
-        onChange(canvas.toDataURL({
+        const dataUrl = canvas.toDataURL({
           format: 'png',
           quality: 1,
           multiplier: 1
-        }));
+        });
+        onChange(dataUrl);
       }
     });
 
