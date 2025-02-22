@@ -9,49 +9,45 @@ import { mapAPIResponse } from "@/utils/dot-api-mapper";
 const DEBOUNCE_TIMEOUT = 300;
 let debounceTimer: NodeJS.Timeout;
 
-function transformToUSDOTData(mappedData: any): USDOTData {
-  const physical = mappedData.physical_address_parsed || {};
-  const mailing = mappedData.mailing_address_parsed || {};
-
+function transformToUSDOTData(data: any): USDOTData {
   return {
-    usdotNumber: mappedData.usdot_number || mappedData.dot_number || '',
-    legalName: mappedData.legal_name || '',
-    dbaName: mappedData.dba_name || '',
-    operatingStatus: mappedData.operating_status || mappedData.usdot_status || '',
-    entityType: mappedData.entity_type || mappedData.entity_type_desc || '',
-    physicalAddress: mappedData.physical_address || '',
-    physicalAddressStreet: physical.street || '',
-    physicalAddressCity: physical.city || '',
-    physicalAddressState: physical.state || '',
-    physicalAddressZip: physical.zip || '',
-    physicalAddressCountry: physical.country || 'USA',
-    mailingAddressStreet: mailing.street || '',
-    mailingAddressCity: mailing.city || '',
-    mailingAddressState: mailing.state || '',
-    mailingAddressZip: mailing.zip || '',
-    mailingAddressCountry: mailing.country || 'USA',
-    telephone: mappedData.telephone || mappedData.telephone_number || '',
-    powerUnits: parseInt(mappedData.power_units || mappedData.total_power_units || '0'),
-    drivers: parseInt(mappedData.drivers || mappedData.total_drivers || '0'),
-    insuranceBIPD: 0,
-    insuranceBond: 0,
-    insuranceCargo: 0,
-    riskScore: 'Unknown',
-    outOfServiceDate: mappedData.out_of_service_date || null,
-    mcs150FormDate: mappedData.mcs150_last_update || null,
-    mcs150Date: mappedData.mcs150_last_update || null,
-    mcs150Year: parseInt(mappedData.mcs150_year || '0'),
-    mcs150Mileage: parseInt(mappedData.mcs150_mileage || '0'),
-    carrierOperation: '',
-    cargoCarried: [],
-    busCount: 0,
-    limoCount: 0,
-    minibusCount: 0,
-    motorcoachCount: 0,
-    vanCount: 0,
-    complaintCount: 0,
-    outOfService: mappedData.out_of_service || false,
-    mcNumber: ''
+    usdotNumber: (data.usdot_number || data.dot_number || '').toString(),
+    legalName: data.legal_name || '',
+    dbaName: data.dba_name || '',
+    operatingStatus: data.operating_status || data.usdot_status || '',
+    entityType: data.entity_type || data.entity_type_desc || '',
+    physicalAddress: data.physical_address || '',
+    physicalAddressStreet: data.physical_address_street || '',
+    physicalAddressCity: data.physical_address_city || '',
+    physicalAddressState: data.physical_address_state || '',
+    physicalAddressZip: data.physical_address_zip_code || '',
+    physicalAddressCountry: 'USA',
+    mailingAddressStreet: data.mailing_address_street || '',
+    mailingAddressCity: data.mailing_address_city || '',
+    mailingAddressState: data.mailing_address_state || '',
+    mailingAddressZip: data.mailing_address_zip_code || '',
+    mailingAddressCountry: 'USA',
+    telephone: data.telephone || data.telephone_number || '',
+    powerUnits: parseInt(data.power_units || data.total_power_units || '0'),
+    drivers: parseInt(data.drivers || data.total_drivers || '0'),
+    busCount: parseInt(data.bus_count || '0'),
+    limoCount: parseInt(data.limo_count || '0'),
+    minibusCount: parseInt(data.minibus_count || '0'),
+    motorcoachCount: parseInt(data.motorcoach_count || '0'),
+    vanCount: parseInt(data.van_count || '0'),
+    complaintCount: parseInt(data.complaint_count || '0'),
+    outOfService: Boolean(data.out_of_service || data.out_of_service_flag),
+    outOfServiceDate: data.out_of_service_date || null,
+    mcNumber: data.mc_number || '',
+    mcs150Date: data.mcs150_date || data.mcs150_last_update || null,
+    mcs150Year: parseInt(data.mcs150_year || '0'),
+    mcs150Mileage: parseInt(data.mcs150_mileage || '0'),
+    carrierOperation: data.carrier_operation || '',
+    cargoCarried: Array.isArray(data.cargo_carried) ? data.cargo_carried : [],
+    insuranceBIPD: parseInt(data.insurance_bipd_on_file || '0'),
+    insuranceBond: parseInt(data.insurance_bond_on_file || '0'),
+    insuranceCargo: parseInt(data.insurance_cargo_on_file || '0'),
+    riskScore: data.risk_score || ''
   };
 }
 
@@ -118,9 +114,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
               body: { dotNumber: trimmedDOT }
             });
 
-            if (apiError) {
-              throw apiError;
-            }
+            if (apiError) throw apiError;
 
             if (!apiData || !apiData.items || !apiData.items[0]) {
               throw new Error('No data received from DOT lookup');
@@ -128,36 +122,12 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
 
             dotData = apiData.items[0];
 
-            // Store or update the data in usdot_info table if it was from API
-            const mappedDataForStorage = mapAPIResponse(dotData);
+            // Store the raw data in the database
             const { error: upsertError } = await supabase
               .from('usdot_info')
               .upsert({
                 usdot_number: trimmedDOT,
                 basics_data: dotData,
-                legal_name: mappedDataForStorage.legal_name,
-                dba_name: mappedDataForStorage.dba_name,
-                api_dba_name: mappedDataForStorage.api_dba_name,
-                api_dba_flag: mappedDataForStorage.api_dba_flag,
-                operating_status: mappedDataForStorage.operating_status,
-                entity_type: mappedDataForStorage.entity_type,
-                physical_address: mappedDataForStorage.physical_address,
-                telephone: mappedDataForStorage.telephone,
-                power_units: mappedDataForStorage.power_units,
-                drivers: mappedDataForStorage.drivers,
-                mcs150_last_update: mappedDataForStorage.mcs150_last_update,
-                out_of_service: mappedDataForStorage.out_of_service,
-                out_of_service_date: mappedDataForStorage.out_of_service_date,
-                api_physical_address_street: mappedDataForStorage.physical_address_parsed.street,
-                api_physical_address_city: mappedDataForStorage.physical_address_parsed.city,
-                api_physical_address_state: mappedDataForStorage.physical_address_parsed.state,
-                api_physical_address_zip: mappedDataForStorage.physical_address_parsed.zip,
-                api_physical_address_country: mappedDataForStorage.physical_address_parsed.country,
-                api_mailing_address_street: mappedDataForStorage.mailing_address_parsed.street,
-                api_mailing_address_city: mappedDataForStorage.mailing_address_parsed.city,
-                api_mailing_address_state: mappedDataForStorage.mailing_address_parsed.state,
-                api_mailing_address_zip: mappedDataForStorage.mailing_address_parsed.zip,
-                api_mailing_address_country: mappedDataForStorage.mailing_address_parsed.country,
                 updated_at: new Date().toISOString()
               });
 
@@ -178,7 +148,6 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           // Transform to USDOTData format
           const transformedData = transformToUSDOTData(mappedData);
 
-          // Only resolve after all data operations are complete
           if (existingFiling) {
             console.log('Found existing filing:', existingFiling);
             resolve({ usdotData: transformedData, resumedFiling: existingFiling });
