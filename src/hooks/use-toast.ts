@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -7,6 +8,7 @@ import type {
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000
+const TOAST_DURATION = 1000 // Adding a 1-second duration for auto-dismiss
 
 type ToasterToast = ToastProps & {
   id: string
@@ -90,8 +92,6 @@ export const reducer = (state: State, action: Action): State => {
     case "DISMISS_TOAST": {
       const { toastId } = action
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
       if (toastId) {
         addToRemoveQueue(toastId)
       } else {
@@ -155,11 +155,15 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
+      duration: TOAST_DURATION, // Add default duration
       onOpenChange: (open) => {
         if (!open) dismiss()
       },
     },
   })
+
+  // Auto-dismiss after duration
+  setTimeout(dismiss, TOAST_DURATION)
 
   return {
     id: id,
