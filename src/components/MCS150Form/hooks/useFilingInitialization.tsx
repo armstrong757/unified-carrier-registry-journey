@@ -34,6 +34,10 @@ export const useFilingInitialization = ({
           setFilingId(resumedFiling.id);
           setFormData(resumedFiling.form_data);
           setCurrentStep(resumedFiling.last_step_completed || 1);
+          // Set the USDOT data from the form_data
+          if (resumedFiling.form_data.usdotData) {
+            setUsdotData(resumedFiling.form_data.usdotData);
+          }
           setIsInitialized(true);
           return;
         }
@@ -46,6 +50,7 @@ export const useFilingInitialization = ({
 
         if (filing) {
           setFilingId(filing.id);
+          setUsdotData(data);
           setIsInitialized(true);
         } else {
           throw new Error('Failed to create filing');
