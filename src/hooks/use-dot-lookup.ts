@@ -5,9 +5,6 @@ import { USDOTData } from "@/types/filing";
 import { useToast } from "@/components/ui/use-toast";
 import { validateDOTData } from "@/utils/dot-data-validation";
 import { mapAPIResponse } from "@/utils/dot-api-mapper";
-import type { Database } from "@/integrations/supabase/types";
-
-type USDOTInfo = Database['public']['Tables']['usdot_info']['Insert'];
 
 const DEBOUNCE_TIMEOUT = 300;
 let debounceTimer: NodeJS.Timeout;
@@ -19,7 +16,7 @@ function transformToUSDOTData(mappedData: any): USDOTData {
   return {
     usdotNumber: mappedData.usdot_number,
     legalName: mappedData.legal_name,
-    dbaName: mappedData.dba_name,
+    dbaName: mappedData.api_dba_name,
     operatingStatus: mappedData.operating_status,
     entityType: mappedData.entity_type,
     physicalAddress: mappedData.physical_address,
@@ -34,8 +31,8 @@ function transformToUSDOTData(mappedData: any): USDOTData {
     mailingAddressZip: mailing.zip,
     mailingAddressCountry: mailing.country,
     telephone: mappedData.telephone || '',
-    powerUnits: mappedData.power_units ? parseInt(String(mappedData.power_units)) : 0,
-    drivers: mappedData.drivers ? parseInt(String(mappedData.drivers)) : 0,
+    powerUnits: mappedData.power_units,
+    drivers: mappedData.drivers,
     insuranceBIPD: 0,
     insuranceBond: 0,
     insuranceCargo: 0,
@@ -43,7 +40,7 @@ function transformToUSDOTData(mappedData: any): USDOTData {
     outOfServiceDate: mappedData.out_of_service_date,
     mcs150FormDate: mappedData.mcs150_last_update,
     mcs150Date: mappedData.mcs150_last_update,
-    mcs150Year: mappedData.mcs150_year ? parseInt(mappedData.mcs150_year) : undefined,
+    mcs150Year: mappedData.mcs150_year || 0,
     mcs150Mileage: mappedData.mcs150_mileage || 0,
     carrierOperation: '',
     cargoCarried: [],
@@ -124,47 +121,40 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           // Transform to USDOTData format
           const transformedData = transformToUSDOTData(mappedData);
 
-          // Parse numeric values as integers
-          const powerUnits = mappedData.power_units ? parseInt(String(mappedData.power_units)) : null;
-          const drivers = mappedData.drivers ? parseInt(String(mappedData.drivers)) : null;
-
           // Store or update the data in usdot_info table
-          const usdotInfo: USDOTInfo = {
-            usdot_number: trimmedDOT,
-            legal_name: mappedData.legal_name,
-            dba_name: mappedData.dba_name,
-            api_dba_name: mappedData.api_dba_name,
-            api_dba_flag: mappedData.api_dba_flag,
-            operating_status: mappedData.operating_status,
-            entity_type: mappedData.entity_type,
-            physical_address: mappedData.physical_address,
-            telephone: mappedData.telephone,
-            power_units: powerUnits,
-            drivers: drivers,
-            mcs150_last_update: mappedData.mcs150_last_update,
-            out_of_service: mappedData.out_of_service,
-            out_of_service_date: mappedData.out_of_service_date,
-            mileage_year: mappedData.mcs150_year,
-            api_physical_address_street: mappedData.physical_address_parsed.street,
-            api_physical_address_city: mappedData.physical_address_parsed.city,
-            api_physical_address_state: mappedData.physical_address_parsed.state,
-            api_physical_address_zip: mappedData.physical_address_parsed.zip,
-            api_physical_address_country: mappedData.physical_address_parsed.country,
-            api_mailing_address_street: mappedData.mailing_address_parsed.street,
-            api_mailing_address_city: mappedData.mailing_address_parsed.city,
-            api_mailing_address_state: mappedData.mailing_address_parsed.state,
-            api_mailing_address_zip: mappedData.mailing_address_parsed.zip,
-            api_mailing_address_country: mappedData.mailing_address_parsed.country,
-            updated_at: new Date().toISOString()
-          };
-
           const { error: upsertError } = await supabase
             .from('usdot_info')
-            .upsert(usdotInfo);
+            .upsert({
+              usdot_number: trimmedDOT,
+              basics_data: data.items[0],
+              legal_name: mappedData.legal_name,
+              dba_name: mappedData.dba_name,
+              api_dba_name: mappedData.api_dba_name,
+              api_dba_flag: mappedData.api_dba_flag,
+              operating_status: mappedData.operating_status,
+              entity_type: mappedData.entity_type,
+              physical_address: mappedData.physical_address,
+              telephone: mappedData.telephone,
+              power_units: mappedData.power_units,
+              drivers: mappedData.drivers,
+              mcs150_last_update: mappedData.mcs150_last_update,
+              out_of_service: mappedData.out_of_service,
+              out_of_service_date: mappedData.out_of_service_date,
+              api_physical_address_street: mappedData.physical_address_parsed.street,
+              api_physical_address_city: mappedData.physical_address_parsed.city,
+              api_physical_address_state: mappedData.physical_address_parsed.state,
+              api_physical_address_zip: mappedData.physical_address_parsed.zip,
+              api_physical_address_country: mappedData.physical_address_parsed.country,
+              api_mailing_address_street: mappedData.mailing_address_parsed.street,
+              api_mailing_address_city: mappedData.mailing_address_parsed.city,
+              api_mailing_address_state: mappedData.mailing_address_parsed.state,
+              api_mailing_address_zip: mappedData.mailing_address_parsed.zip,
+              api_mailing_address_country: mappedData.mailing_address_parsed.country,
+              updated_at: new Date().toISOString()
+            });
 
           if (upsertError) {
             console.error('Error storing USDOT info:', upsertError);
-            throw upsertError;
           }
 
           if (existingFiling) {
