@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Canvas, PencilBrush } from "fabric";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -40,7 +40,9 @@ const SignaturePad = ({
     const updateSignature = () => {
       const dataUrl = canvas.toDataURL({
         format: 'png',
-        quality: 1
+        quality: 1,
+        multiplier: 1,
+        enableRetinaScaling: true
       });
       onChange(dataUrl);
     };
