@@ -8,7 +8,7 @@ import type {
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000
-const TOAST_DURATION = 1000 // Adding a 1-second duration for auto-dismiss
+const TOAST_DURATION = 2000 // Changed to 2 seconds
 
 type ToasterToast = ToastProps & {
   id: string
@@ -155,7 +155,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      duration: TOAST_DURATION, // Add default duration
+      duration: TOAST_DURATION,
       onOpenChange: (open) => {
         if (!open) dismiss()
       },
