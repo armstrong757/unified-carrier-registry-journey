@@ -28,38 +28,42 @@ const SignaturePad = ({
       isDrawingMode: true,
       width: isMobile ? 300 : 400,
       height: 150,
-      backgroundColor: 'white'
+      backgroundColor: 'white',
+      preserveObjectStacking: true
     });
 
-    // Initialize the brush with smoother settings
+    // Initialize the brush with optimized settings for signatures
     const pencilBrush = new PencilBrush(canvas);
     pencilBrush.width = 2;
     pencilBrush.color = "#000000";
     pencilBrush.strokeLineCap = 'round';
     pencilBrush.strokeLineJoin = 'round';
+    pencilBrush.strokeMiterLimit = 10;
+    pencilBrush.strokeDashArray = [];
     canvas.freeDrawingBrush = pencilBrush;
 
-    // Track drawing state and update signature
+    // Track drawing state
+    canvas.on('path:created', () => {
+      if (!canvas.isEmpty()) {
+        const dataUrl = canvas.toDataURL({
+          format: 'png',
+          quality: 1,
+          multiplier: 2
+        });
+        onChange(dataUrl);
+      }
+    });
+
     canvas.on('mouse:down', () => {
       setIsDrawing(true);
     });
 
     canvas.on('mouse:up', () => {
       setIsDrawing(false);
-      // Only update signature if canvas has content
-      if (!canvas.isEmpty()) {
-        const dataUrl = canvas.toDataURL({
-          format: 'png',
-          quality: 1,
-          multiplier: 1
-        });
-        onChange(dataUrl);
-      }
     });
 
     fabricRef.current = canvas;
 
-    // Clean up
     return () => {
       canvas.dispose();
     };
