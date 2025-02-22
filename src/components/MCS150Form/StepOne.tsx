@@ -1,7 +1,6 @@
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useEffect } from "react";
 
 interface StepOneProps {
   formData: any;
@@ -9,16 +8,6 @@ interface StepOneProps {
 }
 
 const StepOne = ({ formData, setFormData }: StepOneProps) => {
-  // Use useEffect to set the default value only once on mount
-  useEffect(() => {
-    if (!formData.reasonForFiling) {
-      setFormData({
-        ...formData,
-        reasonForFiling: 'biennialUpdate'
-      });
-    }
-  }, []); // Empty dependency array means this runs once on mount
-
   const updateReasonForFiling = (value: string) => {
     setFormData({
       ...formData,
@@ -35,8 +24,7 @@ const StepOne = ({ formData, setFormData }: StepOneProps) => {
           Select your reason for filing <span className="text-red-500">*</span>
         </Label>
         <RadioGroup
-          defaultValue="biennialUpdate"
-          value={formData.reasonForFiling}
+          value={formData.reasonForFiling || 'biennialUpdate'}
           onValueChange={updateReasonForFiling}
           className="space-y-1.5"
         >
