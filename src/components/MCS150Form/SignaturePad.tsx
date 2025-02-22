@@ -13,7 +13,6 @@ const SignaturePad = ({
 }: SignaturePadProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricRef = useRef<Canvas | null>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -28,39 +27,27 @@ const SignaturePad = ({
       isDrawingMode: true,
       width: isMobile ? 300 : 400,
       height: 150,
-      backgroundColor: 'white',
-      preserveObjectStacking: true
+      backgroundColor: 'white'
     });
 
-    // Initialize the brush with optimized settings for signatures
+    // Simple brush setup
     const pencilBrush = new PencilBrush(canvas);
     pencilBrush.width = 2;
     pencilBrush.color = "#000000";
-    pencilBrush.strokeLineCap = 'round';
-    pencilBrush.strokeLineJoin = 'round';
-    pencilBrush.strokeMiterLimit = 10;
-    pencilBrush.strokeDashArray = [];
     canvas.freeDrawingBrush = pencilBrush;
 
-    // Track drawing state
-    canvas.on('path:created', () => {
-      if (!canvas.isEmpty()) {
-        const dataUrl = canvas.toDataURL({
-          format: 'png',
-          quality: 1,
-          multiplier: 2
-        });
-        onChange(dataUrl);
-      }
-    });
+    // Update signature on ANY mouse/touch event that could modify the canvas
+    const updateSignature = () => {
+      const dataUrl = canvas.toDataURL({
+        format: 'png',
+        quality: 1
+      });
+      onChange(dataUrl);
+    };
 
-    canvas.on('mouse:down', () => {
-      setIsDrawing(true);
-    });
-
-    canvas.on('mouse:up', () => {
-      setIsDrawing(false);
-    });
+    canvas.on('mouse:up', updateSignature);
+    canvas.on('mouse:move', updateSignature);
+    canvas.on('path:created', updateSignature);
 
     fabricRef.current = canvas;
 
