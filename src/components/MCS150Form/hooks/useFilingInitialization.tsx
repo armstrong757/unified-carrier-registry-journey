@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createFiling } from "@/utils/filing";
+import { USDOTData } from "@/types/filing";
 
 interface UseFilingInitializationProps {
   formData: any;
@@ -18,14 +19,14 @@ export const useFilingInitialization = ({
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const [usdotData, setUsdotData] = useState<any>(null);
+  const [usdotData, setUsdotData] = useState<USDOTData | null>(null);
   const [filingId, setFilingId] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     if (isInitialized) return;
 
-    const initializeFiling = async (data: any) => {
+    const initializeFiling = async (data: USDOTData) => {
       try {
         const resumedFiling = location.state?.resumedFiling;
         
@@ -36,8 +37,9 @@ export const useFilingInitialization = ({
           setCurrentStep(resumedFiling.last_step_completed || 1);
           
           if (resumedFiling.form_data?.usdotData) {
-            console.log('Setting USDOT data from resumed filing:', resumedFiling.form_data.usdotData);
-            setUsdotData(resumedFiling.form_data.usdotData);
+            const resumedData = resumedFiling.form_data.usdotData as USDOTData;
+            console.log('Setting USDOT data from resumed filing:', resumedData);
+            setUsdotData(resumedData);
           }
           setIsInitialized(true);
           return;
@@ -51,7 +53,7 @@ export const useFilingInitialization = ({
 
         if (filing) {
           setFilingId(filing.id);
-          setUsdotData(data); // Restore original working flow
+          setUsdotData(data);
           setIsInitialized(true);
         } else {
           throw new Error('Failed to create filing');
@@ -69,8 +71,8 @@ export const useFilingInitialization = ({
     };
 
     // First try to get data from location state
-    const stateData = location.state?.usdotData;
-    if (stateData) {
+    const stateData = location.state?.usdotData as USDOTData;
+    if (stateData?.usdotNumber) {
       console.log('Using state data:', stateData);
       setUsdotData(stateData);
       sessionStorage.setItem('usdotData', JSON.stringify(stateData));
@@ -92,7 +94,7 @@ export const useFilingInitialization = ({
     }
 
     try {
-      const parsedData = JSON.parse(storedData);
+      const parsedData = JSON.parse(storedData) as USDOTData;
       if (!parsedData.usdotNumber) {
         throw new Error('Invalid USDOT data');
       }

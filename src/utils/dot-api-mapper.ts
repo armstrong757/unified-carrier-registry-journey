@@ -1,7 +1,8 @@
 
 import { cleanPhoneNumber, parseNumericValue, formatDate } from './dot-data-validation';
+import { USDOTData } from '@/types/filing';
 
-export function mapAPIResponse(apiResponse: any) {
+export function mapAPIResponse(apiResponse: any): USDOTData {
   console.log('Mapping API response:', apiResponse);
   
   // Extract data from either basics_data or root level
@@ -31,38 +32,50 @@ export function mapAPIResponse(apiResponse: any) {
   const physicalAddress = parseAddress(data.physical_address);
   const mailingAddress = parseAddress(data.mailing_address || data.physical_address);
 
-  const mappedData = {
-    usdot_number: data.usdot_number || data.dot_number || '',
-    legal_name: data.legal_name || '',
-    dba_name: data.dba_name || '',
-    api_dba_name: data.dba_name || '',
-    api_dba_flag: Boolean(data.dba_flag),
-    operating_status: data.operating_status || data.usdot_status || 'NOT AUTHORIZED',
-    entity_type: data.entity_type || data.entity_type_desc || '',
-    physical_address: data.physical_address || '',
-    telephone: cleanPhoneNumber(data.telephone || data.telephone_number),
-    power_units: parseNumericValue(data.power_units || data.total_power_units),
-    drivers: parseNumericValue(data.drivers || data.total_drivers),
-    mcs150_last_update: formatDate(data.mcs150_last_update || data.mcs150_date),
-    out_of_service: Boolean(data.out_of_service || data.out_of_service_flag),
-    out_of_service_date: formatDate(data.out_of_service_date),
-    mileage_year: data.mcs150_year || '', // For database storage
-    mcs150_year: data.mcs150_year ? parseInt(data.mcs150_year) : undefined, // For interface compatibility
-    mcs150_mileage: parseNumericValue(data.mcs150_mileage),
-    physical_address_parsed: physicalAddress || {
-      street: data.api_physical_address_street || data.physical_address_street || '',
-      city: data.api_physical_address_city || data.physical_address_city || '',
-      state: data.api_physical_address_state || data.physical_address_state || '',
-      zip: data.api_physical_address_zip || data.physical_address_zip_code || '',
-      country: data.api_physical_address_country || 'USA'
-    },
-    mailing_address_parsed: mailingAddress || {
-      street: data.api_mailing_address_street || data.mailing_address_street || '',
-      city: data.api_mailing_address_city || data.mailing_address_city || '',
-      state: data.api_mailing_address_state || data.mailing_address_state || '',
-      zip: data.api_mailing_address_zip || data.mailing_address_zip_code || '',
-      country: data.api_mailing_address_country || 'USA'
-    }
+  // Ensure all numeric values are converted to numbers
+  const powerUnits = parseNumericValue(data.power_units || data.total_power_units);
+  const drivers = parseNumericValue(data.drivers || data.total_drivers);
+  const mcs150Year = data.mcs150_year ? parseInt(data.mcs150_year) : undefined;
+  const mcs150Mileage = parseNumericValue(data.mcs150_mileage);
+
+  const mappedData: USDOTData = {
+    usdotNumber: (data.usdot_number || data.dot_number || '').toString(),
+    legalName: data.legal_name || '',
+    dbaName: data.dba_name || '',
+    operatingStatus: data.operating_status || data.usdot_status || 'NOT AUTHORIZED',
+    entityType: data.entity_type || data.entity_type_desc || '',
+    physicalAddress: data.physical_address || '',
+    physicalAddressStreet: physicalAddress?.street || data.physical_address_street || '',
+    physicalAddressCity: physicalAddress?.city || data.physical_address_city || '',
+    physicalAddressState: physicalAddress?.state || data.physical_address_state || '',
+    physicalAddressZip: physicalAddress?.zip || data.physical_address_zip_code || '',
+    physicalAddressCountry: 'USA',
+    mailingAddressStreet: mailingAddress?.street || data.mailing_address_street || '',
+    mailingAddressCity: mailingAddress?.city || data.mailing_address_city || '',
+    mailingAddressState: mailingAddress?.state || data.mailing_address_state || '',
+    mailingAddressZip: mailingAddress?.zip || data.mailing_address_zip_code || '',
+    mailingAddressCountry: 'USA',
+    telephone: cleanPhoneNumber(data.telephone || data.telephone_number) || '',
+    powerUnits: powerUnits,
+    drivers: drivers,
+    busCount: parseNumericValue(data.bus_count) || 0,
+    limoCount: parseNumericValue(data.limo_count) || 0,
+    minibusCount: parseNumericValue(data.minibus_count) || 0,
+    motorcoachCount: parseNumericValue(data.motorcoach_count) || 0,
+    vanCount: parseNumericValue(data.van_count) || 0,
+    complaintCount: parseNumericValue(data.complaint_count) || 0,
+    outOfService: Boolean(data.out_of_service || data.out_of_service_flag),
+    outOfServiceDate: formatDate(data.out_of_service_date),
+    mcNumber: data.mc_number || '',
+    mcs150Date: formatDate(data.mcs150_last_update || data.mcs150_date),
+    mcs150Year: mcs150Year,
+    mcs150Mileage: mcs150Mileage,
+    carrierOperation: data.carrier_operation || '',
+    cargoCarried: Array.isArray(data.cargo_carried) ? data.cargo_carried : [],
+    insuranceBIPD: parseNumericValue(data.insurance_bipd_on_file) || 0,
+    insuranceBond: parseNumericValue(data.insurance_bond_on_file) || 0,
+    insuranceCargo: parseNumericValue(data.insurance_cargo_on_file) || 0,
+    riskScore: data.risk_score || ''
   };
 
   console.log('Mapped data:', mappedData);
