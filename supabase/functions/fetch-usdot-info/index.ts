@@ -1,5 +1,4 @@
 
-import { createClient } from '@supabase/supabase-js';
 import { corsHeaders } from '../_shared/cors';
 
 const CARRIER_OK_API_URL = 'https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite';
