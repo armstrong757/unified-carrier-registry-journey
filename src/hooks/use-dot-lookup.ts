@@ -127,6 +127,44 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             }
 
             dotData = apiData.items[0];
+
+            // Store or update the data in usdot_info table if it was from API
+            const mappedDataForStorage = mapAPIResponse(dotData);
+            const { error: upsertError } = await supabase
+              .from('usdot_info')
+              .upsert({
+                usdot_number: trimmedDOT,
+                basics_data: dotData,
+                legal_name: mappedDataForStorage.legal_name,
+                dba_name: mappedDataForStorage.dba_name,
+                api_dba_name: mappedDataForStorage.api_dba_name,
+                api_dba_flag: mappedDataForStorage.api_dba_flag,
+                operating_status: mappedDataForStorage.operating_status,
+                entity_type: mappedDataForStorage.entity_type,
+                physical_address: mappedDataForStorage.physical_address,
+                telephone: mappedDataForStorage.telephone,
+                power_units: mappedDataForStorage.power_units,
+                drivers: mappedDataForStorage.drivers,
+                mcs150_last_update: mappedDataForStorage.mcs150_last_update,
+                out_of_service: mappedDataForStorage.out_of_service,
+                out_of_service_date: mappedDataForStorage.out_of_service_date,
+                api_physical_address_street: mappedDataForStorage.physical_address_parsed.street,
+                api_physical_address_city: mappedDataForStorage.physical_address_parsed.city,
+                api_physical_address_state: mappedDataForStorage.physical_address_parsed.state,
+                api_physical_address_zip: mappedDataForStorage.physical_address_parsed.zip,
+                api_physical_address_country: mappedDataForStorage.physical_address_parsed.country,
+                api_mailing_address_street: mappedDataForStorage.mailing_address_parsed.street,
+                api_mailing_address_city: mappedDataForStorage.mailing_address_parsed.city,
+                api_mailing_address_state: mappedDataForStorage.mailing_address_parsed.state,
+                api_mailing_address_zip: mappedDataForStorage.mailing_address_parsed.zip,
+                api_mailing_address_country: mappedDataForStorage.mailing_address_parsed.country,
+                updated_at: new Date().toISOString()
+              });
+
+            if (upsertError) {
+              console.error('Error storing USDOT info:', upsertError);
+              throw upsertError;
+            }
           }
 
           // Map and validate the data
@@ -140,6 +178,7 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
           // Transform to USDOTData format
           const transformedData = transformToUSDOTData(mappedData);
 
+          // Only resolve after all data operations are complete
           if (existingFiling) {
             console.log('Found existing filing:', existingFiling);
             resolve({ usdotData: transformedData, resumedFiling: existingFiling });
@@ -147,43 +186,6 @@ export const useDOTLookup = (filingType: 'ucr' | 'mcs150') => {
             resolve({ usdotData: transformedData });
           }
 
-          // Store or update the data in usdot_info table if it was from API
-          if (!useCachedData) {
-            const { error: upsertError } = await supabase
-              .from('usdot_info')
-              .upsert({
-                usdot_number: trimmedDOT,
-                basics_data: dotData,
-                legal_name: mappedData.legal_name,
-                dba_name: mappedData.dba_name,
-                api_dba_name: mappedData.api_dba_name,
-                api_dba_flag: mappedData.api_dba_flag,
-                operating_status: mappedData.operating_status,
-                entity_type: mappedData.entity_type,
-                physical_address: mappedData.physical_address,
-                telephone: mappedData.telephone,
-                power_units: mappedData.power_units,
-                drivers: mappedData.drivers,
-                mcs150_last_update: mappedData.mcs150_last_update,
-                out_of_service: mappedData.out_of_service,
-                out_of_service_date: mappedData.out_of_service_date,
-                api_physical_address_street: mappedData.physical_address_parsed.street,
-                api_physical_address_city: mappedData.physical_address_parsed.city,
-                api_physical_address_state: mappedData.physical_address_parsed.state,
-                api_physical_address_zip: mappedData.physical_address_parsed.zip,
-                api_physical_address_country: mappedData.physical_address_parsed.country,
-                api_mailing_address_street: mappedData.mailing_address_parsed.street,
-                api_mailing_address_city: mappedData.mailing_address_parsed.city,
-                api_mailing_address_state: mappedData.mailing_address_parsed.state,
-                api_mailing_address_zip: mappedData.mailing_address_parsed.zip,
-                api_mailing_address_country: mappedData.mailing_address_parsed.country,
-                updated_at: new Date().toISOString()
-              });
-
-            if (upsertError) {
-              console.error('Error storing USDOT info:', upsertError);
-            }
-          }
         } catch (error) {
           console.error('Error in DOT lookup:', error);
           // Return basic data even if API fails
