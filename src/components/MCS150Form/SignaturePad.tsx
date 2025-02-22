@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas, PencilBrush } from "fabric";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -13,6 +13,7 @@ const SignaturePad = ({
 }: SignaturePadProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricRef = useRef<Canvas | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -56,15 +57,22 @@ const SignaturePad = ({
     };
 
     // Listen to all relevant events
-    canvas.on('mouse:up', updateSignature);
+    canvas.on('mouse:up', () => {
+      setIsDrawing(false);
+      updateSignature();
+    });
+
     canvas.on('mouse:down', () => {
+      setIsDrawing(true);
       canvas.renderAll();
     });
+
     canvas.on('mouse:move', () => {
-      if (canvas.isDrawing) {
+      if (isDrawing) {
         canvas.renderAll();
       }
     });
+
     canvas.on('path:created', updateSignature);
 
     fabricRef.current = canvas;
@@ -75,7 +83,7 @@ const SignaturePad = ({
     return () => {
       canvas.dispose();
     };
-  }, [onChange, isMobile]);
+  }, [onChange, isMobile, isDrawing]);
 
   const handleClear = () => {
     if (fabricRef.current) {
