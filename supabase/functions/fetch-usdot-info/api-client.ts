@@ -1,59 +1,70 @@
 
-import { USDOTResponse } from './types.ts';
+export async function fetchAndValidateData(data: any) {
+  if (!data || !data.items || !Array.isArray(data.items) || data.items.length === 0) {
+    throw new Error('Invalid response format from CarrierOK API');
+  }
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second
-
-async function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  const carrierData = data.items[0];
+  
+  // Map the response to our expected format
+  return {
+    items: [{
+      ...carrierData,
+      // Ensure these fields are always present with default values if needed
+      dba_flag: Boolean(carrierData.dba_flag),
+      dba_name: carrierData.dba_name || '',
+      physical_address: carrierData.physical_address || '',
+      telephone: carrierData.telephone_number || '',
+      power_units: parseInt(carrierData.total_power_units) || 0,
+      drivers: parseInt(carrierData.total_drivers) || 0,
+      mcs150_last_update: carrierData.mcs150_date || null,
+      out_of_service: Boolean(carrierData.out_of_service_flag),
+      out_of_service_date: carrierData.out_of_service_date || null,
+      operating_status: carrierData.usdot_status || 'Unknown',
+      entity_type: carrierData.entity_type_desc || 'Unknown',
+      mileage_year: carrierData.mcs150_year || '',
+      mileage: carrierData.mcs150_mileage || '0',
+      // Parse addresses
+      physical_address_parsed: parseAddress(carrierData.physical_address),
+      mailing_address_parsed: parseAddress(carrierData.physical_address), // Use physical as fallback if mailing not provided
+    }],
+    total_count: 1
+  };
 }
 
-async function fetchWithRetry(url: string, options: RequestInit, retries = MAX_RETRIES): Promise<Response> {
+function parseAddress(addressString: string) {
+  // Default structure
+  const defaultAddress = {
+    street: '',
+    city: '',
+    state: '',
+    zip: '',
+    country: 'USA'
+  };
+
+  if (!addressString) {
+    return defaultAddress;
+  }
+
   try {
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Expected format: "street, city, state zip"
+    const parts = addressString.split(',').map(part => part.trim());
+    
+    if (parts.length >= 2) {
+      const street = parts[0];
+      const cityStateZip = parts[parts.length - 1].split(' ');
+      
+      return {
+        street: street,
+        city: parts[1],
+        state: cityStateZip[0] || '',
+        zip: cityStateZip[1] || '',
+        country: 'USA'
+      };
     }
-    return response;
   } catch (error) {
-    if (retries > 0) {
-      console.log(`Retry attempt ${MAX_RETRIES - retries + 1} for CarrierOK API request`);
-      await sleep(RETRY_DELAY);
-      return fetchWithRetry(url, options, retries - 1);
-    }
-    throw error;
-  }
-}
-
-export async function getCarrierOKProfile(dotNumber: string): Promise<{ items: USDOTResponse[] }> {
-  const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
-  if (!apiKey) {
-    throw new Error('CARRIER_OK_API_KEY is not set');
+    console.error('Error parsing address:', error);
   }
 
-  const url = `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot=${dotNumber}`;
-  
-  console.log(`Making request to CarrierOK API for DOT: ${dotNumber}`);
-  
-  try {
-    const response = await fetchWithRetry(url, {
-      method: 'GET',
-      headers: {
-        'X-Api-Key': apiKey,
-        'Accept': 'application/json',
-      },
-    });
-
-    const data = await response.json();
-    console.log('CarrierOK API Response:', data);
-
-    if (!data.items || !Array.isArray(data.items) || data.items.length === 0) {
-      throw new Error('No carrier data found');
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Error fetching from CarrierOK API:', error);
-    throw new Error(`Failed to fetch carrier data: ${error.message}`);
-  }
+  return defaultAddress;
 }

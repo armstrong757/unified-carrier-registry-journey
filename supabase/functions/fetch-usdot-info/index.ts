@@ -1,125 +1,69 @@
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { corsHeaders } from '../_shared/cors.ts'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { fetchAndValidateData } from "./api-client.ts";
 
-function validateDOTNumber(dotNumber: string): boolean {
-  // Clean the DOT number by removing any non-digit characters
-  const cleanDotNumber = dotNumber.replace(/\D/g, '');
-  // DOT numbers are typically 5-7 digits
-  return /^\d{5,7}$/.test(cleanDotNumber);
-}
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        ...corsHeaders,
-        'Access-Control-Max-Age': '86400',
-      },
-    })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Ensure the request is a POST
-    if (req.method !== 'POST') {
-      throw new Error('Method not allowed');
+    const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
+    if (!apiKey) {
+      throw new Error('CARRIER_OK_API_KEY environment variable is not set');
     }
 
-    let requestBody;
-    try {
-      const text = await req.text();
-      console.log('Raw request body:', text);
-      
-      if (!text) {
-        throw new Error('Empty request body');
-      }
-      
-      requestBody = JSON.parse(text);
-      console.log('Parsed request body:', requestBody);
-    } catch (e) {
-      console.error('Error parsing request body:', e);
-      throw new Error(`Invalid request body: ${e.message}`);
-    }
-
-    const { dotNumber } = requestBody;
-
+    // Parse request body
+    const { dotNumber } = await req.json();
     if (!dotNumber) {
       throw new Error('DOT number is required');
     }
 
-    const cleanDotNumber = dotNumber.toString().trim();
-    
-    if (!validateDOTNumber(cleanDotNumber)) {
-      throw new Error('Invalid DOT number format. Must be 5-7 digits.');
-    }
+    console.log('Fetching data for DOT:', dotNumber);
 
-    console.log('Processing DOT number:', cleanDotNumber);
-
-    // Fetch carrier data from CarrierOK API
-    const apiKey = Deno.env.get('CARRIER_OK_API_KEY');
-    if (!apiKey) {
-      throw new Error('API key not configured');
-    }
-
-    // Changed 'dot' to 'dot_number' in the URL parameter
-    const apiUrl = `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile-lite?dot_number=${encodeURIComponent(cleanDotNumber)}`;
-    console.log('Making request to CarrierOK API...');
-
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'X-Api-Key': apiKey,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
-
-    const responseText = await response.text();
-    console.log('CarrierOK API raw response:', responseText);
+    const response = await fetch(
+      `https://carrier-okay-6um2cw59.uc.gateway.dev/api/v2/profile?dot=${dotNumber}`,
+      {
+        method: 'GET',
+        headers: {
+          'X-Api-Key': apiKey,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
     if (!response.ok) {
-      throw new Error(`CarrierOK API error: ${response.status} ${response.statusText}\nResponse: ${responseText}`);
+      console.error('CarrierOK API error:', response.status, await response.text());
+      throw new Error(`CarrierOK API returned status ${response.status}`);
     }
 
-    let data;
-    try {
-      data = JSON.parse(responseText);
-      console.log('CarrierOK API parsed response:', data);
-    } catch (e) {
-      console.error('Error parsing API response:', e);
-      throw new Error('Invalid response from CarrierOK API');
-    }
+    const data = await response.json();
+    console.log('CarrierOK API parsed response:', JSON.stringify(data, null, 2));
 
-    if (!data.items || !Array.isArray(data.items)) {
-      throw new Error('Invalid API response format');
-    }
+    // Validate and clean the response
+    const validatedData = await fetchAndValidateData(data);
 
-    if (data.items.length === 0) {
-      throw new Error(`No carrier found with DOT number ${cleanDotNumber}`);
-    }
-
-    return new Response(JSON.stringify(data), {
-      headers: { 
-        ...corsHeaders,
-        'Content-Type': 'application/json',
-      },
-      status: 200,
+    return new Response(JSON.stringify(validatedData), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     console.error('Error in fetch-usdot-info:', error);
-    
-    const errorResponse = {
-      error: error.message || 'An unexpected error occurred',
-      timestamp: new Date().toISOString(),
-      details: error.stack,
-    };
-
-    return new Response(JSON.stringify(errorResponse), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: error.status || 500,
-    });
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        details: 'Failed to fetch USDOT information'
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
