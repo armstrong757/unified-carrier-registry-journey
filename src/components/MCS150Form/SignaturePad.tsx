@@ -36,13 +36,26 @@ const SignaturePad = ({
     pencilBrush.color = "#000000";
     canvas.freeDrawingBrush = pencilBrush;
 
-    // Update signature data whenever a path is created (stroke completed)
-    canvas.on('path:created', () => {
-      onChange(canvas.toDataURL({
-        format: 'png',
-        quality: 1,
-        multiplier: 1
-      }));
+    // Update signature data whenever a stroke is completed
+    canvas.on('mouse:up', () => {
+      if (!canvas.isEmpty()) {
+        onChange(canvas.toDataURL({
+          format: 'png',
+          quality: 1,
+          multiplier: 1
+        }));
+      }
+    });
+
+    // For touch devices
+    canvas.on('touch:end', () => {
+      if (!canvas.isEmpty()) {
+        onChange(canvas.toDataURL({
+          format: 'png',
+          quality: 1,
+          multiplier: 1
+        }));
+      }
     });
 
     fabricRef.current = canvas;
