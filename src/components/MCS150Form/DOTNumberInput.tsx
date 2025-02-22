@@ -20,11 +20,15 @@ export const DOTNumberInput = () => {
 
     const result = await lookupDOT(dotNumber);
     if (result) {
+      // Store the data in session storage for persistence
+      sessionStorage.setItem('usdotData', JSON.stringify(result.usdotData));
+      
       navigate("/mcs150", {
         state: {
           usdotData: result.usdotData,
           resumedFiling: result.resumedFiling
-        }
+        },
+        replace: true // Use replace to prevent back navigation issues
       });
     }
   };

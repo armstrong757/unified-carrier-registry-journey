@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -29,44 +30,43 @@ export const useFilingInitialization = ({
     const stateData = location.state?.usdotData;
     const resumedFiling = location.state?.resumedFiling;
     
-    if (stateData) {
-      console.log('Initializing MCS-150 form with state data');
-      setUsdotData(stateData);
-      
-      const initializeFiling = async () => {
-        try {
-          if (resumedFiling) {
-            console.log('Resuming existing MCS-150 filing');
-            setFilingId(resumedFiling.id);
-            setFormData(resumedFiling.form_data);
-            setCurrentStep(resumedFiling.last_step_completed || 1);
+    const initializeFiling = async (data: any) => {
+      try {
+        if (resumedFiling) {
+          console.log('Resuming existing MCS-150 filing');
+          setFilingId(resumedFiling.id);
+          setFormData(resumedFiling.form_data);
+          setCurrentStep(resumedFiling.last_step_completed || 1);
+        } else {
+          console.log('Creating new MCS-150 filing');
+          const filing = await createFiling(data.usdotNumber, 'mcs150', formData);
+          if (filing) {
+            setFilingId(filing.id);
           } else {
-            console.log('Creating new MCS-150 filing');
-            const filing = await createFiling(stateData.usdotNumber, 'mcs150', formData);
-            if (filing) {
-              setFilingId(filing.id);
-            } else {
-              throw new Error('Failed to create filing');
-            }
-          }
-          setIsInitialized(true);
-        } catch (error) {
-          console.error('Error initializing MCS-150 filing:', error);
-          if (!location.state?.usdotData) {
-            toast({
-              title: "Error",
-              description: "Failed to initialize filing. Please try again.",
-              variant: "destructive",
-            });
-            navigate('/mcs-150-filing');
+            throw new Error('Failed to create filing');
           }
         }
-      };
-      
-      initializeFiling();
+        setIsInitialized(true);
+      } catch (error) {
+        console.error('Error initializing MCS-150 filing:', error);
+        toast({
+          title: "Error",
+          description: "Failed to initialize filing. Please try again.",
+          variant: "destructive",
+        });
+        navigate('/mcs-150-filing');
+      }
+    };
+
+    if (stateData) {
+      console.log('Using state USDOT data for initialization');
+      setUsdotData(stateData);
+      sessionStorage.setItem('usdotData', JSON.stringify(stateData));
+      initializeFiling(stateData);
       return;
     }
 
+    // Try to get data from session storage
     const storedData = sessionStorage.getItem('usdotData');
     if (!storedData) {
       console.log('No DOT data found in session storage');
@@ -84,30 +84,9 @@ export const useFilingInitialization = ({
       if (!parsedData.usdotNumber) {
         throw new Error('Invalid USDOT data');
       }
-      console.log('Using stored DOT data for MCS-150');
+      console.log('Using stored DOT data for initialization');
       setUsdotData(parsedData);
-      
-      const initializeFiling = async () => {
-        try {
-          const filing = await createFiling(parsedData.usdotNumber, 'mcs150', formData);
-          if (filing) {
-            setFilingId(filing.id);
-            setIsInitialized(true);
-          } else {
-            throw new Error('Failed to create filing');
-          }
-        } catch (error) {
-          console.error('Error creating MCS-150 filing:', error);
-          toast({
-            title: "Error",
-            description: "Failed to initialize filing. Please try again.",
-            variant: "destructive",
-          });
-          navigate('/mcs-150-filing');
-        }
-      };
-      
-      initializeFiling();
+      initializeFiling(parsedData);
     } catch (error) {
       console.error('Error parsing stored USDOT data:', error);
       toast({
