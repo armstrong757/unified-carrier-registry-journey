@@ -10,27 +10,38 @@ const addressSchema = z.object({
   country: z.string().default('USA')
 });
 
+// Updated schema to match actual API response
 const dotDataSchema = z.object({
-  usdot_number: z.string(),
+  dot_number: z.string(),
+  docket_prefix: z.string().optional(),
+  docket_number: z.string().optional(),
+  docket: z.string().optional(),
   legal_name: z.string(),
+  dba_flag: z.boolean().optional(),
   dba_name: z.string().optional(),
-  api_dba_name: z.string().optional(),
-  api_dba_flag: z.boolean(),
-  operating_status: z.string(),
-  entity_type: z.string().optional(),
+  usdot_status: z.string(),
+  entity_type_desc: z.string().optional(),
+  total_power_units: z.string().optional(),
+  total_drivers: z.string().optional(),
   physical_address: z.string().optional(),
-  telephone: z.string().nullable().optional(),
-  power_units: z.number().nonnegative(),
-  drivers: z.number().nonnegative(),
-  mcs150_last_update: z.string().nullable(),
-  out_of_service: z.boolean(),
-  out_of_service_date: z.string().nullable(),
-  physical_address_parsed: addressSchema,
-  mailing_address_parsed: addressSchema,
+  physical_address_street: z.string().optional(),
+  physical_address_city: z.string().optional(),
+  physical_address_state: z.string().optional(),
+  physical_address_zip_code: z.string().optional(),
+  telephone_number: z.string().optional(),
+  mcs150_year: z.string().optional(),
+  mcs150_date: z.string().optional(),
+  mcs150_mileage: z.string().optional(),
+  insurance_bipd_on_file: z.string().optional(),
+  insurance_bond_on_file: z.string().optional(),
+  insurance_cargo_on_file: z.string().optional(),
+  out_of_service_flag: z.boolean().optional(),
+  risk_score: z.string().optional()
 });
 
 export function validateDOTData(data: unknown) {
   try {
+    console.log('Validating data:', data);
     return dotDataSchema.parse(data);
   } catch (error) {
     console.error('Data validation error:', error);
