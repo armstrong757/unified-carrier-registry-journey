@@ -33,12 +33,13 @@ Deno.serve(async (req) => {
       throw new Error('CARRIER_OK_API_KEY not configured');
     }
 
-    // Make request to CarrierOK API with proper formatting
+    // Make request to CarrierOK API with correct URL format
+    console.log(`Making request to: ${CARRIER_OK_API_URL}/${dotNumber}`);
     const response = await fetch(`${CARRIER_OK_API_URL}/${dotNumber}`, {
       method: 'GET',
       headers: {
         'X-Api-Key': apiKey,
-        'Accept': 'application/json'
+        'Accept': 'application/json',
       }
     });
 
@@ -55,16 +56,23 @@ Deno.serve(async (req) => {
         );
       }
       
-      throw new Error(`CarrierOK API error: ${errorText || response.status}`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to fetch from CarrierOK API',
+          details: errorText
+        }),
+        { status: response.status, headers: corsHeaders }
+      );
     }
 
     const data = await response.json();
     console.log('CarrierOK API response data:', JSON.stringify(data));
 
+    // Validate response structure
     if (!data.items?.[0]) {
       return new Response(
-        JSON.stringify({ error: 'No data found for this DOT number' }),
-        { status: 404, headers: corsHeaders }
+        JSON.stringify({ error: 'Invalid response format from CarrierOK API' }),
+        { status: 500, headers: corsHeaders }
       );
     }
 
@@ -77,7 +85,7 @@ Deno.serve(async (req) => {
     console.error('Error in fetch-usdot-info:', error);
     return new Response(
       JSON.stringify({
-        error: 'Failed to fetch USDOT information',
+        error: 'Internal server error',
         details: error.message
       }),
       { status: 500, headers: corsHeaders }
