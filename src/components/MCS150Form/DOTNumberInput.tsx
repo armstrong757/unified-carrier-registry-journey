@@ -14,16 +14,17 @@ export const DOTNumberInput = () => {
   const { lookupDOT, isLoading } = useDOTLookup('mcs150');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Ensure this is called immediately
+    e.preventDefault();
     
     if (checkBotAttempt()) return;
 
     try {
       const result = await lookupDOT(dotNumber);
       if (result?.usdotData) {
-        const usdotDataString = JSON.stringify(result.usdotData);
-        sessionStorage.setItem('usdotData', usdotDataString);
+        // Store the data in session storage
+        sessionStorage.setItem('usdotData', JSON.stringify(result.usdotData));
         
+        // Use replace: true to prevent back button issues
         navigate("/mcs150", {
           state: {
             usdotData: result.usdotData,
@@ -45,7 +46,7 @@ export const DOTNumberInput = () => {
           type="text" 
           placeholder="Enter USDOT Number here" 
           value={dotNumber} 
-          onChange={e => setDotNumber(e.target.value)} 
+          onChange={(e) => setDotNumber(e.target.value.trim())}
           className="w-full text-lg py-6" 
           disabled={isLoading} 
         />
